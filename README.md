@@ -19,3 +19,16 @@ High-level tasks and goals:
 - [ ] Dissect chromoskein rendering code
 - [ ] Learn limits of implicit surface rendering without WebGPU (only WebGL)
 - [ ] Compare existing frameworks and see whether there's an option better than three.js (current favorite)
+
+## Next
+(only one task allowed here)
+- [ ] instanced mesh using threejs (reuse some of the threlte code)
+
+## To Do
+- [ ] basic instanced billboards in threejs
+- [ ] loading data
+  - [ ] PDB (easy, use from chromoskein)
+  - [ ] nucle3d (4DN used format, text-based)
+
+
+## Done or canceled
