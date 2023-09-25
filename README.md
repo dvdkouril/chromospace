@@ -14,6 +14,7 @@ MVP Requirements:
 - [ ] implicit surface rendering
 - [ ] representations: spheres, tubes
 - [ ] SSAO
+- [ ] coloring of the structure
 
 High-level tasks and goals:
 - [ ] Dissect chromoskein rendering code
