@@ -14,8 +14,9 @@
     - holds the data
     - has 1+ cameras
     - 
-- Data loader
+- Data loaders
 - Renderer:
+    - probably start with basic mesh renderer
     - implicit surface rendering via impostors
 
 # 3D chromatin data
@@ -26,3 +27,9 @@
 
 # library name ideas
 small module for rendering chromatin data
+tribit?
+mohair
+3d, three, tri
+3bit - like the candy
+anything that's based on vis, three, 3D, genome...sucks
+some german word?

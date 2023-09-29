@@ -1,83 +1,55 @@
 <script lang="ts">
+	import { Viewport3D } from '$lib/Viewport3D';
 	import { onMount } from 'svelte';
-	import * as THREE from 'three';
+	import { ChromatinScene } from '$lib/ChromatinScene';
+	import { getRange } from '$lib/ChromatinModel';
 
 	let test = 'test';
 
 	onMount(() => {
 		const canvas = document.querySelector('#c');
-		const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 
-		const fov = 75;
-		const aspect = 2; // the canvas default
-		const near = 0.1;
-		const far = 5;
-		const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-		camera.position.z = 2;
-
-		const scene = new THREE.Scene();
-
-		{
-			const color = 0xffffff;
-			const intensity = 3;
-			const light = new THREE.DirectionalLight(color, intensity);
-			light.position.set(-1, 2, 4);
-			scene.add(light);
+		if (canvas) {
+			let viewport = new Viewport3D(canvas);
+		} else {
+			console.log('No canvas!');
 		}
 
-		const boxWidth = 1;
-		const boxHeight = 1;
-		const boxDepth = 1;
-		const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+		//~ just sketching out the API
+		let scene = new ChromatinScene();
+		const models = scene.allModels();
 
-		function makeInstance(geometry, color, x) {
-			const material = new THREE.MeshPhongMaterial({ color });
-			const customShaderMaterial = new THREE.ShaderMaterial();
+		const testModel = (models.length > 0) ? models.at(0) : null;
 
-			const cube = new THREE.Mesh(geometry, material);
-			scene.add(cube);
+		if (!testModel) return;
 
-			cube.position.x = x;
-
-			return cube;
-		}
-
-		const cubes = [
-			makeInstance(geometry, 0x44aa88, 0),
-			makeInstance(geometry, 0x8844aa, -2),
-			makeInstance(geometry, 0xaa8844, 2)
-		];
-
-		function render(time) {
-			time *= 0.001; // convert time to seconds
-
-			cubes.forEach((cube, ndx) => {
-				const speed = 1 + ndx * 0.1;
-				const rot = time * speed;
-				cube.rotation.x = rot;
-				cube.rotation.y = rot;
-			});
-
-			renderer.render(scene, camera);
-
-			requestAnimationFrame(render);
-		}
-
-		requestAnimationFrame(render);
+		// const partA = testModel.getRange("chr1:123-321"); //~ => bins: XYZ[] (range completely available)
+		const partA = getRange(testModel, "chr1:123-321"); //~ => bins: XYZ[] (range completely available)
+														  //~ => bins: XYZ[] (only part of the range was available; maybe error in this case?)
+														  //~ => error (genomic coordinates range not available in the model)
+														  //~ => also could have several results when a model has overlapping parts
 	});
 </script>
 
-<canvas id="c" />
+<div style="margin: 0;">
+	<canvas id="c" />
+</div>
 
 <style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
 	html,
 	body {
 		margin: 0;
 		height: 100%;
+		padding: 0;
 	}
 	#c {
 		width: 100%;
 		height: 100%;
 		display: block;
+		position: absolute;
 	}
 </style>
