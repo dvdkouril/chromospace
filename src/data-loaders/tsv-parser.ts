@@ -1,9 +1,10 @@
-import type { BinPosition, ChromatinChunk } from "../chromatin";
+import type { ChromatinChunk } from '../chromatin';
+import { vec3 } from 'gl-matrix';
 
 export const parseTsv = (fileContent: string): ChromatinChunk => {
     const tsvLines = fileContent.split('\n');
 
-    let bins: BinPosition[] = [];
+    let bins: vec3[] = [];
     tsvLines.forEach((line) => {
         const tokens = line.split('\t');
         if (tokens.length < 3) {
@@ -14,8 +15,13 @@ export const parseTsv = (fileContent: string): ChromatinChunk => {
         const y = parseFloat(tokens[1]);
         const z = parseFloat(tokens[2]);
 
-        bins.push({x: x, y: y, z: z});
+        bins.push(vec3.fromValues(x, y, z));
     });
 
-    return { bins: bins };
+    const normalized: vec3[] = [];
+
+    return { 
+        bins: bins, 
+        binsNormalized: normalized,
+    };
 };

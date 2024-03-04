@@ -1,8 +1,4 @@
-export type BinPosition = {
-    x: number;
-    y: number;
-    z: number;
-};
+import { vec3 } from 'gl-matrix';
 
 export type GenomicCoordinates = {
     start: number;
@@ -10,7 +6,7 @@ export type GenomicCoordinates = {
 };
 
 export type ChromatinPart = {
-    bins: BinPosition[];
+    bins: vec3[];
     coordinates: GenomicCoordinates;
     resolution: number;
     label?: string; //~ placeholder for determining some semantics of this part (e.g., chromosome, gene location)
@@ -19,7 +15,8 @@ export type ChromatinPart = {
 // The idea is that you want to have completely anonymous parts, too
 // for when you don't have any other identifying data about the bins.
 export type ChromatinChunk = {
-    bins: BinPosition[];
+    bins: vec3[];
+    binsNormalized: vec3[];
 };
 
 export type ChromatinModel = {
