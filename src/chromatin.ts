@@ -1,4 +1,8 @@
-import type { Vector3 } from "three";
+export type BinPosition = {
+    x: number;
+    y: number;
+    z: number;
+};
 
 export type GenomicCoordinates = {
     start: number;
@@ -6,7 +10,7 @@ export type GenomicCoordinates = {
 };
 
 export type ChromatinPart = {
-    bins: Vector3[];
+    bins: BinPosition[];
     coordinates: GenomicCoordinates;
     resolution: number;
     label?: string; //~ placeholder for determining some semantics of this part (e.g., chromosome, gene location)
@@ -15,12 +19,31 @@ export type ChromatinPart = {
 // The idea is that you want to have completely anonymous parts, too
 // for when you don't have any other identifying data about the bins.
 export type ChromatinChunk = {
-    bins: Vector3[];
+    bins: BinPosition[];
 };
 
 export type ChromatinModel = {
     parts: ChromatinPart[];
-    position: Vector3;
+    position: {x: number; y: number; z: number};
+}
+
+export type ChromatinScene = {
+    chunks: ChromatinChunk[];
+    models: ChromatinModel[];
+}
+
+export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk) {
+    scene = {
+        ...scene,
+        chunks: [...scene.chunks, chunk]
+    };
+}
+
+export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
+    scene = {
+        ...scene,
+        models: [...scene.models, model]
+    };
 }
 
 /**
@@ -29,6 +52,7 @@ export type ChromatinModel = {
  * @returns chromatin part, i.e., list of bin positions corresponding to the genomic coordinates
  */
 export function getRange(model: ChromatinModel, coordinates: string): ChromatinPart | null {
+    console.log(`getRange with ${model} and ${coordinates}`);
 
     return null;
 }

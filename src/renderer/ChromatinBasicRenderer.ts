@@ -1,20 +1,12 @@
 import { WebGLRenderer, Scene, PerspectiveCamera } from 'three';
 
 export class ChromatinBasicRenderer {
-    canvasElement: HTMLCanvasElement | null;
-
     //~ threejs stuff
     renderer: WebGLRenderer;
     scene: Scene;
     camera: PerspectiveCamera;
 
-    constructor(canvas: HTMLCanvasElement | null = null) {
-        this.canvasElement = canvas;
-        
-        if (canvas == null) {
-            this.canvasElement = document.createElement('canvas');
-        }
-
+    constructor(canvas: HTMLCanvasElement | undefined = undefined) {
         this.renderer = new WebGLRenderer({ antialias: true, canvas });
         this.renderer.setClearColor("#eeeeee");
         this.scene = new Scene();
@@ -24,6 +16,11 @@ export class ChromatinBasicRenderer {
         this.camera.position.z = 5;
 
         this.render = this.render.bind(this);
+        this.getCanvasElement = this.getCanvasElement.bind(this);
+    }
+
+    getCanvasElement(): HTMLCanvasElement {
+        return this.renderer.domElement;
     }
 
     startDrawing() {

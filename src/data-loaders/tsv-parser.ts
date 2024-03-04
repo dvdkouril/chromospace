@@ -1,10 +1,9 @@
-import type { ChromatinChunk } from "$lib/chromatin";
-import { Vector3 } from "three";
+import type { BinPosition, ChromatinChunk } from "../chromatin";
 
 export const parseTsv = (fileContent: string): ChromatinChunk => {
     const tsvLines = fileContent.split('\n');
 
-    let bins: Vector3[] = [];
+    let bins: BinPosition[] = [];
     tsvLines.forEach((line) => {
         const tokens = line.split('\t');
         if (tokens.length < 3) {
@@ -15,7 +14,7 @@ export const parseTsv = (fileContent: string): ChromatinChunk => {
         const y = parseFloat(tokens[1]);
         const z = parseFloat(tokens[2]);
 
-        bins.push(new Vector3(x, y, z));
+        bins.push({x: x, y: y, z: z});
     });
 
     return { bins: bins };
