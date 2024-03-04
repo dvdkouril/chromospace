@@ -2,6 +2,7 @@ import './style.css'
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer.ts";
 import { parseTsv } from './data-loaders/tsv-parser.ts';
 import { ChromatinScene, addChunkToScene } from './chromatin.ts';
+import { recenter, normalize } from './utils.ts';
 
 const testData = `
 86.264829	49.017552	-44.123079
@@ -28,10 +29,13 @@ const testData = `
 164.155166	105.109803	-96.801097
 `;
 
-const testChunk = parseTsv(testData);
+const testChunk = parseTsv(testData); //~ parseTsv(data, center = true) ? 
 console.log("testChunk: ");
 console.log(testChunk);
+testChunk.bins = recenter(testChunk.bins);
+testChunk.bins = normalize(testChunk.bins);
 
+//~ create a scene
 let chromatinScene: ChromatinScene = {
     chunks: [],
     models: [],
