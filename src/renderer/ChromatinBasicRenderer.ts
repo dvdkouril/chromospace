@@ -1,6 +1,9 @@
-import { WebGLRenderer, Scene, PerspectiveCamera } from 'three';
+import { WebGLRenderer, Scene, PerspectiveCamera, BoxGeometry, MeshBasicMaterial, Mesh } from 'three';
+import { ChromatinScene } from '../chromatin';
 
 export class ChromatinBasicRenderer {
+    chromatinScene: ChromatinScene | undefined;
+
     //~ threejs stuff
     renderer: WebGLRenderer;
     scene: Scene;
@@ -21,6 +24,24 @@ export class ChromatinBasicRenderer {
 
     getCanvasElement(): HTMLCanvasElement {
         return this.renderer.domElement;
+    }
+
+    addScene(scene: ChromatinScene) {
+        this.chromatinScene = scene;
+
+        const geometry = new BoxGeometry( 1, 1, 1 );
+        const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+        const cube = new Mesh( geometry, material );
+
+        for (let chunk of scene.chunks) {
+            for (let b of chunk.bins) {
+                // cube.position.set(b.x, b.y, b.z);
+                cube.position.set(0, 0, 0);
+                this.scene.add(cube);
+            }
+        }
+
+        //~ TODO: scene.models
     }
 
     startDrawing() {

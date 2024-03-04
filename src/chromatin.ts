@@ -32,11 +32,12 @@ export type ChromatinScene = {
     models: ChromatinModel[];
 }
 
-export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk) {
+export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk): ChromatinScene {
     scene = {
         ...scene,
         chunks: [...scene.chunks, chunk]
     };
+    return scene;
 }
 
 export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {

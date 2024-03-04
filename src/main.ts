@@ -32,15 +32,16 @@ const testChunk = parseTsv(testData);
 console.log("testChunk: ");
 console.log(testChunk);
 
-const chromatinScene: ChromatinScene = {
+let chromatinScene: ChromatinScene = {
     chunks: [],
     models: [],
 };
-addChunkToScene(chromatinScene, testChunk);
+chromatinScene = addChunkToScene(chromatinScene, testChunk);
 console.log(chromatinScene);
 
 //~ create renderer
 const renderer = new ChromatinBasicRenderer();
+renderer.addScene(chromatinScene);
 
 //~ add canvas to the page
 let appEl = document.querySelector<HTMLDivElement>('#app')!;
