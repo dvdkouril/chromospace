@@ -2,6 +2,7 @@ import { WebGLRenderer, Scene, PerspectiveCamera, MeshBasicMaterial, Mesh, Spher
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ChromatinChunk, ChromatinScene } from '../chromatin';
 import { vec3 } from 'gl-matrix';
+import { estimateBestSphereSize } from '../utils';
 
 export class ChromatinBasicRenderer {
     chromatinScene: ChromatinScene | undefined;
@@ -20,7 +21,7 @@ export class ChromatinBasicRenderer {
         this.camera = new PerspectiveCamera( 75, 800 / 600, 0.1, 1000 );
         const controls = new OrbitControls(this.camera, this.renderer.domElement );
 
-        this.camera.position.z = 5;
+        this.camera.position.z = 1.5;
         controls.update();
 
         const lightA = new DirectionalLight();
@@ -56,8 +57,10 @@ export class ChromatinBasicRenderer {
     }
 
     buildPart(chunk: ChromatinChunk): Mesh[] {
-        const sphereGeometry = new SphereGeometry(0.08);
-        const tubeGeometry = new CylinderGeometry(0.05, 0.05, 1.0, 3, 1);
+        const sphereSize = estimateBestSphereSize(chunk.bins);
+        const tubeSize = 0.8 * sphereSize;
+        const sphereGeometry = new SphereGeometry(sphereSize);
+        const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 3, 1);
 
         // const material = new MeshBasicMaterial( { color: 0x00ff00 } );
         // const color = 0x00ff00;

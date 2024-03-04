@@ -29,7 +29,13 @@ const testData = `
 164.155166	105.109803	-96.801097
 `;
 
-const testChunk = parseTsv(testData); //~ parseTsv(data, center = true) ? 
+const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
+const response = await fetch(url);
+if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
+const fileContent = await response.text();
+
+const testChunk = parseTsv(fileContent); //~ parseTsv(data, center = true) ? 
+// const testChunk = parseTsv(testData); //~ parseTsv(data, center = true) ? 
 console.log("testChunk: ");
 console.log(testChunk);
 testChunk.bins = recenter(testChunk.bins);
