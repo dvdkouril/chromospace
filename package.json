@@ -1,6 +1,5 @@
 {
   "name": "chromospace",
-  "private": true,
   "version": "0.0.1",
   "author": "David Kouřil <david.kouril@gmail.com>",
   "type": "module",
