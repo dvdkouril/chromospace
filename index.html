@@ -8,6 +8,53 @@
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <!-- <script type="module" src="/src/main.ts"></script> -->
+    <script type="module">
+    import { ChromatinBasicRenderer } from "./src/renderer/ChromatinBasicRenderer.ts";
+    import { parseTsv } from './src/data-loaders/tsv-parser.ts';
+    import { addChunkToScene } from './src/chromatin.ts';
+
+      console.log("hello!");
+
+      const fetchTsv = async (url) => {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
+          const fileContent = await response.text();
+          return fileContent;
+      };
+
+      (async () => {
+          const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
+          const fileContent = await fetchTsv(url);
+          const testChunk = parseTsv(fileContent, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+          console.log(testChunk);
+
+          //~ create a scene
+          let chromatinScene = {
+              chunks: [],
+              models: [],
+          };
+          chromatinScene = addChunkToScene(chromatinScene, testChunk);
+          console.log(chromatinScene);
+
+          //~ create renderer
+          const renderer = new ChromatinBasicRenderer();
+          renderer.addScene(chromatinScene);
+
+          //~ add canvas to the page
+          let appEl = document.querySelector('#app');
+          const w = 800;
+          const h = 600;
+          const canvas = renderer.getCanvasElement();
+          if (canvas) {
+              canvas.width = w;
+              canvas.height = h;
+              appEl.appendChild(canvas);
+          }
+
+          //~ initialize render loop
+          renderer.startDrawing();
+      })();
+    </script>
   </body>
 </html>
