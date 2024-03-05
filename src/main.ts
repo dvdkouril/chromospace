@@ -2,7 +2,6 @@ import './style.css'
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer.ts";
 import { parseTsv } from './data-loaders/tsv-parser.ts';
 import { ChromatinScene, addChunkToScene } from './chromatin.ts';
-import { recenter, normalize } from './utils.ts';
 
 // const testData = `
 // 86.264829	49.017552	-44.123079
@@ -40,10 +39,8 @@ const fetchTsv = async (url: string): Promise<string> => {
 (async () => {
     const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
     const fileContent = await fetchTsv(url);
-    const testChunk = parseTsv(fileContent); //~ parseTsv(data, center = true) ? 
+    const testChunk = parseTsv(fileContent, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
     console.log(testChunk);
-    testChunk.bins = recenter(testChunk.bins);
-    testChunk.bins = normalize(testChunk.bins);
 
     //~ create a scene
     let chromatinScene: ChromatinScene = {
@@ -71,13 +68,4 @@ const fetchTsv = async (url: string): Promise<string> => {
     //~ initialize render loop
     renderer.startDrawing();
 })();
-
-// const testChunk = parseTsv(fileContent); //~ parseTsv(data, center = true) ? 
-// const testChunk = parseTsv(testData); //~ parseTsv(data, center = true) ? 
-// console.log("testChunk: ");
-// console.log(testChunk);
-// testChunk.bins = recenter(testChunk.bins);
-// testChunk.bins = normalize(testChunk.bins);
-
-
 

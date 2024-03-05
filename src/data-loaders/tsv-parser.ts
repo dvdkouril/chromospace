@@ -1,7 +1,8 @@
 import type { ChromatinChunk } from '../chromatin';
 import { vec3 } from 'gl-matrix';
+import { LoadOptions, normalize, recenter } from './loader-utils';
 
-export const parseTsv = (fileContent: string): ChromatinChunk => {
+export const parseTsv = (fileContent: string, options: LoadOptions): ChromatinChunk => {
     const tsvLines = fileContent.split('\n');
 
     let bins: vec3[] = [];
@@ -18,10 +19,19 @@ export const parseTsv = (fileContent: string): ChromatinChunk => {
         bins.push(vec3.fromValues(x, y, z));
     });
 
-    const normalized: vec3[] = [];
+    const rawBins = bins;
+
+    if (options.center) {
+        bins = recenter(bins);
+    }
+    
+    if (options.normalize) {
+        bins = normalize(bins);
+    }
+
 
     return { 
         bins: bins, 
-        binsNormalized: normalized,
+        rawBins: rawBins,
     };
 };

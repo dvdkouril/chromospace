@@ -16,7 +16,7 @@ export type ChromatinPart = {
 // for when you don't have any other identifying data about the bins.
 export type ChromatinChunk = {
     bins: vec3[];
-    binsNormalized: vec3[];
+    rawBins: vec3[]; //~ bin positions before any processing (recenter, normalize)
 };
 
 export type ChromatinModel = {
