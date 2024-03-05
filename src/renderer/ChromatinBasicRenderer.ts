@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, PerspectiveCamera, MeshBasicMaterial, Mesh, SphereGeometry, CylinderGeometry, Vector3, Euler, Quaternion, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
+import { WebGLRenderer, Scene, PerspectiveCamera, Mesh, SphereGeometry, CylinderGeometry, Vector3, Euler, Quaternion, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ChromatinChunk, ChromatinScene } from '../chromatin';
 import { vec3 } from 'gl-matrix';

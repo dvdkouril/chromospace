@@ -2,11 +2,21 @@
   "name": "chromospace",
   "private": true,
   "version": "0.0.0",
+  "author": "David Kouřil <david.kouril@gmail.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
+  },
+  "files": ["dist"],
+  "main": "./dist/chromospace.umd.cjs",
+  "module": "./dist/chromospace.js",
+  "exports": {
+    ".": {
+      "import": "./dist/chromospace.js",
+      "require": "./dist/chromospace.umd.cjs"
+    }
   },
   "devDependencies": {
     "@types/three": "^0.162.0",
