@@ -2,6 +2,8 @@ import type { ChromatinChunk } from '../chromatin';
 import { vec3 } from 'gl-matrix';
 import { LoadOptions, normalize, recenter } from './loader-utils';
 
+let nextId = -1;
+
 export const parseTsv = (fileContent: string, options: LoadOptions): ChromatinChunk => {
     const tsvLines = fileContent.split('\n');
 
@@ -33,5 +35,6 @@ export const parseTsv = (fileContent: string, options: LoadOptions): ChromatinCh
     return { 
         bins: bins, 
         rawBins: rawBins,
+        id: ++nextId,
     };
 };

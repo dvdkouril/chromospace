@@ -26,8 +26,14 @@
 
       (async () => {
           const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
+          const url2 = "https://dl.dropbox.com/scl/fi/bpd0t21ypyo0nyv3svi14/dros.9.txt?rlkey=i24mzd3hb1zruq7w8eshel9kq&dl=0";          
+          const url3 = "https://dl.dropbox.com/scl/fi/ha34hk0jdg8cj5i7va2lb/dros.26.txt?rlkey=duyjahmvxf64splqvpzndlup3&dl=0";
           const fileContent = await fetchTsv(url);
+          const fileContent2 = await fetchTsv(url2);
+          const fileContent3 = await fetchTsv(url3);
           const testChunk = parseTsv(fileContent, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+          const testChunk2 = parseTsv(fileContent2, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+          const testChunk3 = parseTsv(fileContent3, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
           console.log(testChunk);
 
           //~ create a scene
@@ -36,6 +42,8 @@
               models: [],
           };
           chromatinScene = addChunkToScene(chromatinScene, testChunk);
+          chromatinScene = addChunkToScene(chromatinScene, testChunk2);
+          chromatinScene = addChunkToScene(chromatinScene, testChunk3);
           console.log(chromatinScene);
 
           //~ create renderer

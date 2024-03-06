@@ -17,6 +17,9 @@ export type ChromatinPart = {
 export type ChromatinChunk = {
     bins: vec3[];
     rawBins: vec3[]; //~ bin positions before any processing (recenter, normalize)
+
+    label?: string;
+    id: number;
 };
 
 export type ChromatinModel = {
@@ -27,6 +30,10 @@ export type ChromatinModel = {
 export type ChromatinScene = {
     chunks: ChromatinChunk[];
     models: ChromatinModel[];
+
+    config: {
+        layout: "center" | "grid";
+    };
 }
 
 export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk): ChromatinScene {
