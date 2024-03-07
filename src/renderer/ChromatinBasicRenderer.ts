@@ -2,7 +2,7 @@ import { WebGLRenderer, Scene, PerspectiveCamera, Object3D, Mesh, InstancedMesh,
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ChromatinChunk, ChromatinScene } from '../chromatin';
 import { vec3 } from 'gl-matrix';
-import { estimateBestSphereSize } from '../utils';
+import { estimateBestSphereSize, flattenAllBins } from '../utils';
 
 export class ChromatinBasicRenderer {
     chromatinScene: ChromatinScene | undefined;
@@ -63,20 +63,29 @@ export class ChromatinBasicRenderer {
         }
 
         //~ TODO: scene.models
+        for (let model of scene.models) {
+            const allBins = flattenAllBins(model.parts);
+            // const sphereSize = estimateBestSphereSize(allBins);
+            const sphereSize = estimateBestSphereSize(allBins) * 10;
+            for (let part of model.parts) {
+                const meshes = this.buildPart(part, sphereSize);
+                console.log("meshes: " + meshes);
+            }
+            // if (meshes.length > 0) {
+            //     this.scene.add(...meshes);
+            // }
+        }
     }
 
-    buildPart(chunk: ChromatinChunk): Mesh[] {
-        const sphereSize = estimateBestSphereSize(chunk.bins);
-        const tubeSize = 0.4 * sphereSize;
-        const sphereGeometry = new SphereGeometry(sphereSize);
+    buildPart(chunk: ChromatinChunk, sphereSize?: number): Mesh[] {
+        const sphereRadius = (sphereSize) ? sphereSize : estimateBestSphereSize(chunk.bins);
+        const tubeSize = 0.4 * sphereRadius;
+        const sphereGeometry = new SphereGeometry(sphereRadius);
         const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
 
         const color = this.randomColors[chunk.id];
+        console.log("color: " + color);
         const material = new MeshStandardMaterial( { color: color } );
-
-        // const binSphere = new Mesh(sphereGeometry, material);
-        // // const binSphere = new Mesh(sphereGeometry, shaderMat);
-        // const binTube = new Mesh(tubeGeometry, material);
 
         //~ bin spheres
         const meshInstcedSpheres = new InstancedMesh(sphereGeometry, material, chunk.bins.length);
@@ -105,21 +114,6 @@ export class ChromatinBasicRenderer {
         this.scene.add(meshInstcedTubes);
 
         let meshes: Mesh[] = [];
-        //~ bin spheres
-        // for (let b of chunk.bins) {
-        //     const s = binSphere.clone();
-        //     s.position.set(b[0], b[1], b[2]);
-        //     meshes.push(s);
-        //
-        // }
-        //~ tubes between tubes
-        // for (let tube of this.computeTubes(chunk.bins)) {
-        //     const t = binTube.clone();
-        //     t.position.set(tube.position.x, tube.position.y, tube.position.z);
-        //     t.rotation.set(tube.rotation.x, tube.rotation.y, tube.rotation.z, tube.rotation.order);
-        //     t.scale.setY(tube.scale);
-        //     meshes.push(t);
-        // }
 
         return meshes;
     }

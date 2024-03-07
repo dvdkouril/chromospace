@@ -41,7 +41,16 @@ export const recenter = (
     return positionsCentered;
 };
 
-export const normalize = (positions: vec3[]): vec3[] => {
+export const normalize = (positions: vec3[], factor?: number): vec3[] => {
+    const scaleFactor = (factor == undefined) ? computeNormalizationFactor(positions) : factor;
+
+    const positionsNormalized = positions.map(p => vec3.scale(p, p, scaleFactor));
+
+    return positionsNormalized;
+};
+
+export const computeNormalizationFactor = (positions: vec3[]): number => {
+
     const bbMax = positions.reduce(
         (a, b) => vec3.max(vec3.create(), a, b),
         vec3.fromValues(
@@ -68,7 +77,5 @@ export const normalize = (positions: vec3[]): vec3[] => {
     const maxDim = Math.max(...bbSides);
     const scaleFactor = 1 / maxDim;
 
-    const positionsNormalized = positions.map(p => vec3.scale(p, p, scaleFactor));
-
-    return positionsNormalized;
+    return scaleFactor;
 };

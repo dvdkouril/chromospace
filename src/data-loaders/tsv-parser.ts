@@ -1,6 +1,7 @@
-import type { ChromatinChunk } from '../chromatin';
+import type { ChromatinChunk, ChromatinModel } from '../chromatin';
 import { vec3 } from 'gl-matrix';
-import { LoadOptions, normalize, recenter } from './loader-utils';
+import { LoadOptions, normalize, computeNormalizationFactor, recenter } from './loader-utils';
+import { flattenAllBins } from '../utils';
 
 let nextId = -1;
 
@@ -39,39 +40,61 @@ export const parseTsv = (fileContent: string, options: LoadOptions): ChromatinCh
     };
 };
 
-export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinChunk => {
+export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinModel | undefined => {
     const tsvLines = fileContent.split('\n');
 
-    let bins: vec3[] = [];
+    let parts: ChromatinChunk[] = [];
+    let currentPart: ChromatinChunk | undefined = undefined;
+    let prevChrom = "";
     tsvLines.forEach((line) => {
         const tokens = line.split('\t');
         if (tokens.length < 5) {
             return;
         }
 
-        // const chrom = tokens[0];
-        // const startCoord = tokens[1];
+        const chrom = tokens[0];
+        const startCoord = tokens[1];
+        if (chrom != prevChrom || currentPart == undefined) {
+            // new part
+            currentPart = {
+                bins: [],
+                rawBins: [],
+                coordinates: { start: parseInt(startCoord), end: parseInt(startCoord) },
+                label: chrom,
+                id: ++nextId,
+            };
+            parts.push(currentPart);
+        }
+
         const x = parseFloat(tokens[2]);
         const y = parseFloat(tokens[3]);
         const z = parseFloat(tokens[4]);
 
-        bins.push(vec3.fromValues(x, y, z));
+        currentPart.bins.push(vec3.fromValues(x, y, z));
+        prevChrom = chrom;
     });
 
-    const rawBins = bins;
-
-    if (options.center) {
-        bins = recenter(bins);
+    for (let p of parts) {
+        p.bins;
     }
+
+    // if (options.center) {
+    //
+    //     bins = recenter(bins);
+    // }
     
     if (options.normalize) {
-        bins = normalize(bins);
+        //~ parts.bins -> allBins
+        const allBins: vec3[] = flattenAllBins(parts);
+        const scaleFactor = computeNormalizationFactor(allBins);
+        for (let i = 0; i < parts.length; i++) {
+            const bins = parts[i].bins;
+            parts[i].bins = normalize(bins, scaleFactor);
+        }
     }
 
-
-    return { 
-        bins: bins, 
-        rawBins: rawBins,
-        id: ++nextId,
+    return {
+        parts: parts,
+        position: { x: 0, y: 0, z: 0 },
     };
 };

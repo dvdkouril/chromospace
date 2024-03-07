@@ -1,5 +1,12 @@
 import { vec3 } from 'gl-matrix';
+import { ChromatinChunk } from './chromatin';
 
+export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
+    const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
+      return acc.concat(curr.bins);
+    }, []);
+    return allBins;
+};
 
 export const estimateBestSphereSize = (bins: vec3[]): number => {
     if (bins.length < 2) {

@@ -13,7 +13,7 @@
     //import { ChromatinBasicRenderer } from "./src/renderer/ChromatinBasicRenderer.ts";
     //import { parseTsv } from './src/data-loaders/tsv-parser.ts';
     //import { addChunkToScene } from './src/chromatin.ts';
-    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene } from './src/main.ts';
+    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene, addModelToScene } from './src/main.ts';
 
       console.log("hello!");
 
@@ -49,7 +49,8 @@
           // chromatinScene = addChunkToScene(chromatinScene, testChunk);
           // chromatinScene = addChunkToScene(chromatinScene, testChunk2);
           // chromatinScene = addChunkToScene(chromatinScene, testChunk3);
-          chromatinScene = addChunkToScene(chromatinScene, tab2018Model);
+          // chromatinScene = addChunkToScene(chromatinScene, tab2018Model);
+          chromatinScene = addModelToScene(chromatinScene, tab2018Model);
           console.log(chromatinScene);
 
           //~ create renderer
