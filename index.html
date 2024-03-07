@@ -13,7 +13,7 @@
     //import { ChromatinBasicRenderer } from "./src/renderer/ChromatinBasicRenderer.ts";
     //import { parseTsv } from './src/data-loaders/tsv-parser.ts';
     //import { addChunkToScene } from './src/chromatin.ts';
-    import { ChromatinBasicRenderer, parseTsv, addChunkToScene } from './src/main.ts';
+    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene } from './src/main.ts';
 
       console.log("hello!");
 
@@ -28,6 +28,7 @@
           const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
           const url2 = "https://dl.dropbox.com/scl/fi/bpd0t21ypyo0nyv3svi14/dros.9.txt?rlkey=i24mzd3hb1zruq7w8eshel9kq&dl=0";          
           const url3 = "https://dl.dropbox.com/scl/fi/ha34hk0jdg8cj5i7va2lb/dros.26.txt?rlkey=duyjahmvxf64splqvpzndlup3&dl=0";
+
           const fileContent = await fetchTsv(url);
           const fileContent2 = await fetchTsv(url2);
           const fileContent3 = await fetchTsv(url3);
@@ -36,14 +37,19 @@
           const testChunk3 = parseTsv(fileContent3, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
           console.log(testChunk);
 
+          const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
+          const fileTan2018 = await fetchTsv(urlTan2018);
+          const tab2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+
           //~ create a scene
           let chromatinScene = {
               chunks: [],
               models: [],
           };
-          chromatinScene = addChunkToScene(chromatinScene, testChunk);
-          chromatinScene = addChunkToScene(chromatinScene, testChunk2);
-          chromatinScene = addChunkToScene(chromatinScene, testChunk3);
+          // chromatinScene = addChunkToScene(chromatinScene, testChunk);
+          // chromatinScene = addChunkToScene(chromatinScene, testChunk2);
+          // chromatinScene = addChunkToScene(chromatinScene, testChunk3);
+          chromatinScene = addChunkToScene(chromatinScene, tab2018Model);
           console.log(chromatinScene);
 
           //~ create renderer

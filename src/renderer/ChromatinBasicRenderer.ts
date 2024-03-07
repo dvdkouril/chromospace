@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, PerspectiveCamera, Mesh, SphereGeometry, CylinderGeometry, Vector3, Euler, Quaternion, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
+import { WebGLRenderer, Scene, PerspectiveCamera, Object3D, Mesh, InstancedMesh, SphereGeometry, CylinderGeometry, Vector3, Euler, Quaternion, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ChromatinChunk, ChromatinScene } from '../chromatin';
 import { vec3 } from 'gl-matrix';
@@ -57,7 +57,9 @@ export class ChromatinBasicRenderer {
 
         for (let chunk of scene.chunks) {
             const meshes = this.buildPart(chunk);
-            this.scene.add(...meshes);
+            if (meshes.length > 0) {
+                this.scene.add(...meshes);
+            }
         }
 
         //~ TODO: scene.models
@@ -65,36 +67,59 @@ export class ChromatinBasicRenderer {
 
     buildPart(chunk: ChromatinChunk): Mesh[] {
         const sphereSize = estimateBestSphereSize(chunk.bins);
-        const tubeSize = 0.8 * sphereSize;
+        const tubeSize = 0.4 * sphereSize;
         const sphereGeometry = new SphereGeometry(sphereSize);
-        const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 3, 1);
+        const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
 
-        // const material = new MeshBasicMaterial( { color: 0x00ff00 } );
-        // const color = 0x00ff00;
-        // const color = 0xeeeeee;
-        // const color = 0xffffff;
         const color = this.randomColors[chunk.id];
         const material = new MeshStandardMaterial( { color: color } );
 
-        const binSphere = new Mesh(sphereGeometry, material);
-        const binTube = new Mesh(tubeGeometry, material);
+        // const binSphere = new Mesh(sphereGeometry, material);
+        // // const binSphere = new Mesh(sphereGeometry, shaderMat);
+        // const binTube = new Mesh(tubeGeometry, material);
+
+        //~ bin spheres
+        const meshInstcedSpheres = new InstancedMesh(sphereGeometry, material, chunk.bins.length);
+        const dummyObj = new Object3D();
+        let i = 0;
+        for (let b of chunk.bins) {
+            dummyObj.position.set(b[0], b[1], b[2]);
+            dummyObj.updateMatrix();
+            meshInstcedSpheres.setMatrixAt( i ++, dummyObj.matrix );
+
+        }
+        this.scene.add(meshInstcedSpheres);
+
+        //~ tubes between tubes
+        const tubes = this.computeTubes(chunk.bins);
+        const meshInstcedTubes = new InstancedMesh(tubeGeometry, material, tubes.length);
+        i = 0;
+        for (let tube of tubes) {
+            dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
+            dummyObj.rotation.set(tube.rotation.x, tube.rotation.y, tube.rotation.z, tube.rotation.order);
+            dummyObj.scale.setY(tube.scale);
+            dummyObj.updateMatrix();
+            meshInstcedTubes.setMatrixAt( i ++, dummyObj.matrix );
+
+        }
+        this.scene.add(meshInstcedTubes);
 
         let meshes: Mesh[] = [];
         //~ bin spheres
-        for (let b of chunk.bins) {
-            const s = binSphere.clone();
-            s.position.set(b[0], b[1], b[2]);
-            meshes.push(s);
-
-        }
+        // for (let b of chunk.bins) {
+        //     const s = binSphere.clone();
+        //     s.position.set(b[0], b[1], b[2]);
+        //     meshes.push(s);
+        //
+        // }
         //~ tubes between tubes
-        for (let tube of this.computeTubes(chunk.bins)) {
-            const t = binTube.clone();
-            t.position.set(tube.position.x, tube.position.y, tube.position.z);
-            t.rotation.set(tube.rotation.x, tube.rotation.y, tube.rotation.z, tube.rotation.order);
-            t.scale.setY(tube.scale);
-            meshes.push(t);
-        }
+        // for (let tube of this.computeTubes(chunk.bins)) {
+        //     const t = binTube.clone();
+        //     t.position.set(tube.position.x, tube.position.y, tube.position.z);
+        //     t.rotation.set(tube.rotation.x, tube.rotation.y, tube.rotation.z, tube.rotation.order);
+        //     t.scale.setY(tube.scale);
+        //     meshes.push(t);
+        // }
 
         return meshes;
     }
