@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, PerspectiveCamera, Object3D, Mesh, InstancedMesh, SphereGeometry, CylinderGeometry, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
+import { WebGLRenderer, Scene, PerspectiveCamera, Object3D, InstancedMesh, SphereGeometry, CylinderGeometry, DirectionalLight, AmbientLight, MeshStandardMaterial } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ChromatinChunk, ChromatinScene } from '../chromatin';
 import { estimateBestSphereSize, flattenAllBins, computeTubes, glasbeyColors } from '../utils';
