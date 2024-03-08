@@ -5,28 +5,39 @@ export type GenomicCoordinates = {
     end: number;
 };
 
-// export type ChromatinPart = {
-//     bins: vec3[];
-//     coordinates: GenomicCoordinates;
-//     resolution: number;
-//     label?: string; //~ placeholder for determining some semantics of this part (e.g., chromosome, gene location)
-// };
-
-// The idea is that you want to have completely anonymous parts, too
-// for when you don't have any other identifying data about the bins.
+/**
+ * A simple list of bin positions. 
+ * Used in two scenarios: 
+ *  a) an "anonymous" chunk of chromatin data, and 
+ *  b) properly annotated part of a larger model (e.g., in whole-genome model, chromosomes will be different chunks).
+ */
 export type ChromatinChunk = {
     bins: vec3[];
-    rawBins: vec3[]; //~ bin positions before any processing (recenter, normalize)
+    /** 
+     * bin positions before any processing (recenter, normalize)
+     */
+    rawBins: vec3[]; 
     
-    coordinates?: GenomicCoordinates;
-
-    label?: string;
     id: number;
 };
 
+/**
+ * Adds information identifying the 3D part on genomic sequence
+ */
+export type ChromatinPart = {
+    chunk: ChromatinChunk;
+
+    coordinates: GenomicCoordinates;
+    resolution: number;
+
+    label?: string;
+};
+
+/**
+ * A full model that contains annotation about which genomic regions the individual parts correspond to
+ */
 export type ChromatinModel = {
-    // parts: ChromatinPart[];
-    parts: ChromatinChunk[];
+    parts: ChromatinPart[];
     position: {x: number; y: number; z: number};
 }
 
@@ -39,6 +50,9 @@ export type ChromatinScene = {
     };
 }
 
+/**
+ * Utility function to add a chunk to scene
+ */
 export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk): ChromatinScene {
     scene = {
         ...scene,
@@ -47,6 +61,9 @@ export function addChunkToScene(scene: ChromatinScene, chunk: ChromatinChunk): C
     return scene;
 }
 
+/**
+ * Utility function to add a model to scene
+ */
 export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
     scene = {
         ...scene,

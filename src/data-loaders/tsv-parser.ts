@@ -1,4 +1,4 @@
-import type { ChromatinChunk, ChromatinModel } from '../chromatin';
+import type { ChromatinChunk, ChromatinPart, ChromatinModel } from '../chromatin';
 import { vec3 } from 'gl-matrix';
 import { LoadOptions, normalize, computeNormalizationFactor, recenter } from './loader-utils';
 import { flattenAllBins } from '../utils';
@@ -40,12 +40,21 @@ export const parseTsv = (fileContent: string, options: LoadOptions): ChromatinCh
     };
 };
 
+const getResolution = (firstLine: string, secondLine: string): number => {
+    const tokensFirst = firstLine.split('\t');
+    const tokensSecond = secondLine.split('\t');
+    const startCoord1 = parseInt(tokensFirst[1]);
+    const startCoord2 = parseInt(tokensSecond[1]);
+    return startCoord2 - startCoord1;
+}
+
 export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinModel | undefined => {
     const tsvLines = fileContent.split('\n');
 
-    let parts: ChromatinChunk[] = [];
-    let currentPart: ChromatinChunk | undefined = undefined;
+    let parts: ChromatinPart[] = [];
+    let currentPart: ChromatinPart | undefined = undefined;
     let prevChrom = "";
+    const modelResolution = getResolution(tsvLines[0], tsvLines[1]);
     tsvLines.forEach((line) => {
         const tokens = line.split('\t');
         if (tokens.length < 5) {
@@ -57,11 +66,14 @@ export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinMo
         if (chrom != prevChrom || currentPart == undefined) {
             // new part
             currentPart = {
-                bins: [],
-                rawBins: [],
+                chunk: {
+                    bins: [],
+                    rawBins: [],
+                    id: ++nextId,
+                },
                 coordinates: { start: parseInt(startCoord), end: parseInt(startCoord) },
+                resolution: modelResolution,
                 label: chrom,
-                id: ++nextId,
             };
             parts.push(currentPart);
         }
@@ -70,26 +82,21 @@ export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinMo
         const y = parseFloat(tokens[3]);
         const z = parseFloat(tokens[4]);
 
-        currentPart.bins.push(vec3.fromValues(x, y, z));
+        currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
         prevChrom = chrom;
     });
 
-    for (let p of parts) {
-        p.bins;
+    if (options.center) {
+        console.log("TODO: center bins when loading model");
     }
-
-    // if (options.center) {
-    //
-    //     bins = recenter(bins);
-    // }
     
     if (options.normalize) {
         //~ parts.bins -> allBins
-        const allBins: vec3[] = flattenAllBins(parts);
+        const allBins: vec3[] = flattenAllBins(parts.map(p => p.chunk));
         const scaleFactor = computeNormalizationFactor(allBins);
         for (let i = 0; i < parts.length; i++) {
-            const bins = parts[i].bins;
-            parts[i].bins = normalize(bins, scaleFactor);
+            const bins = parts[i].chunk.bins;
+            parts[i].chunk.bins = normalize(bins, scaleFactor);
         }
     }
 

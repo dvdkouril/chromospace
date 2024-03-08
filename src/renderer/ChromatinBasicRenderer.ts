@@ -56,11 +56,11 @@ export class ChromatinBasicRenderer {
 
         //~ complete models
         for (let model of scene.models) {
-            const allBins = flattenAllBins(model.parts);
+            const allBins = flattenAllBins(model.parts.map(p => p.chunk));
             // const sphereSize = estimateBestSphereSize(allBins);
             const sphereSize = estimateBestSphereSize(allBins) * 10;
             for (let part of model.parts) {
-                this.buildPart(part, sphereSize);
+                this.buildPart(part.chunk, sphereSize);
             }
         }
     }
