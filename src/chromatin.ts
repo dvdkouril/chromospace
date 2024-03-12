@@ -1,4 +1,5 @@
 import { vec3 } from 'gl-matrix';
+import { ChromatinBasicRenderer} from './renderer/ChromatinBasicRenderer';
 
 export type GenomicCoordinates = {
     start: number;
@@ -81,4 +82,12 @@ export function getRange(model: ChromatinModel, coordinates: string): ChromatinC
     console.log(`getRange with ${model} and ${coordinates}`);
 
     return null;
+}
+
+export function display(scene: ChromatinScene): HTMLCanvasElement {
+    const renderer = new ChromatinBasicRenderer();
+    renderer.addScene(scene);
+    renderer.startDrawing();
+    const canvas = renderer.getCanvasElement();
+    return canvas;
 }
