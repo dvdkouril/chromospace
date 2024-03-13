@@ -13,7 +13,7 @@
     //import { ChromatinBasicRenderer } from "./src/renderer/ChromatinBasicRenderer.ts";
     //import { parseTsv } from './src/data-loaders/tsv-parser.ts';
     //import { addChunkToScene } from './src/chromatin.ts';
-    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene, addModelToScene } from './src/main.ts';
+    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene, addModelToScene, getBinsFromModel, getBinsFromPart } from './src/main.ts';
 
       console.log("hello!");
 
@@ -40,18 +40,25 @@
           const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
           const fileTan2018 = await fetchTsv(urlTan2018);
           const tab2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+          
+          //~ API testing
+          console.log(tab2018Model);
+          console.log(getBinsFromPart(tab2018Model.parts[0], 0, 200));
+
+          const p = getBinsFromPart(tab2018Model.parts[0], 0, 200);
 
           //~ create a scene
           let chromatinScene = {
-              chunks: [],
+              chunks: [p.chunk],
               models: [],
           };
           // chromatinScene = addChunkToScene(chromatinScene, testChunk);
           // chromatinScene = addChunkToScene(chromatinScene, testChunk2);
           // chromatinScene = addChunkToScene(chromatinScene, testChunk3);
           // chromatinScene = addChunkToScene(chromatinScene, tab2018Model);
-          chromatinScene = addModelToScene(chromatinScene, tab2018Model);
+          // chromatinScene = addModelToScene(chromatinScene, tab2018Model);
           console.log(chromatinScene);
+
 
           //~ create renderer
           const renderer = new ChromatinBasicRenderer();
@@ -70,6 +77,7 @@
 
           //~ initialize render loop
           renderer.startDrawing();
+
       })();
     </script>
   </body>
