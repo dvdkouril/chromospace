@@ -212,3 +212,7 @@ export function display(scene: ChromatinScene): HTMLCanvasElement {
     const canvas = renderer.getCanvasElement();
     return canvas;
 }
+
+export function sum(a, b) {
+  return a + b
+}
