@@ -194,7 +194,7 @@ export function getBinsFromPart(part: ChromatinPart, start: number, end: number)
  * bins:      ____0_____----1-----||||2|||||xxxx3xxxxx****4*****
  * coordinateToBin(22, 10) -> 2
  */
-function coordinateToBin(coordinate: number, resolution: number, sequenceOffset?: number): number {
+export function coordinateToBin(coordinate: number, resolution: number, sequenceOffset?: number): number {
     if (!sequenceOffset) {
         sequenceOffset = 0;
     }
@@ -211,8 +211,4 @@ export function display(scene: ChromatinScene): HTMLCanvasElement {
     renderer.startDrawing();
     const canvas = renderer.getCanvasElement();
     return canvas;
-}
-
-export function sum(a, b) {
-  return a + b
 }
