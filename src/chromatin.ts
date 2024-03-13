@@ -78,10 +78,46 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
  * @param coordinates 
  * @returns chromatin part, i.e., list of bin positions corresponding to the genomic coordinates
  */
-export function getRange(model: ChromatinModel, coordinates: string): ChromatinChunk | null {
+export function getRange(model: ChromatinModel, coordinates: string): ChromatinPart | null {
     console.log(`getRange with ${model} and ${coordinates}`);
 
-    return null;
+    const toks = coordinates.split(':');
+    const chr = toks[0];
+    const coords = toks[1];
+
+    let newPart: ChromatinPart | null = null;
+    for (let part of model.parts) {
+        //~ first finding the specified chromosome
+        if (chr == part.label) {
+            const start = parseInt(coords.split('-')[0]);
+            const end = parseInt(coords.split('-')[1]);
+
+            // const availableCoordinates = part.coordinates;
+            /*
+             *
+             */
+            const binIndexStart = (start - part.coordinates.start) / part.resolution;
+            const binIndexEnd = (end - part.coordinates.start) / part.resolution;
+
+            //TODO: boundary checks and clipping indices to available ranges
+            
+            newPart = {
+                chunk: {
+                    bins: part.chunk.bins.slice(binIndexStart, binIndexEnd),
+                    rawBins: part.chunk.rawBins.slice(binIndexStart, binIndexEnd),
+                    id: -1,
+                },
+                coordinates: {
+                    start: start, //TODO: adjust for any range clipping
+                    end: end, //TODO: adjust for any range clipping
+                },
+                resolution: part.resolution,
+            };
+        }
+    }
+
+    // return null;
+    return newPart
 }
 
 export function display(scene: ChromatinScene): HTMLCanvasElement {

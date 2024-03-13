@@ -83,6 +83,7 @@ export const parse3dg = (fileContent: string, options: LoadOptions): ChromatinMo
         const z = parseFloat(tokens[4]);
 
         currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
+        currentPart.coordinates.end = parseInt(startCoord); //~ keep pushing the end of this part bin by bin
         prevChrom = chrom;
     });
 
