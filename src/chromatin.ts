@@ -81,6 +81,10 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
 export function getRange(model: ChromatinModel, coordinates: string): ChromatinPart | null {
     console.log(`getRange with ${model} and ${coordinates}`);
 
+    /*
+     * This is probably useful for what queries users might be interested in making: https://genome.ucsc.edu/goldenPath/help/query.html
+     */
+
     const toks = coordinates.split(':');
     const chr = toks[0];
     const coords = toks[1];
@@ -119,9 +123,6 @@ export function getRange(model: ChromatinModel, coordinates: string): ChromatinP
     // return null;
     return newPart
 }
-/*
- * This is probably useful for what queries users might be interested in making: https://genome.ucsc.edu/goldenPath/help/query.html
- */
 
 /*
  * Fetched a bin range from model. 
@@ -183,9 +184,7 @@ export function getBinsFromPart(part: ChromatinPart, start: number, end: number)
 }
 
 /*
- * TODO: move elsewhere
  * Utility function for converting genomic coordinate (i.e., nucleobase position) to bin index, given certain resolution
- *
  * --------
  * Example:
  * resolution: 10bp
