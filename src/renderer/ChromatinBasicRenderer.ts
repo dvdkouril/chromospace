@@ -50,7 +50,7 @@ export class ChromatinBasicRenderer {
     this.camera = new PerspectiveCamera(75, 800 / 600, 0.1, 1000);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    this.camera.position.z = 1.5;
+    this.camera.position.z = 1.0;
     controls.update();
 
     const lightA = new DirectionalLight();
