@@ -32,6 +32,9 @@ export class ChromatinBasicRenderer {
   //~ utils
   randomColors: string[] = [];
 
+  //~ dom
+  redrawRequest: number = 0;
+
   constructor(canvas: HTMLCanvasElement | undefined = undefined) {
     // this.renderer = new WebGLRenderer({ antialias: true, canvas });
     this.renderer = new WebGLRenderer({ 
@@ -67,6 +70,8 @@ export class ChromatinBasicRenderer {
 
     this.render = this.render.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
+    this.startDrawing = this.startDrawing.bind(this);
+    this.endDrawing = this.endDrawing.bind(this);
 
     this.randomColors = glasbeyColors;
   }
@@ -145,11 +150,16 @@ export class ChromatinBasicRenderer {
   }
 
   startDrawing() {
-    requestAnimationFrame(this.render);
+    this.redrawRequest = requestAnimationFrame(this.render);
+  }
+
+  endDrawing() {
+    cancelAnimationFrame(this.redrawRequest);
+    this.renderer.dispose();
   }
 
   render() {
-    requestAnimationFrame(this.render);
+    this.redrawRequest = requestAnimationFrame(this.render);
 
     console.log("drawing");
 

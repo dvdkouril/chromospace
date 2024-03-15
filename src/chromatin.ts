@@ -222,10 +222,10 @@ export function coordinateToBin(
 //     return 0;
 // }
 
-export function display(scene: ChromatinScene): HTMLCanvasElement {
+export function display(scene: ChromatinScene): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer();
   renderer.addScene(scene);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
-  return canvas;
+  return [renderer, canvas];
 }
