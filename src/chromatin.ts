@@ -50,7 +50,9 @@ export type ChromatinScene = {
     layout: "center" | "grid";
   };
 };
-
+export type ChromatinSceneConfig = {
+  binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
+};
 /**
  * Utility function to add a chunk to scene
  */
@@ -222,9 +224,9 @@ export function coordinateToBin(
 //     return 0;
 // }
 
-export function display(scene: ChromatinScene): [ChromatinBasicRenderer, HTMLCanvasElement] {
+export function display(scene: ChromatinScene, config?: ChromatinSceneConfig): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer();
-  renderer.addScene(scene);
+  renderer.addScene(scene, config);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
   return [renderer, canvas];

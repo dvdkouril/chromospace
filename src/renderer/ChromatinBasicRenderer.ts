@@ -12,7 +12,7 @@ import {
 } from "three";
 import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ChromatinChunk, ChromatinScene } from "../chromatin";
+import { ChromatinChunk, ChromatinScene, ChromatinSceneConfig } from "../chromatin";
 import {
   estimateBestSphereSize,
   flattenAllBins,
@@ -22,6 +22,7 @@ import {
 
 export class ChromatinBasicRenderer {
   chromatinScene: ChromatinScene | undefined;
+  config: ChromatinSceneConfig | undefined;
 
   //~ threejs stuff
   renderer: WebGLRenderer;
@@ -80,8 +81,9 @@ export class ChromatinBasicRenderer {
     return this.renderer.domElement;
   }
 
-  addScene(scene: ChromatinScene) {
+  addScene(scene: ChromatinScene, config?: ChromatinSceneConfig) {
     this.chromatinScene = scene;
+    this.config = config;
 
     //~ "anonymous" chunks
     for (let chunk of scene.chunks) {
@@ -100,9 +102,12 @@ export class ChromatinBasicRenderer {
   }
 
   buildPart(chunk: ChromatinChunk, sphereSize?: number) {
-    const sphereRadius = sphereSize
+    let sphereRadius = sphereSize
       ? sphereSize
       : estimateBestSphereSize(chunk.bins);
+    if (this.config) {
+      sphereRadius *= this.config.binSizeScale || 1.0;
+    }
     const tubeSize = 0.4 * sphereRadius;
     const sphereGeometry = new SphereGeometry(sphereRadius);
     const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
