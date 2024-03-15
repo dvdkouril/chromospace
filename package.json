@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "gl-matrix": "^3.4.3",
+    "postprocessing": "^6.35.2",
     "three": "^0.162.0"
   }
 }

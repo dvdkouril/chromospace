@@ -10,6 +10,7 @@ import {
   AmbientLight,
   MeshStandardMaterial,
 } from "three";
+import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { ChromatinChunk, ChromatinScene } from "../chromatin";
 import {
@@ -26,12 +27,19 @@ export class ChromatinBasicRenderer {
   renderer: WebGLRenderer;
   scene: Scene;
   camera: PerspectiveCamera;
+  composer: EffectComposer;
 
   //~ utils
   randomColors: string[] = [];
 
   constructor(canvas: HTMLCanvasElement | undefined = undefined) {
-    this.renderer = new WebGLRenderer({ antialias: true, canvas });
+    // this.renderer = new WebGLRenderer({ antialias: true, canvas });
+    this.renderer = new WebGLRenderer({ 
+      powerPreference: "high-performance",
+      antialias: false, 
+      stencil: false,
+      depth: false,
+      canvas });
     this.renderer.setClearColor("#eeeeee");
     this.renderer.setSize(800, 600);
     this.scene = new Scene();
@@ -51,6 +59,11 @@ export class ChromatinBasicRenderer {
     const lightC = new AmbientLight();
     lightC.intensity = 0.2;
     this.scene.add(lightA, lightB, lightC);
+
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    // this.composer.addPass(new EffectPass(this.camera, new BloomEffect()));
+    this.composer.addPass(new EffectPass(this.camera, new BloomEffect()));
 
     this.render = this.render.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
@@ -140,6 +153,7 @@ export class ChromatinBasicRenderer {
 
     console.log("drawing");
 
-    this.renderer.render(this.scene, this.camera);
+    // this.renderer.render(this.scene, this.camera);
+    this.composer.render();
   }
 }
