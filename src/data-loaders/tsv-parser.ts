@@ -120,3 +120,77 @@ export const parse3dg = (
     position: { x: 0, y: 0, z: 0 },
   };
 };
+
+
+export const parseWeirdTsvFromMiniMDS = (
+  fileContent: string,
+  options: LoadOptions,
+): ChromatinChunk | undefined => {
+  const tsvLines = fileContent.split("\n");
+
+  // let parts: ChromatinPart[] = [];
+  let bins: vec3[] = [];
+  // let currentPart: ChromatinPart | undefined = undefined;
+  // let prevChrom = "";
+  // const modelResolution = getResolution(tsvLines[0], tsvLines[1]);
+  let lineNumber = 0;
+  tsvLines.forEach((line) => {
+
+    if (lineNumber < 3) {
+      lineNumber += 1;
+      return;
+    }
+    lineNumber += 1;
+
+    const tokens = line.split("\t");
+    // if (tokens.length < 5) {
+    //   return;
+    // }
+
+
+    // const chrom = tokens[0];
+    // const startCoord = tokens[1];
+    // if (chrom != prevChrom || currentPart == undefined) {
+    //   // new part
+    //   currentPart = {
+    //     chunk: {
+    //       bins: [],
+    //       rawBins: [],
+    //       id: ++nextId,
+    //     },
+    //     coordinates: { start: parseInt(startCoord), end: parseInt(startCoord) },
+    //     resolution: modelResolution,
+    //     label: chrom,
+    //   };
+    //   parts.push(currentPart);
+    // }
+
+    const x = parseFloat(tokens[1]);
+    const y = parseFloat(tokens[2]);
+    const z = parseFloat(tokens[3]);
+    if (isNaN(x) || isNaN(y) || isNaN(z)) {
+      return;
+    }
+    
+    bins.push(vec3.fromValues(x, y, z));
+    // currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
+    // currentPart.coordinates.end = parseInt(startCoord); //~ keep pushing the end of this part bin by bin
+    // prevChrom = chrom;
+  });
+
+  const rawBins = bins;
+
+  if (options.center) {
+    bins = recenter(bins);
+  }
+
+  if (options.normalize) {
+    bins = normalize(bins);
+  }
+
+  return {
+    bins: bins,
+    rawBins: rawBins,
+    id: ++nextId,
+  };
+};

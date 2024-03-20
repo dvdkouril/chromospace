@@ -37,13 +37,13 @@ export class ChromatinBasicRenderer {
   redrawRequest: number = 0;
 
   constructor(canvas: HTMLCanvasElement | undefined = undefined) {
-    // this.renderer = new WebGLRenderer({ antialias: true, canvas });
-    this.renderer = new WebGLRenderer({ 
-      powerPreference: "high-performance",
-      antialias: false, 
-      stencil: false,
-      depth: false,
-      canvas });
+    this.renderer = new WebGLRenderer({ antialias: true, canvas });
+    // this.renderer = new WebGLRenderer({ 
+    //   powerPreference: "high-performance",
+    //   antialias: false, 
+    //   stencil: false,
+    //   depth: false,
+    //   canvas });
     this.renderer.setClearColor("#eeeeee");
     this.renderer.setSize(800, 600);
     this.scene = new Scene();
@@ -168,7 +168,7 @@ export class ChromatinBasicRenderer {
 
     console.log("drawing");
 
-    // this.renderer.render(this.scene, this.camera);
-    this.composer.render();
+    this.renderer.render(this.scene, this.camera);
+    // this.composer.render();
   }
 }
