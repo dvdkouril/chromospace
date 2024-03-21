@@ -53,3 +53,47 @@ export const parsePDB = (fileContent: string, options: LoadOptions): ChromatinCh
     id: 0,
   };
 };
+
+
+
+
+
+
+
+
+//******
+//MOVEEEEEEE
+
+
+export const parseNumpyArray = (fileContent: DataView, options: LoadOptions): ChromatinChunk => {
+  
+  let bytes = new Float64Array(fileContent.buffer);
+  let bins: vec3[] = [];
+  for (let i = 0; i < bytes.length - 2;) {
+    const x = bytes[i];
+    const y = bytes[i + 1];
+    const z = bytes[i + 2];
+    // console.log("x = " + x + ", y = " + y + ", z = " + z);
+    i += 3;
+
+    if (isNaN(x) || isNaN(y) || isNaN(z)) {
+      continue;
+    }
+    bins.push(vec3.fromValues(x, y, z));
+  }
+
+  const rawBins = bins;
+
+  if (options.center) {
+    bins = recenter(bins);
+  }
+
+  if (options.normalize) {
+    bins = normalize(bins);
+  }
+  return {
+    bins: bins,
+    rawBins: rawBins,
+    id: 0,
+  };
+};
