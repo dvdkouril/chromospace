@@ -3,7 +3,10 @@
 > Visualize chromatin in space!
 
 ## Try it out
-Locally:
+In ObservableHQ:
+[https://observablehq.com/d/e2ead2e7f6700493](https://observablehq.com/d/e2ead2e7f6700493),
+
+or locally:
 ```
 git clone git@github.com:dvdkouril/chromospace.git
 cd chromospace
@@ -11,36 +14,11 @@ npm install
 npm run dev
 ```
 
-In ObservableHQ:
-[https://observablehq.com/d/e2ead2e7f6700493](https://observablehq.com/d/e2ead2e7f6700493)
-
 ## Key concepts
-
-### Genomics semantics
-
-Molecular visualization tools are often used for examining chromatin 3D data. The limiting factor in that case are the missing proper semantics when analyzing the spatial structures. Our goal here is to provide API that fixes that. For example:
-
-Fetching parts of the model should be done semantically using genomic coordinates:
-
-```typescript
-let selectedPart = structure.getPartCoords("chr1:10000-20000");
-let selectedPart = structure.getPartBins(123, 321); // it should still be possible to fetch directly by bin indices
-```
-
-### Made for computational notebooks
-
-Integration in Jupyter Notebook/Lab, Google Colab, Observable is a critical feature.
-
-[ObservableHQ notebook example](https://observablehq.com/d/e2ead2e7f6700493)
-
-### Stay small and focused
-
-This library will only do one thing, hopefully extremely well: visualize 3D chromatin structure with a variety of declaratively specified representations. 
-What it will _not_ do is expand into a bloated library with many options. Additional functionality should be built on top, as further libraries and applications.
-
-### Configuration via grammar
-
-With Gosling in mind, all visualization attributes should be defined through a grammar specification.
+- **Genomics semantics**: Molecular visualization tools are often used for examining chromatin 3D data. The limiting factor in that case are the missing proper semantics when analyzing the spatial structures. For example, selecting part of the model should be possible using genomic coordinates (not "atom" indices): `let selectedPart = structure.getPartCoords("chr11:66546395-66563334");`
+- **Made for computational notebooks**: We need to meet computational biologists where they typically work. Integration in computational notebooks is therefore a critical feature. As a Javascript library, integration in ObservableHQ is free ([ObservableHQ notebook example](https://observablehq.com/d/e2ead2e7f6700493)). Using chromospace in Python-based notebooks (e.g., Jupyter Notebook/Lab or Google Colab) is made thanks to the wonderful [anywidget](https://github.com/manzt/anywidget) library: see [chromospyce](https://github.com/dvdkouril/chromospyce).
+- **Declarative specification**: With [Gosling](https://github.com/gosling-lang/gosling.js) in mind, visualization attributes should be defined through a declarative grammar specification to allow expressive visualization construction.
+- **Staying small and focused**: The many bioinformatics file formats can lead to bloated software that tries to capture every use case. Such software is then hard to maintain. The idea here is to keep chromospace small, doing one thing, hopefully extremely well: visualize 3D chromatin structures with a variety of declaratively specified representations. Additional functionality should be build on top as further libraries and applications. With the computational notebooks integration, we can also afford to leave much of processing to the ecosystem of other bioinformatics tooling.
 
 ## Authors
 Led by [David Kouril](http://davidkouril.com) @ [HIDIVE lab](http://hidivelab.org) (Harvard Medical School).
