@@ -2,6 +2,8 @@
 
 > Visualize chromatin in space!
 
+![chromospace eyecandy](screenshots/eyecandy.png)
+
 ## Try it out
 In ObservableHQ:
 [https://observablehq.com/d/e2ead2e7f6700493](https://observablehq.com/d/e2ead2e7f6700493),
