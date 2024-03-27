@@ -7,7 +7,11 @@ import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
+  color?: string,
 ): ChromatinScene {
+  if (color) {
+    chunk.color = color;
+  }
   scene = {
     ...scene,
     chunks: [...scene.chunks, chunk],

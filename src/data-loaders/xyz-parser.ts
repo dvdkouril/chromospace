@@ -7,6 +7,7 @@ import {
   normalize,
   recenter,
 } from "./loader-utils";
+import chroma from "chroma-js";
 
 let nextId = -1;
 
@@ -61,5 +62,6 @@ export const parseXYZ = (
     bins: bins,
     rawBins: rawBins,
     id: ++nextId,
+    color: chroma.random().hex(),
   };
 };

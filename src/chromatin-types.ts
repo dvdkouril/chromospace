@@ -12,12 +12,16 @@ export type GenomicCoordinates = {
  *  b) properly annotated part of a larger model (e.g., in whole-genome model, chromosomes will be different chunks).
  */
 export type ChromatinChunk = {
+  /**
+   * bin positions that are actually visualized
+   */
   bins: vec3[];
   /**
    * bin positions before any processing (recenter, normalize)
    */
   rawBins: vec3[];
 
+  color: string;
   id: number;
 };
 

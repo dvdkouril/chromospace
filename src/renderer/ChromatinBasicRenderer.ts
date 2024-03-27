@@ -17,7 +17,6 @@ import {
   estimateBestSphereSize,
   flattenAllBins,
   computeTubes,
-  glasbeyColors,
 } from "../utils";
 
 export class ChromatinBasicRenderer {
@@ -29,9 +28,6 @@ export class ChromatinBasicRenderer {
   scene: Scene;
   camera: PerspectiveCamera;
   composer: EffectComposer;
-
-  //~ utils
-  randomColors: string[] = [];
 
   //~ dom
   redrawRequest: number = 0;
@@ -73,8 +69,6 @@ export class ChromatinBasicRenderer {
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
-
-    this.randomColors = glasbeyColors;
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -112,9 +106,7 @@ export class ChromatinBasicRenderer {
     const sphereGeometry = new SphereGeometry(sphereRadius);
     const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
 
-    const color = this.randomColors[chunk.id];
-    console.log("color: " + color);
-    const material = new MeshStandardMaterial({ color: color });
+    const material = new MeshStandardMaterial({ color: chunk.color });
 
     //~ bin spheres
     const meshInstcedSpheres = new InstancedMesh(

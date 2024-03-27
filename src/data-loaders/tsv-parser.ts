@@ -11,6 +11,7 @@ import {
   recenter,
 } from "./loader-utils";
 import { flattenAllBins } from "../utils";
+import chroma from "chroma-js";
 
 let nextId = -1;
 
@@ -47,6 +48,7 @@ export const parseTsv = (
   return {
     bins: bins,
     rawBins: rawBins,
+    color: chroma.random().hex(),
     id: ++nextId,
   };
 };
@@ -83,6 +85,7 @@ export const parse3dg = (
         chunk: {
           bins: [],
           rawBins: [],
+          color: chroma.random().hex(),
           id: ++nextId,
         },
         coordinates: { start: parseInt(startCoord), end: parseInt(startCoord) },
