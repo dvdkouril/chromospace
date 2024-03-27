@@ -12,7 +12,7 @@ import {
 } from "three";
 import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ChromatinChunk, ChromatinScene, ChromatinSceneConfig } from "../chromatin";
+import { ChromatinChunk, ChromatinScene, ChromatinSceneConfig } from "../chromatin-types";
 import {
   estimateBestSphereSize,
   flattenAllBins,

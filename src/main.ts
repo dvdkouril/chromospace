@@ -3,7 +3,7 @@ export type {
   ChromatinChunk,
   ChromatinModel,
   ChromatinScene,
-} from "./chromatin.ts";
+} from "./chromatin-types.ts";
 export {
   addChunkToScene,
   addModelToScene,

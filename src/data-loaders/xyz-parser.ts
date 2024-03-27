@@ -1,6 +1,6 @@
 import type {
   ChromatinChunk
-} from "../chromatin";
+} from "../chromatin-types";
 import { vec3 } from "gl-matrix";
 import {
   LoadOptions,

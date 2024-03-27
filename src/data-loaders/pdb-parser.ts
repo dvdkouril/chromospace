@@ -1,4 +1,4 @@
-import { ChromatinChunk } from "../chromatin";
+import { ChromatinChunk } from "../chromatin-types";
 import { LoadOptions, normalize, recenter } from "./loader-utils";
 import { vec3 } from "gl-matrix";
 

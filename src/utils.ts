@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinChunk } from "./chromatin";
+import { ChromatinChunk } from "./chromatin-types";
 import { Vector3, Euler, Quaternion } from "three";
 
 export const glasbeyColors = [
