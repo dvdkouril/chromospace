@@ -8,7 +8,8 @@ import {
   CylinderGeometry,
   DirectionalLight,
   AmbientLight,
-  MeshStandardMaterial,
+  MeshBasicMaterial,
+  Color,
 } from "three";
 import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -17,7 +18,11 @@ import {
   estimateBestSphereSize,
   flattenAllBins,
   computeTubes,
+  decideColor,
 } from "../utils";
+
+import type { Color as ChromaColor, Scale as ChromaScale } from 'chroma-js';
+import chroma from "chroma-js";
 
 export class ChromatinBasicRenderer {
   chromatinScene: ChromatinScene | undefined;
@@ -79,23 +84,32 @@ export class ChromatinBasicRenderer {
     this.chromatinScene = scene;
     this.config = config;
 
+    const colorScale = chroma.scale(['white', 'rgba(245,166,35,1.0)', 'rgba(208,2,27,1.0)', 'black']);
+    let chunkColors = scene.chunks.map(_ => chroma.random() );
+
     //~ "anonymous" chunks
-    for (let chunk of scene.chunks) {
-      this.buildPart(chunk);
+    for (let [i, chunk] of scene.chunks.entries()) {
+      //~ A) using a color scale with the bin index as lookup
+      this.buildPart(chunk, undefined, colorScale);
+      //~ B) setting a constant color for whole chunk
+      // this.buildPart(chunk, chunkColors[i]);
     }
 
     //~ complete models
     for (let model of scene.models) {
+      chunkColors = model.parts.map(_ => chroma.random() );
       const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
       // const sphereSize = estimateBestSphereSize(allBins);
       const sphereSize = estimateBestSphereSize(allBins) * 10;
-      for (let part of model.parts) {
-        this.buildPart(part.chunk, sphereSize);
+      for (let [i, part] of model.parts.entries()) {
+        //~ TODO: this kinda sucks, maybe make into object
+        // this.buildPart(part.chunk, undefined, colorScale, sphereSize);
+        this.buildPart(part.chunk, chunkColors[i], undefined, sphereSize);
       }
     }
   }
 
-  buildPart(chunk: ChromatinChunk, sphereSize?: number) {
+  buildPart(chunk: ChromatinChunk, color?: ChromaColor, colorMap?: ChromaScale, sphereSize?: number) {
     let sphereRadius = sphereSize
       ? sphereSize
       : estimateBestSphereSize(chunk.bins);
@@ -106,7 +120,7 @@ export class ChromatinBasicRenderer {
     const sphereGeometry = new SphereGeometry(sphereRadius);
     const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
 
-    const material = new MeshStandardMaterial({ color: chunk.color });
+    const material = new MeshBasicMaterial({ color: "#FFFFFF" });
 
     //~ bin spheres
     const meshInstcedSpheres = new InstancedMesh(
@@ -115,11 +129,16 @@ export class ChromatinBasicRenderer {
       chunk.bins.length,
     );
     const dummyObj = new Object3D();
-    let i = 0;
-    for (let b of chunk.bins) {
+    const colorObj = new Color();
+
+    for (let [i, b] of chunk.bins.entries()) {
       dummyObj.position.set(b[0], b[1], b[2]);
       dummyObj.updateMatrix();
-      meshInstcedSpheres.setMatrixAt(i++, dummyObj.matrix);
+      meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
+
+      decideColor(colorObj, i, chunk.bins.length, color, colorMap);
+      meshInstcedSpheres.setColorAt(i, colorObj);
+      i += 1;
     }
     this.scene.add(meshInstcedSpheres);
 
@@ -130,8 +149,7 @@ export class ChromatinBasicRenderer {
       material,
       tubes.length,
     );
-    i = 0;
-    for (let tube of tubes) {
+    for (let [i, tube] of tubes.entries()) {
       dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
       dummyObj.rotation.set(
         tube.rotation.x,
@@ -141,7 +159,10 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-      meshInstcedTubes.setMatrixAt(i++, dummyObj.matrix);
+      meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
+
+      decideColor(colorObj, i, chunk.bins.length, color, colorMap);
+      meshInstcedTubes.setColorAt(i, colorObj);
     }
     this.scene.add(meshInstcedTubes);
   }

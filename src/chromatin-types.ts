@@ -21,7 +21,6 @@ export type ChromatinChunk = {
    */
   rawBins: vec3[];
 
-  color: string;
   id: number;
 };
 

@@ -1,6 +1,8 @@
 import { vec3 } from "gl-matrix";
 import { ChromatinChunk } from "./chromatin-types";
-import { Vector3, Euler, Quaternion } from "three";
+import { Vector3, Euler, Quaternion, Color } from "three";
+import type { Color as ChromaColor, Scale as ChromaScale } from 'chroma-js';
+import chroma from "chroma-js";
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
@@ -69,4 +71,16 @@ const getRotationFromTwoPositions = (from: Vector3, to: Vector3) => {
 
   const eulers = new Euler();
   return eulers.setFromQuaternion(q);
+};
+
+export const decideColor = (outColor: Color, i: number, n: number, color?: ChromaColor, colorMap?: ChromaScale) => {
+  if (colorMap) {
+    const u = i / n;
+    const col = colorMap(u);
+    outColor.set(col.hex());
+  } else if (color) {
+    outColor.set(color.hex());
+  } else {
+    outColor.set(chroma.random().hex());
+  }
 };
