@@ -54,4 +54,5 @@ export type ChromatinScene = {
 };
 export type ChromatinSceneConfig = {
   binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
+  coloring?: "constant" | "scale";
 };

@@ -84,27 +84,41 @@ export class ChromatinBasicRenderer {
     this.chromatinScene = scene;
     this.config = config;
 
-    const colorScale = chroma.scale(['white', 'rgba(245,166,35,1.0)', 'rgba(208,2,27,1.0)', 'black']);
-    let chunkColors = scene.chunks.map(_ => chroma.random() );
+    if (!config) {
+      config = {
+        coloring: "constant",
+        binSizeScale: 1.0,
+      };
+    }
+
 
     //~ "anonymous" chunks
+    const chunkColors = scene.chunks.map(_ => chroma.random() );
+    const colorScale = chroma.scale(['white', 'rgba(245,166,35,1.0)', 'rgba(208,2,27,1.0)', 'black']);
     for (let [i, chunk] of scene.chunks.entries()) {
-      //~ A) using a color scale with the bin index as lookup
-      this.buildPart(chunk, undefined, colorScale);
-      //~ B) setting a constant color for whole chunk
-      // this.buildPart(chunk, chunkColors[i]);
+      if (config.coloring == "constant") {
+        //~ A) setting a constant color for whole chunk
+        this.buildPart(chunk, chunkColors[i]);
+      } else if (config.coloring == "scale") {
+        //~ B) using a color scale with the bin index as lookup
+        this.buildPart(chunk, undefined, colorScale);
+      }
     }
 
     //~ complete models
     for (let model of scene.models) {
-      chunkColors = model.parts.map(_ => chroma.random() );
+      const chunkColors = model.parts.map(_ => chroma.random() );
       const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
       // const sphereSize = estimateBestSphereSize(allBins);
       const sphereSize = estimateBestSphereSize(allBins) * 10;
       for (let [i, part] of model.parts.entries()) {
-        //~ TODO: this kinda sucks, maybe make into object
-        // this.buildPart(part.chunk, undefined, colorScale, sphereSize);
-        this.buildPart(part.chunk, chunkColors[i], undefined, sphereSize);
+        if (config.coloring == "constant") {
+          //~ A) constant colors for each model part
+          this.buildPart(part.chunk, chunkColors[i], undefined, sphereSize);
+        } else if (config.coloring == "scale") {
+          //~ B) color scale for each part
+          this.buildPart(part.chunk, undefined, colorScale, sphereSize);
+        }
       }
     }
   }
