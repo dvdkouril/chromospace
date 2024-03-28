@@ -28,7 +28,7 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
 
 /**
  * Query for bin positions on specified genomic coordinates
- * @param coordinates
+ * @param coordinates, e.g., "chr1:10000000-12000000"
  * @returns chromatin part, i.e., list of bin positions corresponding to the genomic coordinates
  */
 export function getRange(
@@ -40,6 +40,23 @@ export function getRange(
   /*
    * This is probably useful for what queries users might be interested in making: https://genome.ucsc.edu/goldenPath/help/query.html
    */
+    
+  //~ Possibly just a chromosome name (without any coordinates)
+  //~ => return the whole part
+  if (!coordinates.includes(":")) {
+    const chrName = coordinates.trim();
+    for (let part of model.parts) {
+      if (part.label == chrName) {
+        return part;
+        //TODO: what if more parts modeling the same chromosome?
+      }
+    }
+  
+    //~ not found...
+    return null;
+  }
+
+  //~ Otherwise: there are coordinates to check too
 
   const toks = coordinates.split(":");
   const chr = toks[0];
