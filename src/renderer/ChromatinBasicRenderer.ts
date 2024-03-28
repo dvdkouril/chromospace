@@ -91,7 +91,6 @@ export class ChromatinBasicRenderer {
       };
     }
 
-
     //~ "anonymous" chunks
     const chunkColors = scene.chunks.map(_ => chroma.random() );
     const colorScale = chroma.scale(['white', 'rgba(245,166,35,1.0)', 'rgba(208,2,27,1.0)', 'black']);
@@ -107,7 +106,8 @@ export class ChromatinBasicRenderer {
 
     //~ complete models
     for (let model of scene.models) {
-      const chunkColors = model.parts.map(_ => chroma.random() );
+      const needColorsN = model.parts.length;
+      const chunkColors = chroma.cubehelix().scale().colors(needColorsN, null);
       const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
       // const sphereSize = estimateBestSphereSize(allBins);
       const sphereSize = estimateBestSphereSize(allBins) * 10;
