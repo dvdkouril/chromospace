@@ -107,7 +107,8 @@ export class ChromatinBasicRenderer {
     //~ complete models
     for (let model of scene.models) {
       const needColorsN = model.parts.length;
-      const chunkColors = chroma.cubehelix().scale().colors(needColorsN, null);
+      const customCubeHelix = chroma.cubehelix().start(200).rotations(-0.8).gamma(0.8).lightness([0.3, 0.8]);
+      const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
       const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
       // const sphereSize = estimateBestSphereSize(allBins);
       const sphereSize = estimateBestSphereSize(allBins) * 10;
