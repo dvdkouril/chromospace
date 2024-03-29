@@ -1,4 +1,10 @@
-import { ChromatinScene, ChromatinChunk, ChromatinPart, ChromatinModel, ChromatinSceneConfig } from "./chromatin-types";
+import {
+  ChromatinScene,
+  ChromatinChunk,
+  ChromatinPart,
+  ChromatinModel,
+  ChromatinSceneConfig,
+} from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
 
@@ -27,7 +33,10 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
   return scene;
 }
 
-function getChromosome(model: ChromatinModel, chrName: string): ChromatinPart | null {
+function getChromosome(
+  model: ChromatinModel,
+  chrName: string,
+): ChromatinPart | null {
   for (let part of model.parts) {
     if (part.label == chrName) {
       return part;
@@ -38,18 +47,28 @@ function getChromosome(model: ChromatinModel, chrName: string): ChromatinPart | 
 }
 
 function getChromosomeAtCoordinates(
-  model: ChromatinModel, chrName: string, start: number, end: number) 
-{
+  model: ChromatinModel,
+  chrName: string,
+  start: number,
+  end: number,
+) {
   let newPart: ChromatinPart | null = null;
   for (let part of model.parts) {
-
     //~ first finding the specified chromosome
     if (chrName != part.label) {
       continue;
     }
 
-    const binStartIndex = coordinateToBin(start, part.resolution, part.coordinates.start);
-    const binEndIndex = coordinateToBin(end, part.resolution, part.coordinates.start);
+    const binStartIndex = coordinateToBin(
+      start,
+      part.resolution,
+      part.coordinates.start,
+    );
+    const binEndIndex = coordinateToBin(
+      end,
+      part.resolution,
+      part.coordinates.start,
+    );
 
     newPart = {
       chunk: {
@@ -70,7 +89,7 @@ function getChromosomeAtCoordinates(
 
 /**
  * Query for model parts on specified genomic coordinates
- * @param coordinates, e.g., "chr1:10000000-12000000"
+ * @param coordinates, e.g., "chr1" or "chr1:10000000-12000000" (chromosome annotation is linked to what's in ChromatinPart.label
  * @returns chromatin part, i.e., bins corresponding to the genomic coordinates
  */
 export function get(
@@ -78,11 +97,11 @@ export function get(
   coordinates: string,
 ): ChromatinPart | null {
   console.log(`getRange with ${model} and ${coordinates}`);
-    
+
   //~ Possibly just a chromosome name (without any coordinates)
   //~ => return the whole part
   if (!coordinates.includes(":")) {
-    const chromosomeName = coordinates.trim()
+    const chromosomeName = coordinates.trim();
     return getChromosome(model, chromosomeName);
   }
 
@@ -121,8 +140,10 @@ export function getBinsFromPart(
   return newPart;
 }
 
-
-export function display(scene: ChromatinScene, config?: ChromatinSceneConfig): [ChromatinBasicRenderer, HTMLCanvasElement] {
+export function display(
+  scene: ChromatinScene,
+  config?: ChromatinSceneConfig,
+): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer();
   renderer.addScene(scene, config);
   renderer.startDrawing();

@@ -11,9 +11,18 @@ import {
   MeshBasicMaterial,
   Color,
 } from "three";
-import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+import {
+  BloomEffect,
+  EffectComposer,
+  EffectPass,
+  RenderPass,
+} from "postprocessing";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ChromatinChunk, ChromatinScene, ChromatinSceneConfig } from "../chromatin-types";
+import {
+  ChromatinChunk,
+  ChromatinScene,
+  ChromatinSceneConfig,
+} from "../chromatin-types";
 import {
   estimateBestSphereSize,
   flattenAllBins,
@@ -21,7 +30,7 @@ import {
   decideColor,
 } from "../utils";
 
-import type { Color as ChromaColor, Scale as ChromaScale } from 'chroma-js';
+import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 
 export class ChromatinBasicRenderer {
@@ -39,9 +48,9 @@ export class ChromatinBasicRenderer {
 
   constructor(canvas: HTMLCanvasElement | undefined = undefined) {
     this.renderer = new WebGLRenderer({ antialias: true, canvas });
-    // this.renderer = new WebGLRenderer({ 
+    // this.renderer = new WebGLRenderer({
     //   powerPreference: "high-performance",
-    //   antialias: false, 
+    //   antialias: false,
     //   stencil: false,
     //   depth: false,
     //   canvas });
@@ -92,8 +101,13 @@ export class ChromatinBasicRenderer {
     }
 
     //~ "anonymous" chunks
-    const chunkColors = scene.chunks.map(_ => chroma.random() );
-    const colorScale = chroma.scale(['white', 'rgba(245,166,35,1.0)', 'rgba(208,2,27,1.0)', 'black']);
+    const chunkColors = scene.chunks.map((_) => chroma.random());
+    const colorScale = chroma.scale([
+      "white",
+      "rgba(245,166,35,1.0)",
+      "rgba(208,2,27,1.0)",
+      "black",
+    ]);
     for (let [i, chunk] of scene.chunks.entries()) {
       if (config.coloring == "constant") {
         //~ A) setting a constant color for whole chunk
@@ -107,7 +121,12 @@ export class ChromatinBasicRenderer {
     //~ complete models
     for (let model of scene.models) {
       const needColorsN = model.parts.length;
-      const customCubeHelix = chroma.cubehelix().start(200).rotations(-0.8).gamma(0.8).lightness([0.3, 0.8]);
+      const customCubeHelix = chroma
+        .cubehelix()
+        .start(200)
+        .rotations(-0.8)
+        .gamma(0.8)
+        .lightness([0.3, 0.8]);
       const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
       const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
       // const sphereSize = estimateBestSphereSize(allBins);
@@ -124,7 +143,12 @@ export class ChromatinBasicRenderer {
     }
   }
 
-  buildPart(chunk: ChromatinChunk, color?: ChromaColor, colorMap?: ChromaScale, sphereSize?: number) {
+  buildPart(
+    chunk: ChromatinChunk,
+    color?: ChromaColor,
+    colorMap?: ChromaScale,
+    sphereSize?: number,
+  ) {
     let sphereRadius = sphereSize
       ? sphereSize
       : estimateBestSphereSize(chunk.bins);

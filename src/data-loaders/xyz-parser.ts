@@ -1,12 +1,6 @@
-import type {
-  ChromatinChunk
-} from "../chromatin-types";
+import type { ChromatinChunk } from "../chromatin-types";
 import { vec3 } from "gl-matrix";
-import {
-  LoadOptions,
-  normalize,
-  recenter,
-} from "./loader-utils";
+import { LoadOptions, normalize, recenter } from "./loader-utils";
 
 let nextId = -1;
 

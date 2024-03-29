@@ -121,7 +121,6 @@ export const parse3dg = (
   };
 };
 
-
 export const parseWeirdTsvFromMiniMDS = (
   fileContent: string,
   options: LoadOptions,
@@ -135,7 +134,6 @@ export const parseWeirdTsvFromMiniMDS = (
   // const modelResolution = getResolution(tsvLines[0], tsvLines[1]);
   let lineNumber = 0;
   tsvLines.forEach((line) => {
-
     if (lineNumber < 3) {
       lineNumber += 1;
       return;
@@ -146,7 +144,6 @@ export const parseWeirdTsvFromMiniMDS = (
     // if (tokens.length < 5) {
     //   return;
     // }
-
 
     // const chrom = tokens[0];
     // const startCoord = tokens[1];
@@ -171,7 +168,7 @@ export const parseWeirdTsvFromMiniMDS = (
     if (isNaN(x) || isNaN(y) || isNaN(z)) {
       return;
     }
-    
+
     bins.push(vec3.fromValues(x, y, z));
     // currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
     // currentPart.coordinates.end = parseInt(startCoord); //~ keep pushing the end of this part bin by bin
