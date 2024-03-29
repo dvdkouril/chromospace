@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { coordinateToBin } from "../chromatin.ts";
+import { coordinateToBin } from "../utils.ts";
 
 test("coordinateToBin simple", () => {
   //~ In an aligned sequence, and for bins with resolution

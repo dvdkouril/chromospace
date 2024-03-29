@@ -1,5 +1,6 @@
 import { ChromatinScene, ChromatinChunk, ChromatinPart, ChromatinModel, ChromatinSceneConfig } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
+import { coordinateToBin } from "./utils";
 
 /**
  * Utility function to add a chunk to scene
@@ -162,26 +163,6 @@ export function getBinsFromPart(
   return newPart;
 }
 
-/*
- * Utility function for converting genomic coordinate (i.e., nucleobase position) to bin index, given certain resolution
- * --------
- * Example:
- * resolution: 10bp
- * positions: 0123456789...         *
- * sequence:  TCTGCGGAGCACTCTGGTAATGCATATGGTCCACAGGACATTCGTCGCTT
- * bins:      ____0_____----1-----||||2|||||xxxx3xxxxx****4*****
- * coordinateToBin(22, 10) -> 2
- */
-export function coordinateToBin(
-  coordinate: number,
-  resolution: number,
-  sequenceOffset?: number,
-): number {
-  if (!sequenceOffset) {
-    sequenceOffset = 0;
-  }
-  return Math.floor((coordinate - sequenceOffset) / resolution);
-}
 
 export function display(scene: ChromatinScene, config?: ChromatinSceneConfig): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer();
