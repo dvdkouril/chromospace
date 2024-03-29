@@ -96,48 +96,6 @@ export function get(
   return getChromosomeAtCoordinates(model, chr, start, end);
 }
 
-/*
- * Fetched a bin range from model.
- * - absolute for the whole model: bins of each part are concatenated based on order of parts
- */
-export function getBinsFromModel(
-  model: ChromatinModel,
-  start: number,
-  end: number,
-): ChromatinModel | null {
-  /*
-   * I actually have a choice here:
-   * 1) just make the selection into a big "anonymous" part, without any separation of different parts
-   * 2) maintain the separation into parts and essentially just return a new model
-   *
-   * now that I think about it, only 2) really makes sense: I can't concatenate two parts because that would create a connection.
-   */
-
-  let newModel: ChromatinModel = {
-    ...model,
-    parts: [],
-  };
-  // let newPart: ChromatinPart | null = null;
-  let currentOffset = 0;
-  for (let p of model.parts) {
-    const startIndex = start - currentOffset;
-    const endIndex = Math.min(p.chunk.bins.length, end - currentOffset);
-    currentOffset = endIndex;
-    const newPart = {
-      chunk: {
-        ...p.chunk, //TODO: probably I'll want a different id...
-        bins: p.chunk.bins.slice(startIndex, endIndex),
-        rawBins: p.chunk.rawBins.slice(startIndex, endIndex),
-      },
-      coordinates: p.coordinates, //TODO: needs actually converting
-      resolution: p.resolution,
-    };
-    newModel.parts.push(newPart);
-  }
-
-  return newModel;
-}
-
 export function getBinsFromPart(
   part: ChromatinPart,
   start: number,

@@ -9,7 +9,6 @@ export {
   addModelToScene,
   display,
   get,
-  getBinsFromModel,
   getBinsFromPart,
 } from "./chromatin.ts";
 
