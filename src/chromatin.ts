@@ -26,75 +26,73 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
   return scene;
 }
 
+function getChromosome(model: ChromatinModel, chrName: string): ChromatinPart | null {
+  for (let part of model.parts) {
+    if (part.label == chrName) {
+      return part;
+      //TODO: what if more parts modeling the same chromosome?
+    }
+  }
+  return null; //~ not found...
+}
+
+function getChromosomeAtCoordinates(
+  model: ChromatinModel, chrName: string, start: number, end: number) 
+{
+  let newPart: ChromatinPart | null = null;
+  for (let part of model.parts) {
+
+    //~ first finding the specified chromosome
+    if (chrName != part.label) {
+      continue;
+    }
+
+    const binStartIndex = coordinateToBin(start, part.resolution, part.coordinates.start);
+    const binEndIndex = coordinateToBin(end, part.resolution, part.coordinates.start);
+
+    newPart = {
+      chunk: {
+        bins: part.chunk.bins.slice(binStartIndex, binEndIndex),
+        rawBins: part.chunk.rawBins.slice(binStartIndex, binEndIndex),
+        id: -1,
+      },
+      coordinates: {
+        start: start, //TODO: adjust for any range clipping
+        end: end, //TODO: adjust for any range clipping
+      },
+      resolution: part.resolution,
+    };
+  }
+
+  return newPart;
+}
+
 /**
- * Query for bin positions on specified genomic coordinates
+ * Query for model parts on specified genomic coordinates
  * @param coordinates, e.g., "chr1:10000000-12000000"
- * @returns chromatin part, i.e., list of bin positions corresponding to the genomic coordinates
+ * @returns chromatin part, i.e., bins corresponding to the genomic coordinates
  */
-export function getRange(
+export function get(
   model: ChromatinModel,
   coordinates: string,
 ): ChromatinPart | null {
   console.log(`getRange with ${model} and ${coordinates}`);
-
-  /*
-   * This is probably useful for what queries users might be interested in making: https://genome.ucsc.edu/goldenPath/help/query.html
-   */
     
   //~ Possibly just a chromosome name (without any coordinates)
   //~ => return the whole part
   if (!coordinates.includes(":")) {
-    const chrName = coordinates.trim();
-    for (let part of model.parts) {
-      if (part.label == chrName) {
-        return part;
-        //TODO: what if more parts modeling the same chromosome?
-      }
-    }
-  
-    //~ not found...
-    return null;
+    const chromosomeName = coordinates.trim()
+    return getChromosome(model, chromosomeName);
   }
 
   //~ Otherwise: there are coordinates to check too
-
   const toks = coordinates.split(":");
   const chr = toks[0];
   const coords = toks[1];
+  const start = parseInt(coords.split("-")[0]);
+  const end = parseInt(coords.split("-")[1]);
 
-  let newPart: ChromatinPart | null = null;
-  for (let part of model.parts) {
-    //~ first finding the specified chromosome
-    if (chr == part.label) {
-      const start = parseInt(coords.split("-")[0]);
-      const end = parseInt(coords.split("-")[1]);
-
-      // const availableCoordinates = part.coordinates;
-      /*
-       *
-       */
-      const binIndexStart = (start - part.coordinates.start) / part.resolution;
-      const binIndexEnd = (end - part.coordinates.start) / part.resolution;
-
-      //TODO: boundary checks and clipping indices to available ranges
-
-      newPart = {
-        chunk: {
-          bins: part.chunk.bins.slice(binIndexStart, binIndexEnd),
-          rawBins: part.chunk.rawBins.slice(binIndexStart, binIndexEnd),
-          id: -1,
-        },
-        coordinates: {
-          start: start, //TODO: adjust for any range clipping
-          end: end, //TODO: adjust for any range clipping
-        },
-        resolution: part.resolution,
-      };
-    }
-  }
-
-  // return null;
-  return newPart;
+  return getChromosomeAtCoordinates(model, chr, start, end);
 }
 
 /*
@@ -184,10 +182,6 @@ export function coordinateToBin(
   }
   return Math.floor((coordinate - sequenceOffset) / resolution);
 }
-
-// function binToCoordinateStart(): number {
-//     return 0;
-// }
 
 export function display(scene: ChromatinScene, config?: ChromatinSceneConfig): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer();

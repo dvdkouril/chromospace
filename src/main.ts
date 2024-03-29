@@ -8,7 +8,7 @@ export {
   addChunkToScene,
   addModelToScene,
   display,
-  getRange,
+  get,
   getBinsFromModel,
   getBinsFromPart,
 } from "./chromatin.ts";
