@@ -2,6 +2,7 @@
   "name": "chromospace",
   "version": "0.0.6",
   "author": "David Kouřil <david.kouril@gmail.com>",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
