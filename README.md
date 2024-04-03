@@ -2,14 +2,14 @@
 
 > Visualize chromatin in space!
 
-![chromospace eyecandy](screenshots/eyecandy.png)
+![chromospace teaser](https://dl.dropboxusercontent.com/scl/fi/qqx2jqmfhh1ydfa6lalrl/chromospace-repo-teaser.png?rlkey=xdhg78qiowzinhcr4kvy8o8yk&dl=0)
 
 :warning: **NOTE** :construction:: `chromospace` is still very early in development. Expect breaking changes frequently!
 
 ## Try it out
 
 In ObservableHQ:
-[https://observablehq.com/d/e2ead2e7f6700493](https://observablehq.com/d/e2ead2e7f6700493),
+[https://observablehq.com/@david-kouril/chromospace-playground](https://observablehq.com/@david-kouril/chromospace-playground),
 
 or locally:
 
