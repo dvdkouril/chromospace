@@ -46,8 +46,25 @@ export class ChromatinBasicRenderer {
   //~ dom
   redrawRequest: number = 0;
 
-  constructor(canvas: HTMLCanvasElement | undefined = undefined) {
-    this.renderer = new WebGLRenderer({ antialias: true, canvas });
+  // constructor(canvas: HTMLCanvasElement | undefined = undefined) {
+  constructor(
+    params?: {
+      canvas?: HTMLCanvasElement;
+      width?: number;
+      height?: number;
+    }) {
+
+    // if (!params) {
+    //   params = {};
+    // }
+
+    const {
+      canvas = undefined,
+      width = 800,
+      height = 600,
+    } = params || {};
+
+    this.renderer = new WebGLRenderer({ antialias: true, canvas: canvas });
     // this.renderer = new WebGLRenderer({
     //   powerPreference: "high-performance",
     //   antialias: false,
@@ -55,10 +72,12 @@ export class ChromatinBasicRenderer {
     //   depth: false,
     //   canvas });
     this.renderer.setClearColor("#eeeeee");
-    this.renderer.setSize(800, 600);
+    // this.renderer.setSize(800, 600);
+    this.renderer.setSize(width, height);
     this.scene = new Scene();
     // camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this.camera = new PerspectiveCamera(75, 800 / 600, 0.1, 1000);
+    // this.camera = new PerspectiveCamera(75, 800 / 600, 0.1, 1000);
+    this.camera = new PerspectiveCamera(25, width / height, 0.1, 1000);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.camera.position.z = 1.0;

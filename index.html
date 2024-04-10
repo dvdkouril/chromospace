@@ -64,17 +64,27 @@
 
 
           //~ create renderer
-          const renderer = new ChromatinBasicRenderer();
+          /**
+          // options:
+          new ChromatinBasicRenderer() => fill parent
+          new ChromatinBasicRenderer({width: 800, height: 600}) => set 800x600
+          new ChromatinBasicRenderer({width: 800}) => use default aspect ratio
+          new ChromatinBasicRenderer({height: 600}) => use default aspect ratio
+          new ChromatinBasicRenderer({canvas: canvas}) => use the suplied canvas
+          new ChromatinBasicRenderer({canvas: canvas, width}) => use the suplied canvas
+          */
+          // const renderer = new ChromatinBasicRenderer({width: 300});
+          const renderer = new ChromatinBasicRenderer({width: 300, height: 200});
           renderer.addScene(chromatinScene);
 
           //~ add canvas to the page
           let appEl = document.querySelector('#app');
-          const w = 800;
-          const h = 600;
+          // const w = 800;
+          // const h = 600;
           const canvas = renderer.getCanvasElement();
           if (canvas) {
-              canvas.width = w;
-              canvas.height = h;
+              // canvas.width = w;
+              // canvas.height = h;
               appEl.appendChild(canvas);
           }
 
