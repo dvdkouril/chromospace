@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# files for testing (downloaded by vitest.setup.js)
+test-data/

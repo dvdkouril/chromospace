@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import fs from 'fs';
 
 import { coordinateToBin } from "../utils.ts";
 import { get } from "../chromatin.ts";
@@ -14,17 +15,11 @@ test("coordinateToBin with start offset", () => {
   expect(coordinateToBin(33, 10, 20)).toBe(1);
 });
 
-
-const fetchTsv = async (url: string) => {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
-    const fileContent = await response.text();
-    return fileContent;
-};
-
 test("get chromosome", async () => {
-  const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
-  const fileTan2018 = await fetchTsv(urlTan2018);
+  // const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
+  // const fileTan2018 = await fetchTsv(urlTan2018);
+  const filename = "test-data/tan2018.tsv";
+  const fileTan2018 = fs.readFileSync(filename).toString();
   const testModel = parse3dg(fileTan2018 , { center: true, normalize: true });
 
   expect(testModel).toBeDefined();
