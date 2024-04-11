@@ -5,14 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
+    <style>
+      html, body {
+         margin: 0;
+         height: 100%;
+      }
+      #app {
+        height: 100%;
+        background-color: #fdf2f8;
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
-    <!-- <script type="module" src="/src/main.ts"></script> -->
+    <div id="app">
+      <canvas id="c"></canvas>
+    </div>
     <script type="module">
-    //import { ChromatinBasicRenderer } from "./src/renderer/ChromatinBasicRenderer.ts";
-    //import { parseTsv } from './src/data-loaders/tsv-parser.ts';
-    //import { addChunkToScene } from './src/chromatin.ts';
     import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene, addModelToScene, getBinsFromPart } from './src/main.ts';
 
       console.log("hello!");
@@ -64,27 +72,14 @@
 
 
           //~ create renderer
-          /**
-          // options:
-          new ChromatinBasicRenderer() => fill parent
-          new ChromatinBasicRenderer({width: 800, height: 600}) => set 800x600
-          new ChromatinBasicRenderer({width: 800}) => use default aspect ratio
-          new ChromatinBasicRenderer({height: 600}) => use default aspect ratio
-          new ChromatinBasicRenderer({canvas: canvas}) => use the suplied canvas
-          new ChromatinBasicRenderer({canvas: canvas, width}) => use the suplied canvas
-          */
-          // const renderer = new ChromatinBasicRenderer({width: 300});
-          const renderer = new ChromatinBasicRenderer({width: 300, height: 200});
+          const can = document.querySelector( '#c' );
+          const renderer = new ChromatinBasicRenderer({canvas: can});
           renderer.addScene(chromatinScene);
 
           //~ add canvas to the page
           let appEl = document.querySelector('#app');
-          // const w = 800;
-          // const h = 600;
           const canvas = renderer.getCanvasElement();
           if (canvas) {
-              // canvas.width = w;
-              // canvas.height = h;
               appEl.appendChild(canvas);
           }
 

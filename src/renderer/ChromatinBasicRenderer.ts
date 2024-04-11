@@ -50,18 +50,10 @@ export class ChromatinBasicRenderer {
   constructor(
     params?: {
       canvas?: HTMLCanvasElement;
-      width?: number;
-      height?: number;
     }) {
-
-    // if (!params) {
-    //   params = {};
-    // }
-
+    
     const {
       canvas = undefined,
-      width = 800,
-      height = 600,
     } = params || {};
 
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvas });
@@ -72,16 +64,13 @@ export class ChromatinBasicRenderer {
     //   depth: false,
     //   canvas });
     this.renderer.setClearColor("#eeeeee");
-    // this.renderer.setSize(800, 600);
-    this.renderer.setSize(width, height);
     this.scene = new Scene();
-    // camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    // this.camera = new PerspectiveCamera(75, 800 / 600, 0.1, 1000);
-    this.camera = new PerspectiveCamera(25, width / height, 0.1, 1000);
+    this.camera = new PerspectiveCamera(25, 2, 0.1, 1000);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    this.camera.position.z = 1.0;
+    this.camera.position.z = 3.0;
     controls.update();
+
 
     const lightA = new DirectionalLight();
     lightA.position.set(3, 10, 10);
@@ -102,6 +91,12 @@ export class ChromatinBasicRenderer {
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
+    this.resizeRendererToDisplaySize = this.resizeRendererToDisplaySize.bind(this);
+
+    //~ setting size of canvas to fill parent
+    const c = this.getCanvasElement();
+    c.style.width = '100%';
+    c.style.height = '100%';
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -234,10 +229,29 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
+  resizeRendererToDisplaySize(renderer: WebGLRenderer) {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width = Math.floor(canvas.clientWidth * pixelRatio);
+    const height = Math.floor(canvas.clientHeight * pixelRatio);
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
   render() {
     this.redrawRequest = requestAnimationFrame(this.render);
 
     console.log("drawing");
+
+    //~ from: https://threejs.org/manual/#en/responsive
+    if (this.resizeRendererToDisplaySize(this.renderer)) {
+      const canvas = this.renderer.domElement;
+      this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      this.camera.updateProjectionMatrix();
+    }
 
     this.renderer.render(this.scene, this.camera);
     // this.composer.render();
