@@ -46,14 +46,18 @@ export class ChromatinBasicRenderer {
   //~ dom
   redrawRequest: number = 0;
 
+  alwaysRedraw: boolean = false;
+
   // constructor(canvas: HTMLCanvasElement | undefined = undefined) {
   constructor(
     params?: {
       canvas?: HTMLCanvasElement;
+      alwaysRedraw?: boolean;
     }) {
     
     const {
       canvas = undefined,
+      alwaysRedraw = true,
     } = params || {};
 
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvas });
@@ -97,6 +101,11 @@ export class ChromatinBasicRenderer {
     const c = this.getCanvasElement();
     c.style.width = '100%';
     c.style.height = '100%';
+
+    this.alwaysRedraw = alwaysRedraw;
+    if (!alwaysRedraw) {
+      controls.addEventListener('change', this.render);
+    }
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -242,7 +251,9 @@ export class ChromatinBasicRenderer {
   }
 
   render() {
-    this.redrawRequest = requestAnimationFrame(this.render);
+    if (this.alwaysRedraw) {
+      this.redrawRequest = requestAnimationFrame(this.render);
+    }
 
     console.log("drawing");
 
