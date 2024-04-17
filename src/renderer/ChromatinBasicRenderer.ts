@@ -179,9 +179,12 @@ export class ChromatinBasicRenderer {
        * */
       for (let [i, sel] of d.viewConfig.selections.entries()) {
         for (let r of sel.regions) {
-          const [selectedPart, _] = get(d.structure, `${r.chromosome}:${r.start}-${r.end}`);
-          if (selectedPart) {
-            this.buildPart(selectedPart.chunk, chunkColors[i], undefined, d.viewConfig.binSizeScale);
+          const result = get(d.structure, `${r.chromosome}:${r.start}-${r.end}`);
+          if (result) {
+            const [selectedPart, _] = result;
+            if (selectedPart) {
+              this.buildPart(selectedPart.chunk, chunkColors[i], undefined, d.viewConfig.binSizeScale);
+            }
           }
         }
       }
