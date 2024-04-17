@@ -3,6 +3,7 @@ import {
   ChromatinChunk,
   ChromatinPart,
   ChromatinModel,
+  Selection,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
@@ -35,10 +36,20 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
 function getChromosome(
   model: ChromatinModel,
   chrName: string,
-): ChromatinPart | null {
+): [ChromatinPart, Selection] | null {
   for (let part of model.parts) {
     if (part.label == chrName) {
-      return part;
+      const selection: Selection = {
+        regions: [
+          {
+            chromosome: chrName,
+            start: part.coordinates.start,
+            end: part.coordinates.end,
+          }],
+        color: "#FF00FF",
+        label: "",
+      };
+      return [part, selection];
       //TODO: what if more parts modeling the same chromosome?
     }
   }
@@ -50,8 +61,9 @@ function getChromosomeAtCoordinates(
   chrName: string,
   start: number,
   end: number,
-) {
+): [ChromatinPart, Selection] | null {
   let newPart: ChromatinPart | null = null;
+  let selection: Selection | null = null;
   for (let part of model.parts) {
     //~ first finding the specified chromosome
     if (chrName != part.label) {
@@ -76,14 +88,30 @@ function getChromosomeAtCoordinates(
         id: -1,
       },
       coordinates: {
+        chromosome: chrName,
         start: start, //TODO: adjust for any range clipping
         end: end, //TODO: adjust for any range clipping
       },
       resolution: part.resolution,
     };
+
+    selection = {
+      regions: [
+        {
+          chromosome: chrName,
+          start: newPart.coordinates.start,
+          end: newPart.coordinates.end,
+        }],
+      color: "#FF00FF",
+      label: "",
+    };
   }
 
-  return newPart;
+  if (!newPart || !selection) {
+    return null;
+  } else {
+    return [newPart, selection];
+  }
 }
 
 /**
@@ -94,7 +122,7 @@ function getChromosomeAtCoordinates(
 export function get(
   model: ChromatinModel,
   coordinates: string,
-): ChromatinPart | null {
+): [ChromatinPart, Selection] | null {
   console.log(`getRange with ${model} and ${coordinates}`);
 
   //~ Possibly just a chromosome name (without any coordinates)
