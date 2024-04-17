@@ -3,7 +3,6 @@ import {
   ChromatinChunk,
   ChromatinPart,
   ChromatinModel,
-  ChromatinSceneConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
@@ -141,11 +140,11 @@ export function getBinsFromPart(
 }
 
 export function display(
-  scene: ChromatinScene,
-  config?: ChromatinSceneConfig,
+  scene: ChromatinScene, 
+  alwaysRedraw: boolean,
 ): [ChromatinBasicRenderer, HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer();
-  renderer.addScene(scene, config);
+  const renderer = new ChromatinBasicRenderer({ alwaysRedraw: alwaysRedraw });
+  renderer.addScene(scene);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
   return [renderer, canvas];
