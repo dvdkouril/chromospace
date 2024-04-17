@@ -142,6 +142,16 @@ export function get(
   return getChromosomeAtCoordinates(model, chr, start, end);
 }
 
+export function getRegionAsPart(model: ChromatinModel, coordinates: string): ChromatinPart | null {
+  const result = get(model, coordinates);
+  if (result) {
+    const [part, _] = result;
+    return part;
+  } else {
+    return null;
+  }
+}
+
 export function getBinsFromPart(
   part: ChromatinPart,
   start: number,
