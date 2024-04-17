@@ -177,11 +177,11 @@ export class ChromatinBasicRenderer {
        * In the future, it would be great to either generate the individual parts (selected vs. not selected)
        * and render those.
        * */
-      for (let sel of d.viewConfig.selections) {
+      for (let [i, sel] of d.viewConfig.selections.entries()) {
         for (let r of sel.regions) {
-          const selectedPart = get(d.structure, `${r.chromosome}:${r.start}-${r.end}`);
+          const [selectedPart, _] = get(d.structure, `${r.chromosome}:${r.start}-${r.end}`);
           if (selectedPart) {
-            this.buildPart(selectedPart.chunk, chroma("#FF0000"), undefined, d.viewConfig.binSizeScale);
+            this.buildPart(selectedPart.chunk, chunkColors[i], undefined, d.viewConfig.binSizeScale);
           }
         }
       }
