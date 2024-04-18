@@ -3,10 +3,64 @@ import {
   ChromatinChunk,
   ChromatinPart,
   ChromatinModel,
-  ChromatinSceneConfig,
+  Selection,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
+
+// function initScene(): ChromatinScene;
+// function initScene(chunk: ChromatinChunk): ChromatinScene;
+// function initScene(model: ChromatinModel): ChromatinScene;
+// function initScene(initStructure?: ChromatinModel | ChromatinChunk | ChromatinModelDisplayable): ChromatinScene {
+//   let scene: ChromatinScene = {
+//     models: [],
+//     chunks: [],
+//     displayables: [],
+//     config: {
+//       layout: "center",
+//     },
+//   };
+//   if (initStructure instanceof ChromatinModel) {
+//     scene = {
+//       ...scene,
+//       models: [...scene.models, model]
+//     }
+//   }
+//
+//   if (chunk != undefined) {
+//     scene = {
+//       ...scene,
+//       chunks: [...scene.chunks, chunk]
+//     }
+//   }
+//
+//   if (displayable != undefined) {
+//     scene = {
+//       ...scene,
+//       displayables: [...scene.displayables, displayable]
+//     }
+//   }
+//   return scene;
+// }
+//
+// const modelA: ChromatinModel = {
+//   parts: [],
+//   assembly: "",
+// };
+// const chunk: ChromatinChunk = {
+//   bins: [],
+//   rawBins: [],
+//   id: 0,
+// };
+// // const displayableModel: ChromatinModelDisplayable = {};
+// // const scene = initScene(modelA, modelB, chunk, displayableModel);
+// const scene = initScene();
+// const sceneB = initScene(modelA);
+// const sceneC = initScene(chunk);
+//
+// console.log(scene);
+// console.log(sceneB);
+// console.log(sceneC);
 
 /**
  * Utility function to add a chunk to scene
@@ -36,10 +90,20 @@ export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
 function getChromosome(
   model: ChromatinModel,
   chrName: string,
-): ChromatinPart | null {
+): [ChromatinPart, Selection] | null {
   for (let part of model.parts) {
     if (part.label == chrName) {
-      return part;
+      const selection: Selection = {
+        regions: [
+          {
+            chromosome: chrName,
+            start: part.coordinates.start,
+            end: part.coordinates.end,
+          }],
+        color: "#FF00FF",
+        label: "",
+      };
+      return [part, selection];
       //TODO: what if more parts modeling the same chromosome?
     }
   }
@@ -51,8 +115,9 @@ function getChromosomeAtCoordinates(
   chrName: string,
   start: number,
   end: number,
-) {
+): [ChromatinPart, Selection] | null {
   let newPart: ChromatinPart | null = null;
+  let selection: Selection | null = null;
   for (let part of model.parts) {
     //~ first finding the specified chromosome
     if (chrName != part.label) {
@@ -77,14 +142,30 @@ function getChromosomeAtCoordinates(
         id: -1,
       },
       coordinates: {
+        chromosome: chrName,
         start: start, //TODO: adjust for any range clipping
         end: end, //TODO: adjust for any range clipping
       },
       resolution: part.resolution,
     };
+
+    selection = {
+      regions: [
+        {
+          chromosome: chrName,
+          start: newPart.coordinates.start,
+          end: newPart.coordinates.end,
+        }],
+      color: "#FF00FF",
+      label: "",
+    };
   }
 
-  return newPart;
+  if (!newPart || !selection) {
+    return null;
+  } else {
+    return [newPart, selection];
+  }
 }
 
 /**
@@ -95,7 +176,7 @@ function getChromosomeAtCoordinates(
 export function get(
   model: ChromatinModel,
   coordinates: string,
-): ChromatinPart | null {
+): [ChromatinPart, Selection] | null {
   console.log(`getRange with ${model} and ${coordinates}`);
 
   //~ Possibly just a chromosome name (without any coordinates)
@@ -113,6 +194,16 @@ export function get(
   const end = parseInt(coords.split("-")[1]);
 
   return getChromosomeAtCoordinates(model, chr, start, end);
+}
+
+export function getRegionAsPart(model: ChromatinModel, coordinates: string): ChromatinPart | null {
+  const result = get(model, coordinates);
+  if (result) {
+    const [part, _] = result;
+    return part;
+  } else {
+    return null;
+  }
 }
 
 export function getBinsFromPart(
@@ -140,12 +231,16 @@ export function getBinsFromPart(
   return newPart;
 }
 
+export type DisplayOptions = {
+  alwaysRedraw?: boolean;
+};
+
 export function display(
-  scene: ChromatinScene,
-  config?: ChromatinSceneConfig,
+  scene: ChromatinScene, 
+  options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer();
-  renderer.addScene(scene, config);
+  const renderer = new ChromatinBasicRenderer({ alwaysRedraw: options.alwaysRedraw });
+  renderer.addScene(scene);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
   return [renderer, canvas];

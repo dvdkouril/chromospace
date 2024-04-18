@@ -1,10 +1,5 @@
 import { vec3 } from "gl-matrix";
 
-export type GenomicCoordinates = {
-  start: number;
-  end: number;
-};
-
 /**
  * A simple list of bin positions.
  * Used in two scenarios:
@@ -24,6 +19,14 @@ export type ChromatinChunk = {
   id: number;
 };
 
+export type GenomicCoordinates = {
+  chromosome: string;
+  /* basepair starting position */
+  start: number;
+  /* basepair ending position */
+  end: number;
+};
+
 /**
  * Adds information identifying the 3D part on genomic sequence
  */
@@ -40,19 +43,52 @@ export type ChromatinPart = {
  * A full model that contains annotation about which genomic regions the individual parts correspond to
  */
 export type ChromatinModel = {
+  /* Distinct, separated parts of a chromatin model. Most often single chromosomes. */
   parts: ChromatinPart[];
-  position: { x: number; y: number; z: number };
+  /* Identifying organism and genome assembly */
+  assembly: string;
+};
+
+type ChromatinSceneConfig = {
+  layout: "center" | "grid";
 };
 
 export type ChromatinScene = {
   chunks: ChromatinChunk[];
   models: ChromatinModel[];
 
-  config: {
-    layout: "center" | "grid";
-  };
+  displayables: ChromatinModelDisplayable[];
+
+  config: ChromatinSceneConfig;
 };
-export type ChromatinSceneConfig = {
+
+/**
+ * TODO: come up with a better name, this is kinda stupid.
+ * What this structure should represent is a visual instantiation of a ChromatinModel, with different attributes influencing its visual presentation
+ */
+// export type ChromatinModelInstance = {
+export type ChromatinModelDisplayable = {
+  /* The 3D structure, just the raw data, nothing about the visual appearance */
+  structure: ChromatinModel;
+  // signal: ChromatinMappableSignal; //~ placeholder: in the "displayable" it probably makes sense to have the data by which you'll visually modify the 3D structure
+  viewConfig: ChromatinModelViewConfig; //~ viewConfig then specifies how the `signal` is mapped to visual attributes of the structure
+};
+
+export type ChromatinModelViewConfig = {
   binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
   coloring?: "constant" | "scale";
+  // signals: []; //~ placeholder: for later when I have genomic signals for coloring the structure too
+  selections: Selection[];
+};
+
+/**
+ * Two scenarios in mind:
+ *  1. continuous selection along the genomic sequence
+ *    - in this case, the `regions` array will just a single selected region
+ *  2. selection in 3D (i.e., resulting in many disconnected regions)
+ */
+export type Selection = {
+  regions: GenomicCoordinates[];
+  color: string;
+  label: string;
 };
