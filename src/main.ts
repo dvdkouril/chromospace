@@ -10,6 +10,7 @@ export {
   display,
   get,
   getBinsFromPart,
+  initScene,
 } from "./chromatin.ts";
 
 export {

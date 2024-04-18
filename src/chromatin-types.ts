@@ -39,9 +39,7 @@ export type ChromatinPart = {
   label?: string;
 };
 
-/**
- * A full model that contains annotation about which genomic regions the individual parts correspond to
- */
+/* A full model that contains annotation about which genomic regions the individual parts correspond to */
 export type ChromatinModel = {
   /* Distinct, separated parts of a chromatin model. Most often single chromosomes. */
   parts: ChromatinPart[];
@@ -49,25 +47,17 @@ export type ChromatinModel = {
   assembly: string;
 };
 
-type ChromatinSceneConfig = {
-  layout: "center" | "grid";
-};
-
-export type ChromatinScene = {
-  chunks: ChromatinChunk[];
-  models: ChromatinModel[];
-
-  displayables: ChromatinModelDisplayable[];
-
-  config: ChromatinSceneConfig;
-};
+export type DisplayableChunk = {
+  kind: "chunk";
+  structure: ChromatinChunk;
+  color: string;
+}
 
 /**
- * TODO: come up with a better name, this is kinda stupid.
  * What this structure should represent is a visual instantiation of a ChromatinModel, with different attributes influencing its visual presentation
  */
-// export type ChromatinModelInstance = {
-export type ChromatinModelDisplayable = {
+export type DisplayableModel = {
+  kind: "model";
   /* The 3D structure, just the raw data, nothing about the visual appearance */
   structure: ChromatinModel;
   // signal: ChromatinMappableSignal; //~ placeholder: in the "displayable" it probably makes sense to have the data by which you'll visually modify the 3D structure
@@ -91,4 +81,13 @@ export type Selection = {
   regions: GenomicCoordinates[];
   color: string;
   label: string;
+};
+
+type ChromatinSceneConfig = {
+  layout: "center" | "grid";
+};
+
+export type ChromatinScene = {
+  structures: (DisplayableChunk | DisplayableModel)[];
+  config: ChromatinSceneConfig;
 };
