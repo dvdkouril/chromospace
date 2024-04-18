@@ -177,11 +177,15 @@ export function getBinsFromPart(
   return newPart;
 }
 
+export type DisplayOptions = {
+  alwaysRedraw?: boolean;
+};
+
 export function display(
   scene: ChromatinScene, 
-  alwaysRedraw: boolean,
+  options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer({ alwaysRedraw: alwaysRedraw });
+  const renderer = new ChromatinBasicRenderer({ alwaysRedraw: options.alwaysRedraw });
   renderer.addScene(scene);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
