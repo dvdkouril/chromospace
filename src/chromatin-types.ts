@@ -1,11 +1,5 @@
 import { vec3 } from "gl-matrix";
 
-export type GenomicCoordinates = {
-  chromosome: string;
-  start: number;
-  end: number;
-};
-
 /**
  * A simple list of bin positions.
  * Used in two scenarios:
@@ -25,6 +19,14 @@ export type ChromatinChunk = {
   id: number;
 };
 
+export type GenomicCoordinates = {
+  chromosome: string;
+  /* basepair starting position */
+  start: number;
+  /* basepair ending position */
+  end: number;
+};
+
 /**
  * Adds information identifying the 3D part on genomic sequence
  */
@@ -41,8 +43,14 @@ export type ChromatinPart = {
  * A full model that contains annotation about which genomic regions the individual parts correspond to
  */
 export type ChromatinModel = {
+  /* Distinct, separated parts of a chromatin model. Most often single chromosomes. */
   parts: ChromatinPart[];
+  /* Identifying organism and genome assembly */
   assembly: string;
+};
+
+type ChromatinSceneConfig = {
+  layout: "center" | "grid";
 };
 
 export type ChromatinScene = {
@@ -51,9 +59,7 @@ export type ChromatinScene = {
 
   displayables: ChromatinModelDisplayable[];
 
-  config: {
-    layout: "center" | "grid";
-  };
+  config: ChromatinSceneConfig;
 };
 
 /**
@@ -65,20 +71,20 @@ export type ChromatinModelDisplayable = {
   /* The 3D structure, just the raw data, nothing about the visual appearance */
   structure: ChromatinModel;
   // signal: ChromatinMappableSignal; //~ placeholder: in the "displayable" it probably makes sense to have the data by which you'll visually modify the 3D structure
-
   viewConfig: ChromatinModelViewConfig; //~ viewConfig then specifies how the `signal` is mapped to visual attributes of the structure
 };
 
 export type ChromatinModelViewConfig = {
   binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
   coloring?: "constant" | "scale";
+  // signals: []; //~ placeholder: for later when I have genomic signals for coloring the structure too
   selections: Selection[];
 };
 
 /**
  * Two scenarios in mind:
  *  1. continuous selection along the genomic sequence
- *    - in this case, the regions array will just a single selected region
+ *    - in this case, the `regions` array will just a single selected region
  *  2. selection in 3D (i.e., resulting in many disconnected regions)
  */
 export type Selection = {
@@ -86,10 +92,3 @@ export type Selection = {
   color: string;
   label: string;
 };
-
-/**
- * The idea is that when rendering, you get both the model and a selection:
- * render(model, selection);
- * and then when building that part for rendering, you just look at selection
- * and see if it's undefined (=you draw everything) or an actual selection
- */
