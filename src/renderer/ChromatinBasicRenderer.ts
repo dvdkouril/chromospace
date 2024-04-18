@@ -21,13 +21,12 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   ChromatinChunk,
   ChromatinScene,
-  ChromatinModel,
-  Selection,
-  ChromatinModelDisplayable,
+  DisplayableChunk,
+  DisplayableModel,
+  ChromatinModelViewConfig,
 } from "../chromatin-types";
 import {
   estimateBestSphereSize,
-  flattenAllBins,
   computeTubes,
   decideColor,
 } from "../utils";
@@ -50,7 +49,6 @@ export class ChromatinBasicRenderer {
 
   alwaysRedraw: boolean = false;
 
-  // constructor(canvas: HTMLCanvasElement | undefined = undefined) {
   constructor(
     params?: {
       canvas?: HTMLCanvasElement;
@@ -116,21 +114,36 @@ export class ChromatinBasicRenderer {
 
   addScene(scene: ChromatinScene) {
     this.chromatinScene = scene;
+    this.buildStructures(scene.structures);
+  }
 
-    type ModelConfig = {
-      coloring: "constant" | "scale";
-      binSizeScale: number;
-      selections: Selection[];
-    };
-    // if (!config) {
-      // config = {
-      const config: ModelConfig = {
-        coloring: "constant",
-        binSizeScale: 1.0,
-        selections: [],
-      };
-    // }
-    
+  buildStructures(structures: (DisplayableChunk | DisplayableModel)[]) {
+    for (let s of structures) {
+      switch (s.kind) {
+        case "model":
+          this.buildDisplayableModel(s);
+          break;
+        case "chunk":
+          this.buildDisplayableChunk(s);
+          break;
+      }
+    }
+  }
+
+  //~ TODO: move somewhere else!
+  decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: number, n: number): [ChromaColor | undefined, ChromaScale | undefined, number] {
+    let color: ChromaColor | undefined = undefined;
+    let scale: ChromaScale | undefined = undefined;
+    // let size = 1.0;
+    let size = 0.001; //TODO: estimate
+    //~ https://gka.github.io/chroma.js/#cubehelix
+    const customCubeHelix = chroma
+      .cubehelix()
+      .start(200)
+      .rotations(-0.8)
+      .gamma(0.8)
+      .lightness([0.3, 0.8]);
+
     const colorScale = chroma.scale([
       "white",
       "rgba(245,166,35,1.0)",
@@ -138,106 +151,77 @@ export class ChromatinBasicRenderer {
       "black",
     ]);
 
-    //~ "anonymous" chunks
-    this.addChunks(scene.chunks, colorScale, config);
-
-    //~ complete models
-    this.addModels(scene.models, colorScale, config);
-
-    //~ "displayables" (model + viewConfig)
-    this.addDisplayables(scene.displayables, colorScale);
-  }
-
-  addDisplayables(displayables: ChromatinModelDisplayable[], colorScale: ChromaScale<ChromaColor>) {
-
-    //~ todo: better
-    const chunkColors = [...Array(256).keys()].map((_) => chroma.random());
-
-    const hasSelection = displayables.some((d) => d.viewConfig.selections.length > 0);
+    const needColorsN = n;
+    const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
     const deemphasizedColor = chroma("#a3a3a3");
+    const hasSelection = viewConfig.selections.length > 0;
 
-    for (let d of displayables) {
-      /* Same as with normal model: make each part into a "model" to render */
-      for (let [i, part] of d.structure.parts.entries()) {
-        if (d.viewConfig.coloring == "constant") {
-          //~ A) constant colors for each model part
-          const decideColor = hasSelection ? deemphasizedColor : chunkColors[i];
-          this.buildPart(part.chunk, decideColor, undefined);
-        } else if (d.viewConfig.coloring == "scale") {
-          //~ B) color scale for each part
-          if (hasSelection) {
-            this.buildPart(part.chunk, deemphasizedColor, undefined);
-          } else {
-            this.buildPart(part.chunk, undefined, colorScale);
+    if (viewConfig.coloring == "constant") {
+      color = hasSelection ? deemphasizedColor : chunkColors[i];
+    } else if (viewConfig.coloring == "scale") {
+      color = hasSelection ? deemphasizedColor : undefined;
+      scale = hasSelection ? undefined : colorScale;
+    }
+
+    return [color, scale, size];
+  }
+
+  buildDisplayableModel(model: DisplayableModel) {
+
+    for (let [i, part] of model.structure.parts.entries()) {
+      const n = model.structure.parts.length;
+      const [singleColor, colorScale, sphereSize] = this.decideVisualParameters(model.viewConfig, i, n);
+      this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
+    }
+
+    /* Indicate selections:
+     * For now I just draw a somewhat bigger mark "over" the basic structure.
+     * In the future, it would be great to either generate the individual parts (selected vs. not selected)
+     * and render those.
+     * */
+    const customCubeHelix = chroma
+      .cubehelix()
+      .start(200)
+      .rotations(-0.8)
+      .gamma(0.8)
+      .lightness([0.3, 0.8]);
+    const needColorsN = model.viewConfig.selections.length;
+    const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
+    for (let [i, sel] of model.viewConfig.selections.entries()) {
+      for (let r of sel.regions) {
+        const result = get(model.structure, `${r.chromosome}:${r.start}-${r.end}`);
+        if (result) {
+          const [selectedPart, _] = result;
+          if (selectedPart) {
+            this.buildPart(selectedPart.chunk, chunkColors[i], undefined, model.viewConfig.binSizeScale);
           }
         }
       }
-      /* Extra: indicate selections:
-       * For now I just draw a somewhat bigger mark "over" the basic structure.
-       * In the future, it would be great to either generate the individual parts (selected vs. not selected)
-       * and render those.
-       * */
-      for (let [i, sel] of d.viewConfig.selections.entries()) {
-        for (let r of sel.regions) {
-          const result = get(d.structure, `${r.chromosome}:${r.start}-${r.end}`);
-          if (result) {
-            const [selectedPart, _] = result;
-            if (selectedPart) {
-              this.buildPart(selectedPart.chunk, chunkColors[i], undefined, d.viewConfig.binSizeScale);
-            }
-          }
-        }
-      }
     }
   }
 
-  addChunks(chunks: ChromatinChunk[], colorScale: ChromaScale<ChromaColor>, config: {
-        coloring: "constant" | "scale";
-        binSizeScale: number;
-        selections: Selection[];
-      }) {
-
-    const chunkColors = chunks.map((_) => chroma.random());
-    for (let [i, chunk] of chunks.entries()) {
-      if (config.coloring == "constant") {
-        //~ A) setting a constant color for whole chunk
-        this.buildPart(chunk, chunkColors[i]);
-      } else if (config.coloring == "scale") {
-        //~ B) using a color scale with the bin index as lookup
-        this.buildPart(chunk, undefined, colorScale);
-      }
-    }
+  buildDisplayableChunk(chunk: DisplayableChunk) {
+    console.log("not implemented, but received:");
+    console.log(chunk);
   }
 
-  addModels(models: ChromatinModel[], colorScale: ChromaScale<ChromaColor>, config: {
-        coloring: "constant" | "scale";
-        binSizeScale: number;
-        selections: Selection[];
-      }) {
-    //~ complete models
-    for (let model of models) {
-      const needColorsN = model.parts.length;
-      const customCubeHelix = chroma
-        .cubehelix()
-        .start(200)
-        .rotations(-0.8)
-        .gamma(0.8)
-        .lightness([0.3, 0.8]);
-      const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-      const allBins = flattenAllBins(model.parts.map((p) => p.chunk));
-      // const sphereSize = estimateBestSphereSize(allBins);
-      const sphereSize = estimateBestSphereSize(allBins) * 10;
-      for (let [i, part] of model.parts.entries()) {
-        if (config.coloring == "constant") {
-          //~ A) constant colors for each model part
-          this.buildPart(part.chunk, chunkColors[i], undefined, sphereSize);
-        } else if (config.coloring == "scale") {
-          //~ B) color scale for each part
-          this.buildPart(part.chunk, undefined, colorScale, sphereSize);
-        }
-      }
-    }
-  }
+  // addChunks(chunks: ChromatinChunk[], colorScale: ChromaScale<ChromaColor>, config: {
+  //       coloring: "constant" | "scale";
+  //       binSizeScale: number;
+  //       selections: Selection[];
+  //     }) {
+  //
+  //   const chunkColors = chunks.map((_) => chroma.random());
+  //   for (let [i, chunk] of chunks.entries()) {
+  //     if (config.coloring == "constant") {
+  //       //~ A) setting a constant color for whole chunk
+  //       this.buildPart(chunk, chunkColors[i]);
+  //     } else if (config.coloring == "scale") {
+  //       //~ B) using a color scale with the bin index as lookup
+  //       this.buildPart(chunk, undefined, colorScale);
+  //     }
+  //   }
+  // }
 
   buildPart(
     chunk: ChromatinChunk,

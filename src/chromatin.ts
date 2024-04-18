@@ -4,6 +4,9 @@ import {
   ChromatinPart,
   ChromatinModel,
   Selection,
+  DisplayableChunk,
+  DisplayableModel,
+  ChromatinModelViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
@@ -62,6 +65,15 @@ import { coordinateToBin } from "./utils";
 // console.log(sceneB);
 // console.log(sceneC);
 
+export function initScene(): ChromatinScene {
+  return {
+    structures: [],
+    config: {
+      layout: "center",
+    },
+  };
+}
+
 /**
  * Utility function to add a chunk to scene
  */
@@ -69,20 +81,39 @@ export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
 ): ChromatinScene {
+  const newDisplayableChunk: DisplayableChunk = {
+    kind: "chunk",
+    structure: chunk,
+    color: "#ff00ff",
+  };
   scene = {
     ...scene,
-    chunks: [...scene.chunks, chunk],
-  };
+    structures: [...scene.structures, newDisplayableChunk],
+  }
   return scene;
 }
 
 /**
  * Utility function to add a model to scene
  */
-export function addModelToScene(scene: ChromatinScene, model: ChromatinModel) {
+export function addModelToScene(scene: ChromatinScene, model: ChromatinModel, viewConfig?: ChromatinModelViewConfig) {
+  if (viewConfig == undefined) {
+    viewConfig = {
+      binSizeScale: 0.0001,
+      coloring: "constant",
+      selections: [],
+    };
+  }
+
+  const newDisplayableModel: DisplayableModel = {
+    kind: "model",
+    structure: model,
+    viewConfig: viewConfig,
+  };
+
   scene = {
     ...scene,
-    models: [...scene.models, model],
+    structures: [...scene.structures, newDisplayableModel],
   };
   return scene;
 }
