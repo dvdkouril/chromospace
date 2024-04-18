@@ -8,6 +8,60 @@ import {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
 
+// function initScene(): ChromatinScene;
+// function initScene(chunk: ChromatinChunk): ChromatinScene;
+// function initScene(model: ChromatinModel): ChromatinScene;
+// function initScene(initStructure?: ChromatinModel | ChromatinChunk | ChromatinModelDisplayable): ChromatinScene {
+//   let scene: ChromatinScene = {
+//     models: [],
+//     chunks: [],
+//     displayables: [],
+//     config: {
+//       layout: "center",
+//     },
+//   };
+//   if (initStructure instanceof ChromatinModel) {
+//     scene = {
+//       ...scene,
+//       models: [...scene.models, model]
+//     }
+//   }
+//
+//   if (chunk != undefined) {
+//     scene = {
+//       ...scene,
+//       chunks: [...scene.chunks, chunk]
+//     }
+//   }
+//
+//   if (displayable != undefined) {
+//     scene = {
+//       ...scene,
+//       displayables: [...scene.displayables, displayable]
+//     }
+//   }
+//   return scene;
+// }
+//
+// const modelA: ChromatinModel = {
+//   parts: [],
+//   assembly: "",
+// };
+// const chunk: ChromatinChunk = {
+//   bins: [],
+//   rawBins: [],
+//   id: 0,
+// };
+// // const displayableModel: ChromatinModelDisplayable = {};
+// // const scene = initScene(modelA, modelB, chunk, displayableModel);
+// const scene = initScene();
+// const sceneB = initScene(modelA);
+// const sceneC = initScene(chunk);
+//
+// console.log(scene);
+// console.log(sceneB);
+// console.log(sceneC);
+
 /**
  * Utility function to add a chunk to scene
  */
