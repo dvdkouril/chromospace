@@ -149,26 +149,36 @@ export class ChromatinBasicRenderer {
   }
 
   addDisplayables(displayables: ChromatinModelDisplayable[], colorScale: ChromaScale<ChromaColor>) {
-
-    //~ todo: better
-    const chunkColors = [...Array(256).keys()].map((_) => chroma.random());
-
-    const hasSelection = displayables.some((d) => d.viewConfig.selections.length > 0);
+    //~ https://gka.github.io/chroma.js/#cubehelix
+    const customCubeHelix = chroma
+      .cubehelix()
+      .start(200)
+      .rotations(-0.8)
+      .gamma(0.8)
+      .lightness([0.3, 0.8]);
     const deemphasizedColor = chroma("#a3a3a3");
 
+    const hasSelection = displayables.some((d) => d.viewConfig.selections.length > 0);
     for (let d of displayables) {
       /* Same as with normal model: make each part into a "model" to render */
+      //~ preparing colors
+      const needColorsN = d.structure.parts.length;
+      const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
+      //~ preparing bin size
+      const allBins = flattenAllBins(d.structure.parts.map((p) => p.chunk));
+      const sphereSize = estimateBestSphereSize(allBins) * 10; //TODO: this will actually fail to give good size, because I merge all parts into one big array and there will be big distances between the beginning and end of each part
+
       for (let [i, part] of d.structure.parts.entries()) {
         if (d.viewConfig.coloring == "constant") {
           //~ A) constant colors for each model part
           const decideColor = hasSelection ? deemphasizedColor : chunkColors[i];
-          this.buildPart(part.chunk, decideColor, undefined);
+          this.buildPart(part.chunk, decideColor, undefined, sphereSize);
         } else if (d.viewConfig.coloring == "scale") {
           //~ B) color scale for each part
           if (hasSelection) {
-            this.buildPart(part.chunk, deemphasizedColor, undefined);
+            this.buildPart(part.chunk, deemphasizedColor, undefined, sphereSize);
           } else {
-            this.buildPart(part.chunk, undefined, colorScale);
+            this.buildPart(part.chunk, undefined, colorScale, sphereSize);
           }
         }
       }
