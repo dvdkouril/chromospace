@@ -30,10 +30,10 @@ import {
   decideColor,
   decideVisualParameters,
   customCubeHelix,
+  defaultColorScale,
 } from "../utils";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
-import chroma from "chroma-js";
 import { get } from "../chromatin";
 
 export class ChromatinBasicRenderer {
@@ -139,11 +139,7 @@ export class ChromatinBasicRenderer {
       this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
     }
 
-    /* Second: Indicate selections (if any)
-     * For now I just draw a somewhat bigger mark "over" the basic structure.
-     * In the future, it would be great to either generate the individual parts (selected vs. not selected)
-     * and render those.
-     * */
+    /* Second: Indicate selections (if any) */
     const needColorsN = model.viewConfig.selections.length;
     const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
     for (let [i, sel] of model.viewConfig.selections.entries()) {
@@ -159,9 +155,23 @@ export class ChromatinBasicRenderer {
     }
   }
 
+  /*
+   * chunk options:
+   * - custom color
+   * - generate color for me
+   * - custom scale
+   * - default scale
+  */
   buildDisplayableChunk(chunk: DisplayableChunk) {
-    console.log("not implemented, but received:");
-    console.log(chunk);
+    const chunkColors = customCubeHelix.scale().colors(256, null);
+    const randColor = chunkColors[Math.floor(Math.random() * 255)];
+    if (chunk.coloring == "constant") {
+      //~ A) setting a constant color for whole chunk
+      this.buildPart(chunk.structure, randColor);
+    } else if (chunk.coloring == "scale") {
+      //~ B) using a color scale with the bin index as lookup
+      this.buildPart(chunk.structure, undefined, defaultColorScale);
+    }
   }
 
   // addChunks(chunks: ChromatinChunk[], colorScale: ChromaScale<ChromaColor>, config: {
@@ -191,13 +201,9 @@ export class ChromatinBasicRenderer {
     let sphereRadius = sphereSize
       ? sphereSize
       : estimateBestSphereSize(chunk.bins);
-    // if (this.config) {
-    //   sphereRadius *= this.config.binSizeScale || 1.0;
-    // }
     const tubeSize = 0.4 * sphereRadius;
     const sphereGeometry = new SphereGeometry(sphereRadius);
     const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
-
     const material = new MeshBasicMaterial({ color: "#FFFFFF" });
 
     //~ bin spheres

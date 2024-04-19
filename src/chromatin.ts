@@ -80,11 +80,12 @@ export function initScene(): ChromatinScene {
 export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
+  coloring?: "constant" | "scale",
 ): ChromatinScene {
   const newDisplayableChunk: DisplayableChunk = {
     kind: "chunk",
     structure: chunk,
-    color: "#ff00ff",
+    coloring: coloring || "constant",
   };
   scene = {
     ...scene,

@@ -50,7 +50,8 @@ export type ChromatinModel = {
 export type DisplayableChunk = {
   kind: "chunk";
   structure: ChromatinChunk;
-  color: string;
+  // color: string;
+  coloring?: "constant" | "scale";
 }
 
 /**

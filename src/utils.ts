@@ -12,6 +12,12 @@ export const customCubeHelix = chroma
   .gamma(0.8)
   .lightness([0.3, 0.8]);
 
+export const defaultColorScale = chroma.scale([
+    "white",
+    "rgba(245,166,35,1.0)",
+    "rgba(208,2,27,1.0)",
+    "black",
+  ]);
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
@@ -107,13 +113,6 @@ export function decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: 
   // let size = 1.0;
   let size = 0.001; //TODO: estimate
 
-  const colorScale = chroma.scale([
-    "white",
-    "rgba(245,166,35,1.0)",
-    "rgba(208,2,27,1.0)",
-    "black",
-  ]);
-
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
   const deemphasizedColor = chroma("#a3a3a3");
@@ -123,7 +122,7 @@ export function decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: 
     color = hasSelection ? deemphasizedColor : chunkColors[i];
   } else if (viewConfig.coloring == "scale") {
     color = hasSelection ? deemphasizedColor : undefined;
-    scale = hasSelection ? undefined : colorScale;
+    scale = hasSelection ? undefined : defaultColorScale;
   }
 
   return [color, scale, size];
