@@ -1,8 +1,17 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinChunk } from "./chromatin-types";
+import { ChromatinChunk, ChromatinModelViewConfig } from "./chromatin-types";
 import { Vector3, Euler, Quaternion, Color } from "three";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
+
+//~ https://gka.github.io/chroma.js/#cubehelix
+export const customCubeHelix = chroma
+  .cubehelix()
+  .start(200)
+  .rotations(-0.8)
+  .gamma(0.8)
+  .lightness([0.3, 0.8]);
+
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
@@ -90,6 +99,35 @@ export const decideColor = (
     outColor.set(chroma.random().hex());
   }
 };
+
+/* Returns visual attributes of i-th bin (out on n) based on config */
+export function decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: number, n: number): [ChromaColor | undefined, ChromaScale | undefined, number] {
+  let color: ChromaColor | undefined = undefined;
+  let scale: ChromaScale | undefined = undefined;
+  // let size = 1.0;
+  let size = 0.001; //TODO: estimate
+
+  const colorScale = chroma.scale([
+    "white",
+    "rgba(245,166,35,1.0)",
+    "rgba(208,2,27,1.0)",
+    "black",
+  ]);
+
+  const needColorsN = n;
+  const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
+  const deemphasizedColor = chroma("#a3a3a3");
+  const hasSelection = viewConfig.selections.length > 0;
+
+  if (viewConfig.coloring == "constant") {
+    color = hasSelection ? deemphasizedColor : chunkColors[i];
+  } else if (viewConfig.coloring == "scale") {
+    color = hasSelection ? deemphasizedColor : undefined;
+    scale = hasSelection ? undefined : colorScale;
+  }
+
+  return [color, scale, size];
+}
 
 /*
  * Utility function for converting genomic coordinate (i.e., nucleobase position) to bin index, given certain resolution

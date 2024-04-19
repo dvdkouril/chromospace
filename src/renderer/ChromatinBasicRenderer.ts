@@ -23,12 +23,13 @@ import {
   ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
-  ChromatinModelViewConfig,
 } from "../chromatin-types";
 import {
   estimateBestSphereSize,
   computeTubes,
   decideColor,
+  decideVisualParameters,
+  customCubeHelix,
 } from "../utils";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
@@ -130,61 +131,19 @@ export class ChromatinBasicRenderer {
     }
   }
 
-  //~ TODO: move somewhere else!
-  decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: number, n: number): [ChromaColor | undefined, ChromaScale | undefined, number] {
-    let color: ChromaColor | undefined = undefined;
-    let scale: ChromaScale | undefined = undefined;
-    // let size = 1.0;
-    let size = 0.001; //TODO: estimate
-    //~ https://gka.github.io/chroma.js/#cubehelix
-    const customCubeHelix = chroma
-      .cubehelix()
-      .start(200)
-      .rotations(-0.8)
-      .gamma(0.8)
-      .lightness([0.3, 0.8]);
-
-    const colorScale = chroma.scale([
-      "white",
-      "rgba(245,166,35,1.0)",
-      "rgba(208,2,27,1.0)",
-      "black",
-    ]);
-
-    const needColorsN = n;
-    const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-    const deemphasizedColor = chroma("#a3a3a3");
-    const hasSelection = viewConfig.selections.length > 0;
-
-    if (viewConfig.coloring == "constant") {
-      color = hasSelection ? deemphasizedColor : chunkColors[i];
-    } else if (viewConfig.coloring == "scale") {
-      color = hasSelection ? deemphasizedColor : undefined;
-      scale = hasSelection ? undefined : colorScale;
-    }
-
-    return [color, scale, size];
-  }
-
   buildDisplayableModel(model: DisplayableModel) {
-
+    /* First: Build the whole model */
     for (let [i, part] of model.structure.parts.entries()) {
       const n = model.structure.parts.length;
-      const [singleColor, colorScale, sphereSize] = this.decideVisualParameters(model.viewConfig, i, n);
+      const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
       this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
     }
 
-    /* Indicate selections:
+    /* Second: Indicate selections (if any)
      * For now I just draw a somewhat bigger mark "over" the basic structure.
      * In the future, it would be great to either generate the individual parts (selected vs. not selected)
      * and render those.
      * */
-    const customCubeHelix = chroma
-      .cubehelix()
-      .start(200)
-      .rotations(-0.8)
-      .gamma(0.8)
-      .lightness([0.3, 0.8]);
     const needColorsN = model.viewConfig.selections.length;
     const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
     for (let [i, sel] of model.viewConfig.selections.entries()) {
