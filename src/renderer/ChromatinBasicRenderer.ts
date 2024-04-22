@@ -12,11 +12,14 @@ import {
   Color,
 } from "three";
 import {
-  BloomEffect,
   EffectComposer,
   EffectPass,
   RenderPass,
+  SMAAEffect,
+  SMAAPreset,
 } from "postprocessing";
+// @ts-ignore
+import {N8AOPostPass} from "n8ao";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   ChromatinChunk,
@@ -44,6 +47,7 @@ export class ChromatinBasicRenderer {
   scene: Scene;
   camera: PerspectiveCamera;
   composer: EffectComposer;
+  ssaoPasses: [N8AOPostPass, N8AOPostPass];
 
   //~ dom
   redrawRequest: number = 0;
@@ -61,13 +65,12 @@ export class ChromatinBasicRenderer {
       alwaysRedraw = true,
     } = params || {};
 
-    this.renderer = new WebGLRenderer({ antialias: true, canvas: canvas });
-    // this.renderer = new WebGLRenderer({
-    //   powerPreference: "high-performance",
-    //   antialias: false,
-    //   stencil: false,
-    //   depth: false,
-    //   canvas });
+    this.renderer = new WebGLRenderer({
+      powerPreference: "high-performance",
+      antialias: false,
+      stencil: false,
+      depth: false,
+      canvas });
     this.renderer.setClearColor("#eeeeee");
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(25, 2, 0.1, 1000);
@@ -89,8 +92,27 @@ export class ChromatinBasicRenderer {
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    // this.composer.addPass(new EffectPass(this.camera, new BloomEffect()));
-    this.composer.addPass(new EffectPass(this.camera, new BloomEffect()));
+    // N8AOPass replaces RenderPass
+    const w = 1920;
+    const h = 1080;
+    const n8aopass = new N8AOPostPass(this.scene, this.camera, w, h);
+    n8aopass.configuration.aoRadius = 0.1;
+    n8aopass.configuration.distanceFalloff = 1.0;
+    n8aopass.configuration.intensity = 2.0;
+    this.composer.addPass(n8aopass);
+
+    const n8aopassBigger = new N8AOPostPass(this.scene, this.camera, w, h);
+    n8aopassBigger.configuration.aoRadius = 1.0;
+    n8aopassBigger.configuration.distanceFalloff = 1.0;
+    n8aopassBigger.configuration.intensity = 2.0;
+    this.composer.addPass(n8aopass);
+
+    this.ssaoPasses = [n8aopass, n8aopassBigger];
+
+    /* SMAA Recommended */
+    this.composer.addPass(new EffectPass(this.camera, new SMAAEffect({
+        preset: SMAAPreset.ULTRA
+    })));
 
     this.render = this.render.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
@@ -268,6 +290,10 @@ export class ChromatinBasicRenderer {
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);
+      this.composer.setSize(width, height);
+      const [pass1, pass2] = this.ssaoPasses;
+      pass1.setSize(width, height);
+      pass2.setSize(width, height);
     }
     return needResize;
   }
@@ -286,7 +312,6 @@ export class ChromatinBasicRenderer {
       this.camera.updateProjectionMatrix();
     }
 
-    this.renderer.render(this.scene, this.camera);
-    // this.composer.render();
+    this.composer.render();
   }
 }
