@@ -4,6 +4,7 @@ import fs from 'fs';
 import { coordinateToBin } from "../utils.ts";
 import { get } from "../chromatin.ts";
 import { parse3dg } from "../data-loaders/tsv-parser.ts";
+import { fail } from "assert";
 
 test("coordinateToBin simple", () => {
   //~ In an aligned sequence, and for bins with resolution
@@ -16,8 +17,6 @@ test("coordinateToBin with start offset", () => {
 });
 
 test("get chromosome", async () => {
-  // const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
-  // const fileTan2018 = await fetchTsv(urlTan2018);
   const filename = "test-data/tan2018.tsv";
   const fileTan2018 = fs.readFileSync(filename).toString();
   const testModel = parse3dg(fileTan2018 , { center: true, normalize: true });
@@ -26,11 +25,38 @@ test("get chromosome", async () => {
 
   const chr15patPart = get(testModel!, "15(pat)");
   expect(chr15patPart).toBeDefined();
-  expect(chr15patPart?.label).toBe("15(pat)");
-  expect(chr15patPart?.chunk.bins.length).toBe(825);
+  expect(chr15patPart).toBeTruthy();
+  if (chr15patPart != null) {
+    const [part, selection] = chr15patPart;
+    expect(part.label).toBe("15(pat)");
+    expect(part.chunk.bins.length).toBe(825);
+    expect(selection.label).toBe("15(pat)");
+  }
+  else {
+    fail();
+  }
+});
 
-  const chr1patPart = get(testModel!, "1(pat)");
-  expect(chr1patPart).toBeDefined();
-  expect(chr1patPart?.label).toBe("1(pat)");
-  expect(chr1patPart?.chunk.bins.length).toBe(2487);
+test("get coordinates", () => {
+  const filename = "test-data/tan2018.tsv";
+  const fileTan2018 = fs.readFileSync(filename).toString();
+  const testModel = parse3dg(fileTan2018 , { center: true, normalize: true });
+
+  expect(testModel).toBeDefined();
+
+  const regionPart = get(testModel!, "15(pat):20000000-40000000");
+  expect(regionPart).toBeDefined();
+  expect(regionPart).toBeTruthy();
+  if (regionPart) {
+    const [part, selection] = regionPart;
+    expect(part.chunk.bins.length).toBe(200);
+    expect(part.coordinates.chromosome).toBe("15(pat)");
+    expect(part.coordinates.start).toBe(20000000);
+    expect(part.coordinates.end).toBe(40000000);
+    expect(selection.regions[0].start).toBe(20000000);
+    expect(selection.regions[0].end).toBe(40000000);
+  }
+  else {
+    fail();
+  }
 });

@@ -133,7 +133,7 @@ function getChromosome(
             end: part.coordinates.end,
           }],
         color: "#FF00FF",
-        label: "",
+        label: chrName,
       };
       return [part, selection];
       //TODO: what if more parts modeling the same chromosome?
