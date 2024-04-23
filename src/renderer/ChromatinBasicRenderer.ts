@@ -37,6 +37,7 @@ import {
 } from "../utils";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
+import chroma from "chroma-js";
 import { get } from "../chromatin";
 
 export class ChromatinBasicRenderer {
@@ -154,11 +155,17 @@ export class ChromatinBasicRenderer {
   }
 
   buildDisplayableModel(model: DisplayableModel) {
+    const hasSelection = model.viewConfig.selections.length > 0;
     /* First: Build the whole model */
     for (let [i, part] of model.structure.parts.entries()) {
       const n = model.structure.parts.length;
       const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
-      this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
+      //~ this is a hack: should go inside (?) the decider func above
+      if (hasSelection) {
+        this.buildPart(part.chunk, chroma("#a3a3a3"), undefined, 0.001); //TODO: unnecessary single import of whole chroma
+      } else {
+        this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
+      }
     }
 
     /* Second: Indicate selections (if any) */
@@ -185,34 +192,19 @@ export class ChromatinBasicRenderer {
    * - default scale
   */
   buildDisplayableChunk(chunk: DisplayableChunk) {
-    const chunkColors = customCubeHelix.scale().colors(256, null);
-    const randColor = chunkColors[Math.floor(Math.random() * 255)];
-    if (chunk.coloring == "constant") {
+    if (chunk.viewConfig.coloring == "constant") {
       //~ A) setting a constant color for whole chunk
-      this.buildPart(chunk.structure, randColor);
-    } else if (chunk.coloring == "scale") {
+      const randColor  = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
+      let color = randColor;
+      if (chunk.viewConfig.color) { //~ override color if supplied
+        color = chroma(chunk.viewConfig.color);
+      }
+      this.buildPart(chunk.structure, color);
+    } else if (chunk.viewConfig.coloring == "scale") {
       //~ B) using a color scale with the bin index as lookup
       this.buildPart(chunk.structure, undefined, defaultColorScale);
     }
   }
-
-  // addChunks(chunks: ChromatinChunk[], colorScale: ChromaScale<ChromaColor>, config: {
-  //       coloring: "constant" | "scale";
-  //       binSizeScale: number;
-  //       selections: Selection[];
-  //     }) {
-  //
-  //   const chunkColors = chunks.map((_) => chroma.random());
-  //   for (let [i, chunk] of chunks.entries()) {
-  //     if (config.coloring == "constant") {
-  //       //~ A) setting a constant color for whole chunk
-  //       this.buildPart(chunk, chunkColors[i]);
-  //     } else if (config.coloring == "scale") {
-  //       //~ B) using a color scale with the bin index as lookup
-  //       this.buildPart(chunk, undefined, colorScale);
-  //     }
-  //   }
-  // }
 
   buildPart(
     chunk: ChromatinChunk,

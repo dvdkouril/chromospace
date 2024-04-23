@@ -7,6 +7,7 @@ import {
   DisplayableChunk,
   DisplayableModel,
   ChromatinModelViewConfig,
+  ChromatinChunkViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { coordinateToBin } from "./utils";
@@ -80,12 +81,20 @@ export function initScene(): ChromatinScene {
 export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
-  coloring?: "constant" | "scale",
+  viewConfig?: ChromatinChunkViewConfig,
 ): ChromatinScene {
+  if (viewConfig == undefined) {
+    viewConfig = {
+      binSizeScale: 0.0001,
+      coloring: "constant",
+      color: undefined,
+    };
+  }
+
   const newDisplayableChunk: DisplayableChunk = {
     kind: "chunk",
     structure: chunk,
-    coloring: coloring || "constant",
+    viewConfig: viewConfig,
   };
   scene = {
     ...scene,

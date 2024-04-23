@@ -111,7 +111,7 @@ export function decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: 
   let color: ChromaColor | undefined = undefined;
   let scale: ChromaScale | undefined = undefined;
   // let size = 1.0;
-  let size = 0.001; //TODO: estimate
+  let size = 0.008; //TODO: estimate
 
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);

@@ -50,8 +50,13 @@ export type ChromatinModel = {
 export type DisplayableChunk = {
   kind: "chunk";
   structure: ChromatinChunk;
-  // color: string;
+  viewConfig: ChromatinChunkViewConfig;
+}
+
+export type ChromatinChunkViewConfig = {
+  binSizeScale?: number;
   coloring?: "constant" | "scale";
+  color?: string;
 }
 
 /**
