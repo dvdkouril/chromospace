@@ -141,6 +141,14 @@ export class ChromatinBasicRenderer {
     this.buildStructures(scene.structures);
   }
 
+  updateViewConfig() {
+    if (this.chromatinScene) {
+      this.scene.clear();
+      this.buildStructures(this.chromatinScene.structures);
+      this.redrawRequest = requestAnimationFrame(this.render);
+    }
+  }
+
   buildStructures(structures: (DisplayableChunk | DisplayableModel)[]) {
     for (let s of structures) {
       switch (s.kind) {
