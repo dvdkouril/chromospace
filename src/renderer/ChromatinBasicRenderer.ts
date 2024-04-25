@@ -181,12 +181,16 @@ export class ChromatinBasicRenderer {
     // const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
     for (let [i, sel] of model.viewConfig.selections.entries()) {
       const randColor  = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
+      let color = randColor;
+      if (model.viewConfig.color) { //~ override color if supplied
+        color = chroma(model.viewConfig.color);
+      }
       for (let r of sel.regions) {
         const result = get(model.structure, `${r.chromosome}:${r.start}-${r.end}`);
         if (result) {
           const [selectedPart, _] = result;
           if (selectedPart) {
-            this.buildPart(selectedPart.chunk, randColor, undefined, model.viewConfig.binSizeScale);
+            this.buildPart(selectedPart.chunk, color, undefined, model.viewConfig.binSizeScale);
           }
         }
       }
