@@ -170,9 +170,9 @@ export class ChromatinBasicRenderer {
       const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
       //~ this is a hack: should go inside (?) the decider func above
       if (hasSelection) {
-        this.buildPart(part.chunk, chroma("#a3a3a3"), undefined, 0.001); //TODO: unnecessary single import of whole chroma
+        this.buildPart(part.chunk, { color: chroma("#a3a3a3"), sphereSize: 0.001 }); //TODO: unnecessary single import of whole chroma
       } else {
-        this.buildPart(part.chunk, singleColor, colorScale, sphereSize);
+        this.buildPart(part.chunk, { color: singleColor, colorMap: colorScale, sphereSize: sphereSize });
       }
     }
 
@@ -190,7 +190,7 @@ export class ChromatinBasicRenderer {
         if (result) {
           const [selectedPart, _] = result;
           if (selectedPart) {
-            this.buildPart(selectedPart.chunk, color, undefined, model.viewConfig.binSizeScale);
+            this.buildPart(selectedPart.chunk, { color: color, sphereSize: model.viewConfig.binSizeScale });
           }
         }
       }
@@ -212,25 +212,35 @@ export class ChromatinBasicRenderer {
       if (chunk.viewConfig.color) { //~ override color if supplied
         color = chroma(chunk.viewConfig.color);
       }
-      this.buildPart(chunk.structure, color);
+      this.buildPart(chunk.structure, { color: color });
     } else if (chunk.viewConfig.coloring == "scale") {
       //~ B) using a color scale with the bin index as lookup
-      this.buildPart(chunk.structure, undefined, defaultColorScale);
+      this.buildPart(chunk.structure, { colorMap: defaultColorScale });
     }
   }
 
   buildPart(
     chunk: ChromatinChunk,
-    color?: ChromaColor,
-    colorMap?: ChromaScale,
-    sphereSize?: number,
+    config: {
+      color?: ChromaColor,
+      colorMap?: ChromaScale,
+      sphereSize?: number,
+      makeLinks?: boolean,
+    },
   ) {
+
+    const {
+      color = undefined,
+      colorMap = undefined,
+      sphereSize = undefined,
+      makeLinks = true,
+    } = config;
+
     let sphereRadius = sphereSize
       ? sphereSize
       : estimateBestSphereSize(chunk.bins);
     const tubeSize = 0.4 * sphereRadius;
     const sphereGeometry = new SphereGeometry(sphereRadius);
-    const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
     const material = new MeshBasicMaterial({ color: "#FFFFFF" });
 
     //~ bin spheres
@@ -253,13 +263,25 @@ export class ChromatinBasicRenderer {
     }
     this.scene.add(meshInstcedSpheres);
 
+    if (makeLinks) {
+      this.buildLinks(chunk, tubeSize, color, colorMap);
+    }
+  }
+
+  buildLinks(chunk: ChromatinChunk, tubeSize: number, color?: ChromaColor, colorMap?: ChromaScale) {
     //~ tubes between tubes
     const tubes = computeTubes(chunk.bins);
+    const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
+    const material = new MeshBasicMaterial({ color: "#FFFFFF" });
+
     const meshInstcedTubes = new InstancedMesh(
       tubeGeometry,
       material,
       tubes.length,
     );
+
+    const dummyObj = new Object3D();
+    const colorObj = new Color();
     for (let [i, tube] of tubes.entries()) {
       dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
       dummyObj.rotation.set(
@@ -270,9 +292,8 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-      meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
-
       decideColor(colorObj, i, chunk.bins.length, color, colorMap);
+      meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
       meshInstcedTubes.setColorAt(i, colorObj);
     }
     this.scene.add(meshInstcedTubes);
