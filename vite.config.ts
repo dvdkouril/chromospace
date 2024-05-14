@@ -11,6 +11,7 @@ export default defineConfig({
       // the proper extensions will be added
       fileName: "chromospace",
     },
+    emptyOutDir: false,
     target: "esnext",
     // rollupOptions: {
     //   // make sure to externalize deps that shouldn't be bundled

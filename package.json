@@ -15,8 +15,10 @@
   ],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/main.d.ts",
       "import": "./dist/chromospace.js",
       "require": "./dist/chromospace.umd.cjs"
     }
