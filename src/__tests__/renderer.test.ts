@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
-import { ChromatinBasicRenderer } from "../main";
+import { test } from "vitest";
+// import { ChromatinBasicRenderer } from "../main";
 
 test("empty", () => {
   

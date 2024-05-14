@@ -179,7 +179,7 @@ export class ChromatinBasicRenderer {
     /* Second: Indicate selections (if any) */
     // const needColorsN = model.viewConfig.selections.length;
     // const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-    for (let [i, sel] of model.viewConfig.selections.entries()) {
+    for (let sel of model.viewConfig.selections.values()) {
       const randColor  = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
       let color = randColor;
       if (model.viewConfig.color) { //~ override color if supplied
