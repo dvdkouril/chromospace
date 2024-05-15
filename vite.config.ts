@@ -10,6 +10,7 @@ export default defineConfig({
       name: "chromospace",
       // the proper extensions will be added
       fileName: "chromospace",
+      formats: ["es"],
     },
     emptyOutDir: false,
     target: "esnext",
@@ -26,14 +27,14 @@ export default defineConfig({
     //   },
     // },
     rollupOptions: {
-      output: {
-        format: "es",
-        // Provide global variables to use in the UMD build
-        // for externalized deps
-        globals: {
-          three: "Three",
-        },
-      },
+      // output: {
+      //   format: "es",
+      //   // Provide global variables to use in the UMD build
+      //   // for externalized deps
+      //   globals: {
+      //     three: "Three",
+      //   },
+      // },
       external: ["three"],
     },
   },
