@@ -94,7 +94,15 @@ type ChromatinSceneConfig = {
   layout: "center" | "grid";
 };
 
+export type TrackViewConfig = {
+  mark: "sphere" | "box";
+  links: boolean;
+  color?: string;
+};
+
 export type ChromatinScene = {
   structures: (DisplayableChunk | DisplayableModel)[];
   config: ChromatinSceneConfig;
+
+  //~ grammar approach
 };
