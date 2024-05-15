@@ -44,7 +44,7 @@ export type ChromatinModel = {
   /* Distinct, separated parts of a chromatin model. Most often single chromosomes. */
   parts: ChromatinPart[];
   /* Identifying organism and genome assembly */
-  assembly: string;
+  assembly?: string;
 };
 
 export type DisplayableChunk = {
