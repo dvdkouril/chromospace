@@ -5,7 +5,7 @@ import type {
 } from "../chromatin-types";
 import { vec3 } from "gl-matrix";
 import {
-  LoadOptions,
+  type LoadOptions,
   normalize,
   computeNormalizationFactor,
   recenter,
@@ -27,9 +27,9 @@ export const parseTsv = (
       return;
     }
 
-    const x = parseFloat(tokens[0]);
-    const y = parseFloat(tokens[1]);
-    const z = parseFloat(tokens[2]);
+    const x = Number.parseFloat(tokens[0]);
+    const y = Number.parseFloat(tokens[1]);
+    const z = Number.parseFloat(tokens[2]);
 
     bins.push(vec3.fromValues(x, y, z));
   });
@@ -54,8 +54,8 @@ export const parseTsv = (
 const getResolution = (firstLine: string, secondLine: string): number => {
   const tokensFirst = firstLine.split("\t");
   const tokensSecond = secondLine.split("\t");
-  const startCoord1 = parseInt(tokensFirst[1]);
-  const startCoord2 = parseInt(tokensSecond[1]);
+  const startCoord1 = Number.parseInt(tokensFirst[1]);
+  const startCoord2 = Number.parseInt(tokensSecond[1]);
   return startCoord2 - startCoord1;
 };
 
@@ -65,7 +65,7 @@ export const parse3dg = (
 ): ChromatinModel | undefined => {
   const tsvLines = fileContent.split("\n");
 
-  let parts: ChromatinPart[] = [];
+  const parts: ChromatinPart[] = [];
   let currentPart: ChromatinPart | undefined = undefined;
   let prevChrom = "";
   const modelResolution = getResolution(tsvLines[0], tsvLines[1]);
@@ -86,8 +86,8 @@ export const parse3dg = (
           id: ++nextId,
         },
         coordinates: {
-          start: parseInt(startCoord),
-          end: parseInt(startCoord),
+          start: Number.parseInt(startCoord),
+          end: Number.parseInt(startCoord),
           chromosome: chrom,
         },
         resolution: modelResolution,
@@ -96,12 +96,12 @@ export const parse3dg = (
       parts.push(currentPart);
     }
 
-    const x = parseFloat(tokens[2]);
-    const y = parseFloat(tokens[3]);
-    const z = parseFloat(tokens[4]);
+    const x = Number.parseFloat(tokens[2]);
+    const y = Number.parseFloat(tokens[3]);
+    const z = Number.parseFloat(tokens[4]);
 
     currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
-    currentPart.coordinates.end = parseInt(startCoord); //~ keep pushing the end of this part bin by bin
+    currentPart.coordinates.end = Number.parseInt(startCoord); //~ keep pushing the end of this part bin by bin
     prevChrom = chrom;
   });
 
@@ -165,9 +165,9 @@ export const parseWeirdTsvFromMiniMDS = (
     //   parts.push(currentPart);
     // }
 
-    const x = parseFloat(tokens[1]);
-    const y = parseFloat(tokens[2]);
-    const z = parseFloat(tokens[3]);
+    const x = Number.parseFloat(tokens[1]);
+    const y = Number.parseFloat(tokens[2]);
+    const z = Number.parseFloat(tokens[3]);
     if (isNaN(x) || isNaN(y) || isNaN(z)) {
       return;
     }

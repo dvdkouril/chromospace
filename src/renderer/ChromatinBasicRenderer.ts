@@ -31,9 +31,9 @@ export class ChromatinBasicRenderer {
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
 
   //~ dom
-  redrawRequest: number = 0;
+  redrawRequest = 0;
 
-  alwaysRedraw: boolean = false;
+  alwaysRedraw = false;
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -154,7 +154,7 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
-    let sphereRadius = size ? size : estimateBestSphereSize(segment.positions);
+    const sphereRadius = size ? size : estimateBestSphereSize(segment.positions);
     const tubeSize = 0.4 * sphereRadius;
     const geometry = decideGeometry(segment.mark, segment.attributes);
     const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
@@ -212,7 +212,7 @@ export class ChromatinBasicRenderer {
 
     const dummyObj = new THREE.Object3D();
     const colorObj = new THREE.Color();
-    for (let [i, tube] of tubes.entries()) {
+    for (const [i, tube] of tubes.entries()) {
       dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
       dummyObj.rotation.set(
         tube.rotation.x,

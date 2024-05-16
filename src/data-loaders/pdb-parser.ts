@@ -1,5 +1,5 @@
-import { ChromatinChunk } from "../chromatin-types";
-import { LoadOptions, normalize, recenter } from "./loader-utils";
+import type { ChromatinChunk } from "../chromatin-types";
+import { type LoadOptions, normalize, recenter } from "./loader-utils";
 import { vec3 } from "gl-matrix";
 
 /**
@@ -12,14 +12,14 @@ export const parsePDB = (
 ): ChromatinChunk => {
   const pdbLines = fileContent.split("\n");
 
-  let hetatms: vec3[] = [];
+  const hetatms: vec3[] = [];
   let bins: vec3[] = [];
   pdbLines.forEach((line) => {
     const lineAnnot = line.substring(0, 6);
     if (lineAnnot == "HETATM") {
-      const x = parseFloat(line.substring(30, 38));
-      const y = parseFloat(line.substring(38, 46));
-      const z = parseFloat(line.substring(46, 54));
+      const x = Number.parseFloat(line.substring(30, 38));
+      const y = Number.parseFloat(line.substring(38, 46));
+      const z = Number.parseFloat(line.substring(46, 54));
 
       hetatms.push(vec3.fromValues(x, y, z));
     }
@@ -32,7 +32,7 @@ export const parsePDB = (
        * According to this: https://files.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_Letter.pdf
        * you can have up to 4 neighbors.
        */
-      const current = parseInt(line.substring(6, 11)); //TODO: are these indices correct?
+      const current = Number.parseInt(line.substring(6, 11)); //TODO: are these indices correct?
       // const previous  = parseInt(line.substring(11, 16));
       // const next  = parseInt(line.substring(16, 21));
       bins.push(hetatms[current - 1]);
@@ -62,7 +62,7 @@ export const parseNumpyArray = (
   fileContent: DataView,
   options: LoadOptions,
 ): ChromatinChunk => {
-  let bytes = new Float64Array(fileContent.buffer);
+  const bytes = new Float64Array(fileContent.buffer);
   let bins: vec3[] = [];
   for (let i = 0; i < bytes.length - 2; ) {
     const x = bytes[i];

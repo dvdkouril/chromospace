@@ -1,13 +1,13 @@
 import { vec3 } from "gl-matrix";
-import {
+import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
   MarkTypes,
 } from "./chromatin-types";
-import { Vector3, Euler, Quaternion, Color } from "three";
+import { Vector3, Euler, Quaternion, type Color } from "three";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
-import { VisualAttributes } from "./renderer/renderer-types";
+import type { VisualAttributes } from "./renderer/renderer-types";
 import * as THREE from "three";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
@@ -145,7 +145,7 @@ export function decideVisualParameters(
   let color: ChromaColor | undefined = undefined;
   let scale: ChromaScale | undefined = undefined;
   // let size = 1.0;
-  let size = 0.008; //TODO: estimate
+  const size = 0.008; //TODO: estimate
 
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);

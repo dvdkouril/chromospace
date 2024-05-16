@@ -1,4 +1,4 @@
-import {
+import type {
   ChromatinScene,
   ChromatinChunk,
   ChromatinPart,
@@ -10,7 +10,7 @@ import {
   ChromatinChunkViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import { DrawableMarkSegment } from "./renderer/renderer-types";
+import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   coordinateToBin,
   decideVisualParameters,
@@ -143,7 +143,7 @@ function getChromosome(
   model: ChromatinModel,
   chrName: string,
 ): [ChromatinPart, Selection] | null {
-  for (let part of model.parts) {
+  for (const part of model.parts) {
     if (part.label == chrName) {
       const selection: Selection = {
         regions: [
@@ -171,7 +171,7 @@ function getChromosomeAtCoordinates(
 ): [ChromatinPart, Selection] | null {
   let newPart: ChromatinPart | null = null;
   let selection: Selection | null = null;
-  for (let part of model.parts) {
+  for (const part of model.parts) {
     //~ first finding the specified chromosome
     if (chrName != part.label) {
       continue;
@@ -244,8 +244,8 @@ export function get(
   const toks = coordinates.split(":");
   const chr = toks[0];
   const coords = toks[1];
-  const start = parseInt(coords.split("-")[0]);
-  const end = parseInt(coords.split("-")[1]);
+  const start = Number.parseInt(coords.split("-")[0]);
+  const end = Number.parseInt(coords.split("-")[1]);
 
   return getChromosomeAtCoordinates(model, chr, start, end);
 }
@@ -292,7 +292,7 @@ function buildStructures(
   structures: (DisplayableChunk | DisplayableModel)[],
   renderer: ChromatinBasicRenderer,
 ) {
-  for (let s of structures) {
+  for (const s of structures) {
     switch (s.kind) {
       case "model":
         buildDisplayableModel(s, renderer);
@@ -308,8 +308,8 @@ function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
 ) {
-  let segments: DrawableMarkSegment[] = [];
-  for (let [i, part] of model.structure.parts.entries()) {
+  const segments: DrawableMarkSegment[] = [];
+  for (const [i, part] of model.structure.parts.entries()) {
     const n = model.structure.parts.length;
     const [singleColor, colorScale, _] = decideVisualParameters(
       model.viewConfig,

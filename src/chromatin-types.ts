@@ -1,4 +1,4 @@
-import { vec3 } from "gl-matrix";
+import type { vec3 } from "gl-matrix";
 
 /**
  * A simple list of bin positions.
