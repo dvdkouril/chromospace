@@ -152,9 +152,9 @@ export function decideVisualParameters(
   const deemphasizedColor = chroma("#a3a3a3");
   const hasSelection = viewConfig.selections.length > 0;
 
-  if (viewConfig.coloring == "constant") {
+  if (viewConfig.coloring === "constant") {
     color = hasSelection ? deemphasizedColor : chunkColors[i];
-  } else if (viewConfig.coloring == "scale") {
+  } else if (viewConfig.coloring === "scale") {
     color = hasSelection ? deemphasizedColor : undefined;
     scale = hasSelection ? undefined : defaultColorScale;
   }

@@ -16,14 +16,14 @@ export const parsePDB = (
   let bins: vec3[] = [];
   pdbLines.forEach((line) => {
     const lineAnnot = line.substring(0, 6);
-    if (lineAnnot == "HETATM") {
+    if (lineAnnot === "HETATM") {
       const x = Number.parseFloat(line.substring(30, 38));
       const y = Number.parseFloat(line.substring(38, 46));
       const z = Number.parseFloat(line.substring(46, 54));
 
       hetatms.push(vec3.fromValues(x, y, z));
     }
-    if (lineAnnot == "CONECT") {
+    if (lineAnnot === "CONECT") {
       /**
        * Honestly, this just shows how unsuitable PDB is for chromatin,
        * we will always have just a sequence of bins, each with two neigh-
@@ -71,7 +71,7 @@ export const parseNumpyArray = (
     // console.log("x = " + x + ", y = " + y + ", z = " + z);
     i += 3;
 
-    if (isNaN(x) || isNaN(y) || isNaN(z)) {
+    if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) {
       continue;
     }
     bins.push(vec3.fromValues(x, y, z));

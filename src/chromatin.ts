@@ -90,7 +90,7 @@ export function addChunkToScene(
   chunk: ChromatinChunk,
   viewConfig?: ChromatinChunkViewConfig,
 ): ChromatinScene {
-  if (viewConfig == undefined) {
+  if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
       coloring: "constant",
@@ -118,7 +118,7 @@ export function addModelToScene(
   model: ChromatinModel,
   viewConfig?: ChromatinModelViewConfig,
 ) {
-  if (viewConfig == undefined) {
+  if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
       coloring: "constant",
@@ -144,7 +144,7 @@ function getChromosome(
   chrName: string,
 ): [ChromatinPart, Selection] | null {
   for (const part of model.parts) {
-    if (part.label == chrName) {
+    if (part.label === chrName) {
       const selection: Selection = {
         regions: [
           {
@@ -173,7 +173,7 @@ function getChromosomeAtCoordinates(
   let selection: Selection | null = null;
   for (const part of model.parts) {
     //~ first finding the specified chromosome
-    if (chrName != part.label) {
+    if (chrName !== part.label) {
       continue;
     }
 
@@ -217,9 +217,8 @@ function getChromosomeAtCoordinates(
 
   if (!newPart || !selection) {
     return null;
-  } else {
-    return [newPart, selection];
   }
+    return [newPart, selection];
 }
 
 /**
@@ -258,9 +257,8 @@ export function getRegionAsPart(
   if (result) {
     const [part, _] = result;
     return part;
-  } else {
-    return null;
   }
+    return null;
 }
 
 export function getBinsFromPart(
@@ -346,7 +344,7 @@ function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
 ) {
-  if (chunk.viewConfig.coloring == "constant") {
+  if (chunk.viewConfig.coloring === "constant") {
     //~ A) setting a constant color for whole chunk
     const randColor = customCubeHelix.scale().colors(256, null)[
       Math.floor(Math.random() * 255)
@@ -369,7 +367,7 @@ function buildDisplayableChunk(
       },
     };
     renderer.addSegments([segment]);
-  } else if (chunk.viewConfig.coloring == "scale") {
+  } else if (chunk.viewConfig.coloring === "scale") {
     //~ B) using a color scale with the bin index as lookup
     // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
     const segment: DrawableMarkSegment = {

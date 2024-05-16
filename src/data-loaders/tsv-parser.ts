@@ -77,7 +77,7 @@ export const parse3dg = (
 
     const chrom = tokens[0];
     const startCoord = tokens[1];
-    if (chrom != prevChrom || currentPart == undefined) {
+    if (chrom !== prevChrom || currentPart === undefined) {
       // new part
       currentPart = {
         chunk: {
@@ -168,7 +168,7 @@ export const parseWeirdTsvFromMiniMDS = (
     const x = Number.parseFloat(tokens[1]);
     const y = Number.parseFloat(tokens[2]);
     const z = Number.parseFloat(tokens[3]);
-    if (isNaN(x) || isNaN(y) || isNaN(z)) {
+    if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) {
       return;
     }
 

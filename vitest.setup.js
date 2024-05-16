@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import { beforeAll } from "vitest";
 import "vitest-canvas-mock";
 
@@ -18,9 +18,9 @@ beforeAll(async () => {
 });
 
 async function downloadFile(url, filename) {
-  console.log("downloading: " + url);
+  console.log(`downloading: ${url}`);
   const file = await fetchFile(url);
-  const path = testDataDir + "/" + filename;
+  const path = `${testDataDir}/${filename}`;
   fs.writeFileSync(path, file);
 }
 
