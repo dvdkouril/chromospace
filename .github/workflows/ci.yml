@@ -38,4 +38,4 @@ jobs:
       - uses: biomejs/setup-biome@v2
         with:
           version: latest
-      - run: biome format .
+      - run: biome ci .
