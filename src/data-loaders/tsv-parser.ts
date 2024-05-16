@@ -85,7 +85,11 @@ export const parse3dg = (
           rawBins: [],
           id: ++nextId,
         },
-        coordinates: { start: parseInt(startCoord), end: parseInt(startCoord), chromosome: chrom },
+        coordinates: {
+          start: parseInt(startCoord),
+          end: parseInt(startCoord),
+          chromosome: chrom,
+        },
         resolution: modelResolution,
         label: chrom,
       };

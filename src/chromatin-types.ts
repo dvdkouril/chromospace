@@ -51,13 +51,13 @@ export type DisplayableChunk = {
   kind: "chunk";
   structure: ChromatinChunk;
   viewConfig: ChromatinChunkViewConfig;
-}
+};
 
 export type ChromatinChunkViewConfig = {
   binSizeScale?: number;
   coloring?: "constant" | "scale";
   color?: string;
-}
+};
 
 /**
  * What this structure should represent is a visual instantiation of a ChromatinModel, with different attributes influencing its visual presentation
@@ -94,7 +94,7 @@ type ChromatinSceneConfig = {
   layout: "center" | "grid";
 };
 
-export type MarkTypes = "sphere" | "box" | "octahedron"
+export type MarkTypes = "sphere" | "box" | "octahedron";
 
 export type TrackViewConfig = {
   mark: MarkTypes;

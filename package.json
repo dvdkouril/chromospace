@@ -11,9 +11,7 @@
     "test": "vitest --pool=forks",
     "typecheck": "tsc"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",
@@ -25,6 +23,7 @@
     }
   },
   "devDependencies": {
+    "@biomejs/biome": "1.7.3",
     "@types/chroma-js": "^2.4.4",
     "@types/node": "^20.12.7",
     "@types/three": "^0.162.0",

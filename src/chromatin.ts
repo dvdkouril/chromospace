@@ -11,7 +11,12 @@ import {
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { DrawableMarkSegment } from "./renderer/renderer-types";
-import { coordinateToBin, decideVisualParameters, defaultColorScale, customCubeHelix } from "./utils";
+import {
+  coordinateToBin,
+  decideVisualParameters,
+  defaultColorScale,
+  customCubeHelix,
+} from "./utils";
 import chroma from "chroma-js";
 
 // function initScene(): ChromatinScene;
@@ -101,14 +106,18 @@ export function addChunkToScene(
   scene = {
     ...scene,
     structures: [...scene.structures, newDisplayableChunk],
-  }
+  };
   return scene;
 }
 
 /**
  * Utility function to add a model to scene
  */
-export function addModelToScene(scene: ChromatinScene, model: ChromatinModel, viewConfig?: ChromatinModelViewConfig) {
+export function addModelToScene(
+  scene: ChromatinScene,
+  model: ChromatinModel,
+  viewConfig?: ChromatinModelViewConfig,
+) {
   if (viewConfig == undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
@@ -142,7 +151,8 @@ function getChromosome(
             chromosome: chrName,
             start: part.coordinates.start,
             end: part.coordinates.end,
-          }],
+          },
+        ],
         color: "#FF00FF",
         label: chrName,
       };
@@ -198,7 +208,8 @@ function getChromosomeAtCoordinates(
           chromosome: chrName,
           start: newPart.coordinates.start,
           end: newPart.coordinates.end,
-        }],
+        },
+      ],
       color: "#FF00FF",
       label: "",
     };
@@ -239,7 +250,10 @@ export function get(
   return getChromosomeAtCoordinates(model, chr, start, end);
 }
 
-export function getRegionAsPart(model: ChromatinModel, coordinates: string): ChromatinPart | null {
+export function getRegionAsPart(
+  model: ChromatinModel,
+  coordinates: string,
+): ChromatinPart | null {
   const result = get(model, coordinates);
   if (result) {
     const [part, _] = result;
@@ -274,7 +288,10 @@ export function getBinsFromPart(
   return newPart;
 }
 
-function buildStructures(structures: (DisplayableChunk | DisplayableModel)[], renderer: ChromatinBasicRenderer) {
+function buildStructures(
+  structures: (DisplayableChunk | DisplayableModel)[],
+  renderer: ChromatinBasicRenderer,
+) {
   for (let s of structures) {
     switch (s.kind) {
       case "model":
@@ -287,11 +304,18 @@ function buildStructures(structures: (DisplayableChunk | DisplayableModel)[], re
   }
 }
 
-function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasicRenderer) {
+function buildDisplayableModel(
+  model: DisplayableModel,
+  renderer: ChromatinBasicRenderer,
+) {
   let segments: DrawableMarkSegment[] = [];
   for (let [i, part] of model.structure.parts.entries()) {
     const n = model.structure.parts.length;
-    const [singleColor, colorScale, _] = decideVisualParameters(model.viewConfig, i, n);
+    const [singleColor, colorScale, _] = decideVisualParameters(
+      model.viewConfig,
+      i,
+      n,
+    );
     //~ this is a hack: should go inside (?) the decider func above
     // const marks: MarkTypes[] = ["sphere", "box", "octahedron"];
     const segment: DrawableMarkSegment = {
@@ -317,13 +341,19 @@ function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasic
  * - generate color for me
  * - custom scale
  * - default scale
-*/
-function buildDisplayableChunk(chunk: DisplayableChunk, renderer: ChromatinBasicRenderer) {
+ */
+function buildDisplayableChunk(
+  chunk: DisplayableChunk,
+  renderer: ChromatinBasicRenderer,
+) {
   if (chunk.viewConfig.coloring == "constant") {
     //~ A) setting a constant color for whole chunk
-    const randColor = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
+    const randColor = customCubeHelix.scale().colors(256, null)[
+      Math.floor(Math.random() * 255)
+    ];
     let color = randColor;
-    if (chunk.viewConfig.color) { //~ override color if supplied
+    if (chunk.viewConfig.color) {
+      //~ override color if supplied
       color = chroma(chunk.viewConfig.color);
     }
     // this.buildPart(chunk.structure, { color: color });
@@ -366,10 +396,12 @@ export type DisplayOptions = {
 };
 
 export function display(
-  scene: ChromatinScene, 
+  scene: ChromatinScene,
   options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer({ alwaysRedraw: options.alwaysRedraw });
+  const renderer = new ChromatinBasicRenderer({
+    alwaysRedraw: options.alwaysRedraw,
+  });
   // renderer.addScene(scene);
   buildStructures(scene.structures, renderer);
   renderer.startDrawing();

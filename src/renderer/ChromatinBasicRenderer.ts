@@ -7,7 +7,7 @@ import {
   SMAAPreset,
 } from "postprocessing";
 // @ts-ignore
-import {N8AOPostPass} from "n8ao";
+import { N8AOPostPass } from "n8ao";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   estimateBestSphereSize,
@@ -15,16 +15,12 @@ import {
   decideColor,
   decideGeometry,
 } from "../utils";
-import type {
-  DrawableMarkSegment,
-} from "./renderer-types";
+import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
-
 export class ChromatinBasicRenderer {
-
   markSegments: DrawableMarkSegment[] = [];
 
   //~ threejs stuff
@@ -39,23 +35,19 @@ export class ChromatinBasicRenderer {
 
   alwaysRedraw: boolean = false;
 
-  constructor(
-    params?: {
-      canvas?: HTMLCanvasElement;
-      alwaysRedraw?: boolean;
-    }) {
-    
-    const {
-      canvas = undefined,
-      alwaysRedraw = true,
-    } = params || {};
+  constructor(params?: {
+    canvas?: HTMLCanvasElement;
+    alwaysRedraw?: boolean;
+  }) {
+    const { canvas = undefined, alwaysRedraw = true } = params || {};
 
     this.renderer = new THREE.WebGLRenderer({
       powerPreference: "high-performance",
       antialias: false,
       stencil: false,
       depth: false,
-      canvas });
+      canvas,
+    });
     this.renderer.setClearColor("#eeeeee");
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
@@ -63,7 +55,6 @@ export class ChromatinBasicRenderer {
 
     this.camera.position.z = 3.0;
     controls.update();
-
 
     const lightA = new THREE.DirectionalLight();
     lightA.position.set(3, 10, 10);
@@ -95,24 +86,30 @@ export class ChromatinBasicRenderer {
     this.ssaoPasses = [n8aopass, n8aopassBigger];
 
     /* SMAA Recommended */
-    this.composer.addPass(new EffectPass(this.camera, new SMAAEffect({
-        preset: SMAAPreset.ULTRA
-    })));
+    this.composer.addPass(
+      new EffectPass(
+        this.camera,
+        new SMAAEffect({
+          preset: SMAAPreset.ULTRA,
+        }),
+      ),
+    );
 
     this.render = this.render.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
-    this.resizeRendererToDisplaySize = this.resizeRendererToDisplaySize.bind(this);
+    this.resizeRendererToDisplaySize =
+      this.resizeRendererToDisplaySize.bind(this);
 
     //~ setting size of canvas to fill parent
     const c = this.getCanvasElement();
-    c.style.width = '100%';
-    c.style.height = '100%';
+    c.style.width = "100%";
+    c.style.height = "100%";
 
     this.alwaysRedraw = alwaysRedraw;
     if (!alwaysRedraw) {
-      controls.addEventListener('change', this.render);
+      controls.addEventListener("change", this.render);
     }
   }
 
@@ -121,16 +118,16 @@ export class ChromatinBasicRenderer {
   }
 
   /**
-  * Entrypoint for adding actual data to show
-  */
+   * Entrypoint for adding actual data to show
+   */
   addSegments(newSegments: DrawableMarkSegment[]) {
     this.markSegments = [...this.markSegments, ...newSegments];
     this.buildStructures();
   }
 
   /**
-  * Turns all drawable segments into THREE objects to be rendered
-  */
+   * Turns all drawable segments into THREE objects to be rendered
+   */
   buildStructures() {
     for (const segment of this.markSegments) {
       this.buildPart(segment);
@@ -138,8 +135,8 @@ export class ChromatinBasicRenderer {
   }
 
   /**
-  * Meant to be called directly from client (eg, Observable notebook) to request redraw
-  */
+   * Meant to be called directly from client (eg, Observable notebook) to request redraw
+   */
   updateViewConfig() {
     this.scene.clear();
     this.buildStructures();
@@ -147,12 +144,9 @@ export class ChromatinBasicRenderer {
   }
 
   /**
-  * Turns a singular segment (ie, position+mark+attributes) into THREEjs objects for rendering
-  */
-  buildPart(
-    segment: DrawableMarkSegment
-  ) {
-
+   * Turns a singular segment (ie, position+mark+attributes) into THREEjs objects for rendering
+   */
+  buildPart(segment: DrawableMarkSegment) {
     const {
       color = undefined,
       colorMap = undefined,
@@ -160,9 +154,7 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
-    let sphereRadius = size
-      ? size
-      : estimateBestSphereSize(segment.positions);
+    let sphereRadius = size ? size : estimateBestSphereSize(segment.positions);
     const tubeSize = 0.4 * sphereRadius;
     const geometry = decideGeometry(segment.mark, segment.attributes);
     const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
@@ -193,12 +185,23 @@ export class ChromatinBasicRenderer {
   }
 
   /**
-  * Utility function for building links between marks (optional)
-  */
-  buildLinks(positions: vec3[], tubeSize: number, color?: ChromaColor, colorMap?: ChromaScale) {
+   * Utility function for building links between marks (optional)
+   */
+  buildLinks(
+    positions: vec3[],
+    tubeSize: number,
+    color?: ChromaColor,
+    colorMap?: ChromaScale,
+  ) {
     //~ tubes between tubes
     const tubes = computeTubes(positions);
-    const tubeGeometry = new THREE.CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
+    const tubeGeometry = new THREE.CylinderGeometry(
+      tubeSize,
+      tubeSize,
+      1.0,
+      10,
+      1,
+    );
     const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
 
     const meshInstcedTubes = new THREE.InstancedMesh(

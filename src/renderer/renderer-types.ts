@@ -9,7 +9,7 @@ export type DrawableMarkSegment = {
 
 export type VisualAttributes = {
   color?: ChromaColor;
-  colorMap?: ChromaScale,
+  colorMap?: ChromaScale;
   size: number;
-  makeLinks: boolean,
+  makeLinks: boolean;
 };
