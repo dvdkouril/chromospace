@@ -1,8 +1,10 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinChunk, ChromatinModelViewConfig } from "./chromatin-types";
+import { ChromatinChunk, ChromatinModelViewConfig, MarkTypes } from "./chromatin-types";
 import { Vector3, Euler, Quaternion, Color } from "three";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
+import { VisualAttributes } from "./renderer/renderer-types";
+import * as THREE from "three";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma
@@ -103,6 +105,22 @@ export const decideColor = (
     outColor.set(color.hex());
   } else {
     outColor.set(chroma.random().hex());
+  }
+};
+
+export const decideGeometry = (
+  mark: MarkTypes, 
+  attributes: VisualAttributes
+): THREE.SphereGeometry | THREE.BoxGeometry | THREE.OctahedronGeometry | undefined => {
+  switch (mark) {
+    case "sphere":
+      return new THREE.SphereGeometry(attributes.size);
+    case "box":
+      return new THREE.BoxGeometry(attributes.size, attributes.size, attributes.size);
+    case "octahedron":
+      return new THREE.OctahedronGeometry(attributes.size);
+    default:
+      return undefined;
   }
 };
 
