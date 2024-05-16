@@ -296,7 +296,8 @@ function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasic
     //~ this is a hack: should go inside (?) the decider func above
     const marks: MarkTypes[] = ["sphere", "box", "octahedron"];
     const segment: DrawableMarkSegment = {
-      mark: marks[(i % 3)],
+      // mark: marks[(i % 3)],
+      mark: "octahedron",
       positions: part.chunk.bins,
       attributes: {
         color: singleColor,
