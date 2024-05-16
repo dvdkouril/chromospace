@@ -94,8 +94,10 @@ type ChromatinSceneConfig = {
   layout: "center" | "grid";
 };
 
+export type MarkTypes = "sphere" | "box" | "octahedron"
+
 export type TrackViewConfig = {
-  mark: "sphere" | "box";
+  mark: MarkTypes;
   links: boolean;
   color?: string;
 };

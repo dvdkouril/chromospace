@@ -8,6 +8,7 @@ import {
   DisplayableModel,
   ChromatinModelViewConfig,
   ChromatinChunkViewConfig,
+  MarkTypes,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import { DrawableMarkSegment } from "./renderer/renderer-types";
@@ -288,13 +289,14 @@ function buildStructures(structures: (DisplayableChunk | DisplayableModel)[], re
 }
 
 function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasicRenderer) {
+  let segments: DrawableMarkSegment[] = [];
   for (let [i, part] of model.structure.parts.entries()) {
     const n = model.structure.parts.length;
-    const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
+    const [singleColor, colorScale, _] = decideVisualParameters(model.viewConfig, i, n);
     //~ this is a hack: should go inside (?) the decider func above
+    const marks: MarkTypes[] = ["sphere", "box", "octahedron"];
     const segment: DrawableMarkSegment = {
-      mark: "sphere",
-      // mark: "box",
+      mark: marks[(i % 3)],
       positions: part.chunk.bins,
       attributes: {
         color: singleColor,
@@ -304,8 +306,9 @@ function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasic
         makeLinks: false,
       },
     };
-    renderer.addSegments([segment]);
+    segments.push(segment);
   }
+  renderer.addSegments(segments);
 }
 
 /*

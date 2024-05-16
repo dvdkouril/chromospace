@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinChunk, ChromatinModelViewConfig } from "./chromatin-types";
+import { ChromatinChunk, ChromatinModelViewConfig, MarkTypes } from "./chromatin-types";
 import { Vector3, Euler, Quaternion, Color } from "three";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
@@ -109,14 +109,16 @@ export const decideColor = (
 };
 
 export const decideGeometry = (
-  mark: "sphere" | "box", 
+  mark: MarkTypes, 
   attributes: VisualAttributes
-): THREE.SphereGeometry | THREE.BoxGeometry | undefined => {
+): THREE.SphereGeometry | THREE.BoxGeometry | THREE.OctahedronGeometry | undefined => {
   switch (mark) {
     case "sphere":
       return new THREE.SphereGeometry(attributes.size);
     case "box":
       return new THREE.BoxGeometry(attributes.size, attributes.size, attributes.size);
+    case "octahedron":
+      return new THREE.OctahedronGeometry(attributes.size);
     default:
       return undefined;
   }
