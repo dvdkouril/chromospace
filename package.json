@@ -11,9 +11,7 @@
     "test": "vitest --pool=forks",
     "typecheck": "tsc"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",

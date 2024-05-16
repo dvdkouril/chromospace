@@ -1,9 +1,7 @@
 import { test } from "vitest";
 // import { ChromatinBasicRenderer } from "../main";
 
-test("empty", () => {
-  
-});
+test("empty", () => {});
 
 // test("renderer constructor: no params", () => {
 //   const options = {};

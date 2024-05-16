@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import fs from 'fs';
+import fs from "fs";
 
 import { coordinateToBin } from "../utils.ts";
 import { get } from "../chromatin.ts";
@@ -19,7 +19,7 @@ test("coordinateToBin with start offset", () => {
 test("get chromosome", async () => {
   const filename = "test-data/tan2018.tsv";
   const fileTan2018 = fs.readFileSync(filename).toString();
-  const testModel = parse3dg(fileTan2018 , { center: true, normalize: true });
+  const testModel = parse3dg(fileTan2018, { center: true, normalize: true });
 
   expect(testModel).toBeDefined();
 
@@ -31,8 +31,7 @@ test("get chromosome", async () => {
     expect(part.label).toBe("15(pat)");
     expect(part.chunk.bins.length).toBe(825);
     expect(selection.label).toBe("15(pat)");
-  }
-  else {
+  } else {
     fail();
   }
 });
@@ -40,7 +39,7 @@ test("get chromosome", async () => {
 test("get coordinates", () => {
   const filename = "test-data/tan2018.tsv";
   const fileTan2018 = fs.readFileSync(filename).toString();
-  const testModel = parse3dg(fileTan2018 , { center: true, normalize: true });
+  const testModel = parse3dg(fileTan2018, { center: true, normalize: true });
 
   expect(testModel).toBeDefined();
 
@@ -55,8 +54,7 @@ test("get coordinates", () => {
     expect(part.coordinates.end).toBe(40000000);
     expect(selection.regions[0].start).toBe(20000000);
     expect(selection.regions[0].end).toBe(40000000);
-  }
-  else {
+  } else {
     fail();
   }
 });

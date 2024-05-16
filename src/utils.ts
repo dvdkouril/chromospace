@@ -1,5 +1,9 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinChunk, ChromatinModelViewConfig, MarkTypes } from "./chromatin-types";
+import {
+  ChromatinChunk,
+  ChromatinModelViewConfig,
+  MarkTypes,
+} from "./chromatin-types";
 import { Vector3, Euler, Quaternion, Color } from "three";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
@@ -15,11 +19,11 @@ export const customCubeHelix = chroma
   .lightness([0.3, 0.8]);
 
 export const defaultColorScale = chroma.scale([
-    "white",
-    "rgba(245,166,35,1.0)",
-    "rgba(208,2,27,1.0)",
-    "black",
-  ]);
+  "white",
+  "rgba(245,166,35,1.0)",
+  "rgba(208,2,27,1.0)",
+  "black",
+]);
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
@@ -109,14 +113,22 @@ export const decideColor = (
 };
 
 export const decideGeometry = (
-  mark: MarkTypes, 
-  attributes: VisualAttributes
-): THREE.SphereGeometry | THREE.BoxGeometry | THREE.OctahedronGeometry | undefined => {
+  mark: MarkTypes,
+  attributes: VisualAttributes,
+):
+  | THREE.SphereGeometry
+  | THREE.BoxGeometry
+  | THREE.OctahedronGeometry
+  | undefined => {
   switch (mark) {
     case "sphere":
       return new THREE.SphereGeometry(attributes.size);
     case "box":
-      return new THREE.BoxGeometry(attributes.size, attributes.size, attributes.size);
+      return new THREE.BoxGeometry(
+        attributes.size,
+        attributes.size,
+        attributes.size,
+      );
     case "octahedron":
       return new THREE.OctahedronGeometry(attributes.size);
     default:
@@ -125,7 +137,11 @@ export const decideGeometry = (
 };
 
 /* Returns visual attributes of i-th bin (out on n) based on config */
-export function decideVisualParameters(viewConfig: ChromatinModelViewConfig, i: number, n: number): [ChromaColor | undefined, ChromaScale | undefined, number] {
+export function decideVisualParameters(
+  viewConfig: ChromatinModelViewConfig,
+  i: number,
+  n: number,
+): [ChromaColor | undefined, ChromaScale | undefined, number] {
   let color: ChromaColor | undefined = undefined;
   let scale: ChromaScale | undefined = undefined;
   // let size = 1.0;
