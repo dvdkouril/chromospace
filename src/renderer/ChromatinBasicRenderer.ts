@@ -1,16 +1,4 @@
-import {
-  WebGLRenderer,
-  Scene,
-  PerspectiveCamera,
-  Object3D,
-  InstancedMesh,
-  SphereGeometry,
-  CylinderGeometry,
-  DirectionalLight,
-  AmbientLight,
-  MeshBasicMaterial,
-  Color,
-} from "three";
+import * as THREE from "three";
 import {
   EffectComposer,
   EffectPass,
@@ -22,31 +10,27 @@ import {
 import {N8AOPostPass} from "n8ao";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
-  ChromatinChunk,
-  ChromatinScene,
-  DisplayableChunk,
-  DisplayableModel,
-} from "../chromatin-types";
-import {
   estimateBestSphereSize,
   computeTubes,
   decideColor,
-  decideVisualParameters,
-  customCubeHelix,
-  defaultColorScale,
+  decideGeometry,
 } from "../utils";
+import type {
+  DrawableMarkSegment,
+} from "./renderer-types";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
-import chroma from "chroma-js";
-import { get } from "../chromatin";
+import type { vec3 } from "gl-matrix";
+
 
 export class ChromatinBasicRenderer {
-  chromatinScene: ChromatinScene | undefined;
+
+  markSegments: DrawableMarkSegment[] = [];
 
   //~ threejs stuff
-  renderer: WebGLRenderer;
-  scene: Scene;
-  camera: PerspectiveCamera;
+  renderer: THREE.WebGLRenderer;
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
   composer: EffectComposer;
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
 
@@ -66,28 +50,28 @@ export class ChromatinBasicRenderer {
       alwaysRedraw = true,
     } = params || {};
 
-    this.renderer = new WebGLRenderer({
+    this.renderer = new THREE.WebGLRenderer({
       powerPreference: "high-performance",
       antialias: false,
       stencil: false,
       depth: false,
       canvas });
     this.renderer.setClearColor("#eeeeee");
-    this.scene = new Scene();
-    this.camera = new PerspectiveCamera(25, 2, 0.1, 1000);
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.camera.position.z = 3.0;
     controls.update();
 
 
-    const lightA = new DirectionalLight();
+    const lightA = new THREE.DirectionalLight();
     lightA.position.set(3, 10, 10);
     lightA.castShadow = true;
-    const lightB = new DirectionalLight();
+    const lightB = new THREE.DirectionalLight();
     lightB.position.set(-3, 10, -10);
     lightB.intensity = 0.2;
-    const lightC = new AmbientLight();
+    const lightC = new THREE.AmbientLight();
     lightC.intensity = 0.2;
     this.scene.add(lightA, lightB, lightC);
 
@@ -136,152 +120,95 @@ export class ChromatinBasicRenderer {
     return this.renderer.domElement;
   }
 
-  addScene(scene: ChromatinScene) {
-    this.chromatinScene = scene;
-    this.buildStructures(scene.structures);
-  }
-
-  updateViewConfig() {
-    if (this.chromatinScene) {
-      this.scene.clear();
-      this.buildStructures(this.chromatinScene.structures);
-      this.redrawRequest = requestAnimationFrame(this.render);
-    }
-  }
-
-  buildStructures(structures: (DisplayableChunk | DisplayableModel)[]) {
-    for (let s of structures) {
-      switch (s.kind) {
-        case "model":
-          this.buildDisplayableModel(s);
-          break;
-        case "chunk":
-          this.buildDisplayableChunk(s);
-          break;
-      }
-    }
-  }
-
-  buildDisplayableModel(model: DisplayableModel) {
-    const hasSelection = model.viewConfig.selections.length > 0;
-    /* First: Build the whole model */
-    for (let [i, part] of model.structure.parts.entries()) {
-      const n = model.structure.parts.length;
-      const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
-      //~ this is a hack: should go inside (?) the decider func above
-      if (hasSelection) {
-        this.buildPart(part.chunk, { color: chroma("#a3a3a3"), sphereSize: 0.001 }); //TODO: unnecessary single import of whole chroma
-      } else {
-        this.buildPart(part.chunk, { color: singleColor, colorMap: colorScale, sphereSize: sphereSize });
-      }
-    }
-
-    /* Second: Indicate selections (if any) */
-    // const needColorsN = model.viewConfig.selections.length;
-    // const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-    for (let sel of model.viewConfig.selections.values()) {
-      const randColor  = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
-      let color = randColor;
-      if (model.viewConfig.color) { //~ override color if supplied
-        color = chroma(model.viewConfig.color);
-      }
-      for (let r of sel.regions) {
-        const result = get(model.structure, `${r.chromosome}:${r.start}-${r.end}`);
-        if (result) {
-          const [selectedPart, _] = result;
-          if (selectedPart) {
-            this.buildPart(selectedPart.chunk, { color: color, sphereSize: model.viewConfig.binSizeScale });
-          }
-        }
-      }
-    }
-  }
-
-  /*
-   * chunk options:
-   * - custom color
-   * - generate color for me
-   * - custom scale
-   * - default scale
+  /**
+  * Entrypoint for adding actual data to show
   */
-  buildDisplayableChunk(chunk: DisplayableChunk) {
-    if (chunk.viewConfig.coloring == "constant") {
-      //~ A) setting a constant color for whole chunk
-      const randColor  = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
-      let color = randColor;
-      if (chunk.viewConfig.color) { //~ override color if supplied
-        color = chroma(chunk.viewConfig.color);
-      }
-      this.buildPart(chunk.structure, { color: color });
-    } else if (chunk.viewConfig.coloring == "scale") {
-      //~ B) using a color scale with the bin index as lookup
-      this.buildPart(chunk.structure, { colorMap: defaultColorScale });
+  addSegments(newSegments: DrawableMarkSegment[]) {
+    this.markSegments = [...this.markSegments, ...newSegments];
+    this.buildStructures();
+  }
+
+  /**
+  * Turns all drawable segments into THREE objects to be rendered
+  */
+  buildStructures() {
+    for (const segment of this.markSegments) {
+      this.buildPart(segment);
     }
   }
 
+  /**
+  * Meant to be called directly from client (eg, Observable notebook) to request redraw
+  */
+  updateViewConfig() {
+    this.scene.clear();
+    this.buildStructures();
+    this.redrawRequest = requestAnimationFrame(this.render);
+  }
+
+  /**
+  * Turns a singular segment (ie, position+mark+attributes) into THREEjs objects for rendering
+  */
   buildPart(
-    chunk: ChromatinChunk,
-    config: {
-      color?: ChromaColor,
-      colorMap?: ChromaScale,
-      sphereSize?: number,
-      makeLinks?: boolean,
-    },
+    segment: DrawableMarkSegment
   ) {
 
     const {
       color = undefined,
       colorMap = undefined,
-      sphereSize = undefined,
+      size = undefined,
       makeLinks = true,
-    } = config;
+    } = segment.attributes;
 
-    let sphereRadius = sphereSize
-      ? sphereSize
-      : estimateBestSphereSize(chunk.bins);
+    let sphereRadius = size
+      ? size
+      : estimateBestSphereSize(segment.positions);
     const tubeSize = 0.4 * sphereRadius;
-    const sphereGeometry = new SphereGeometry(sphereRadius);
-    const material = new MeshBasicMaterial({ color: "#FFFFFF" });
+    const geometry = decideGeometry(segment.mark, segment.attributes);
+    const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
 
     //~ bin spheres
-    const meshInstcedSpheres = new InstancedMesh(
-      sphereGeometry,
+    const meshInstcedSpheres = new THREE.InstancedMesh(
+      geometry,
       material,
-      chunk.bins.length,
+      segment.positions.length,
     );
-    const dummyObj = new Object3D();
-    const colorObj = new Color();
+    const dummyObj = new THREE.Object3D();
+    const colorObj = new THREE.Color();
 
-    for (let [i, b] of chunk.bins.entries()) {
+    for (let [i, b] of segment.positions.entries()) {
       dummyObj.position.set(b[0], b[1], b[2]);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
 
-      decideColor(colorObj, i, chunk.bins.length, color, colorMap);
+      decideColor(colorObj, i, segment.positions.length, color, colorMap);
       meshInstcedSpheres.setColorAt(i, colorObj);
       i += 1;
     }
     this.scene.add(meshInstcedSpheres);
 
     if (makeLinks) {
-      this.buildLinks(chunk, tubeSize, color, colorMap);
+      this.buildLinks(segment.positions, tubeSize, color, colorMap);
     }
   }
 
-  buildLinks(chunk: ChromatinChunk, tubeSize: number, color?: ChromaColor, colorMap?: ChromaScale) {
+  /**
+  * Utility function for building links between marks (optional)
+  */
+  buildLinks(positions: vec3[], tubeSize: number, color?: ChromaColor, colorMap?: ChromaScale) {
     //~ tubes between tubes
-    const tubes = computeTubes(chunk.bins);
-    const tubeGeometry = new CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
-    const material = new MeshBasicMaterial({ color: "#FFFFFF" });
+    const tubes = computeTubes(positions);
+    const tubeGeometry = new THREE.CylinderGeometry(tubeSize, tubeSize, 1.0, 10, 1);
+    const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
 
-    const meshInstcedTubes = new InstancedMesh(
+    const meshInstcedTubes = new THREE.InstancedMesh(
       tubeGeometry,
       material,
       tubes.length,
     );
 
-    const dummyObj = new Object3D();
-    const colorObj = new Color();
+    const dummyObj = new THREE.Object3D();
+    const colorObj = new THREE.Color();
     for (let [i, tube] of tubes.entries()) {
       dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
       dummyObj.rotation.set(
@@ -292,7 +219,7 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-      decideColor(colorObj, i, chunk.bins.length, color, colorMap);
+      decideColor(colorObj, i, positions.length, color, colorMap);
       meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
       meshInstcedTubes.setColorAt(i, colorObj);
     }
@@ -308,7 +235,7 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
-  resizeRendererToDisplaySize(renderer: WebGLRenderer) {
+  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
     const canvas = renderer.domElement;
     const pixelRatio = window.devicePixelRatio;
     const width = Math.floor(canvas.clientWidth * pixelRatio);

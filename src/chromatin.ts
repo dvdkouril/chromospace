@@ -10,7 +10,9 @@ import {
   ChromatinChunkViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import { coordinateToBin } from "./utils";
+import { DrawableMarkSegment } from "./renderer/renderer-types";
+import { coordinateToBin, decideVisualParameters, defaultColorScale, customCubeHelix } from "./utils";
+import chroma from "chroma-js";
 
 // function initScene(): ChromatinScene;
 // function initScene(chunk: ChromatinChunk): ChromatinScene;
@@ -272,6 +274,90 @@ export function getBinsFromPart(
   return newPart;
 }
 
+function buildStructures(structures: (DisplayableChunk | DisplayableModel)[], renderer: ChromatinBasicRenderer) {
+  for (let s of structures) {
+    switch (s.kind) {
+      case "model":
+        buildDisplayableModel(s, renderer);
+        break;
+      case "chunk":
+        buildDisplayableChunk(s, renderer);
+        break;
+    }
+  }
+}
+
+function buildDisplayableModel(model: DisplayableModel, renderer: ChromatinBasicRenderer) {
+  for (let [i, part] of model.structure.parts.entries()) {
+    const n = model.structure.parts.length;
+    const [singleColor, colorScale, sphereSize] = decideVisualParameters(model.viewConfig, i, n);
+    //~ this is a hack: should go inside (?) the decider func above
+    const segment: DrawableMarkSegment = {
+      mark: "sphere",
+      // mark: "box",
+      positions: part.chunk.bins,
+      attributes: {
+        color: singleColor,
+        colorMap: colorScale,
+        // size: sphereSize,
+        size: 0.01,
+        makeLinks: false,
+      },
+    };
+    renderer.addSegments([segment]);
+  }
+}
+
+/*
+ * chunk options:
+ * - custom color
+ * - generate color for me
+ * - custom scale
+ * - default scale
+*/
+function buildDisplayableChunk(chunk: DisplayableChunk, renderer: ChromatinBasicRenderer) {
+  if (chunk.viewConfig.coloring == "constant") {
+    //~ A) setting a constant color for whole chunk
+    const randColor = customCubeHelix.scale().colors(256, null)[Math.floor(Math.random() * 255)];
+    let color = randColor;
+    if (chunk.viewConfig.color) { //~ override color if supplied
+      color = chroma(chunk.viewConfig.color);
+    }
+    // this.buildPart(chunk.structure, { color: color });
+
+    const segment: DrawableMarkSegment = {
+      mark: "sphere",
+      positions: chunk.structure.bins,
+      attributes: {
+        color: color,
+        colorMap: undefined,
+        size: 1.0,
+        makeLinks: true,
+      },
+    };
+    renderer.addSegments([segment]);
+  } else if (chunk.viewConfig.coloring == "scale") {
+    //~ B) using a color scale with the bin index as lookup
+    // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
+    const segment: DrawableMarkSegment = {
+      mark: "sphere",
+      positions: chunk.structure.bins,
+      attributes: {
+        color: undefined,
+        colorMap: defaultColorScale,
+        size: 1.0,
+        makeLinks: true,
+      },
+    };
+    renderer.addSegments([segment]);
+  }
+}
+
+// type DrawableChromatinPart = {
+//   structure: ChromatinChunk;
+//   viewConfig: VisualChannels;
+// };
+
 export type DisplayOptions = {
   alwaysRedraw?: boolean;
 };
@@ -281,7 +367,8 @@ export function display(
   options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer({ alwaysRedraw: options.alwaysRedraw });
-  renderer.addScene(scene);
+  // renderer.addScene(scene);
+  buildStructures(scene.structures, renderer);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
   return [renderer, canvas];
