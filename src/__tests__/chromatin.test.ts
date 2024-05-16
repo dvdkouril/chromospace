@@ -1,10 +1,10 @@
-import { expect, test } from "vitest";
 import fs from "node:fs";
+import { expect, test } from "vitest";
 
-import { coordinateToBin } from "../utils.ts";
+import { fail } from "node:assert";
 import { get } from "../chromatin.ts";
 import { parse3dg } from "../data-loaders/tsv-parser.ts";
-import { fail } from "node:assert";
+import { coordinateToBin } from "../utils.ts";
 
 test("coordinateToBin simple", () => {
   //~ In an aligned sequence, and for bins with resolution

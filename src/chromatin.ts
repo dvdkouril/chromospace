@@ -1,23 +1,23 @@
+import chroma from "chroma-js";
 import type {
-  ChromatinScene,
   ChromatinChunk,
-  ChromatinPart,
+  ChromatinChunkViewConfig,
   ChromatinModel,
-  Selection,
+  ChromatinModelViewConfig,
+  ChromatinPart,
+  ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
-  ChromatinModelViewConfig,
-  ChromatinChunkViewConfig,
+  Selection,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   coordinateToBin,
+  customCubeHelix,
   decideVisualParameters,
   defaultColorScale,
-  customCubeHelix,
 } from "./utils";
-import chroma from "chroma-js";
 
 // function initScene(): ChromatinScene;
 // function initScene(chunk: ChromatinChunk): ChromatinScene;
@@ -218,7 +218,7 @@ function getChromosomeAtCoordinates(
   if (!newPart || !selection) {
     return null;
   }
-    return [newPart, selection];
+  return [newPart, selection];
 }
 
 /**
@@ -258,7 +258,7 @@ export function getRegionAsPart(
     const [part, _] = result;
     return part;
   }
-    return null;
+  return null;
 }
 
 export function getBinsFromPart(

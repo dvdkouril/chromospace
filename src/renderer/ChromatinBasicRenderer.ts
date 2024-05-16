@@ -1,4 +1,5 @@
-import * as THREE from "three";
+// @ts-ignore
+import { N8AOPostPass } from "n8ao";
 import {
   EffectComposer,
   EffectPass,
@@ -6,14 +7,13 @@ import {
   SMAAEffect,
   SMAAPreset,
 } from "postprocessing";
-// @ts-ignore
-import { N8AOPostPass } from "n8ao";
+import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
-  estimateBestSphereSize,
   computeTubes,
   decideColor,
   decideGeometry,
+  estimateBestSphereSize,
 } from "../utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
@@ -154,7 +154,9 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
-    const sphereRadius = size ? size : estimateBestSphereSize(segment.positions);
+    const sphereRadius = size
+      ? size
+      : estimateBestSphereSize(segment.positions);
     const tubeSize = 0.4 * sphereRadius;
     const geometry = decideGeometry(segment.mark, segment.attributes);
     const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });

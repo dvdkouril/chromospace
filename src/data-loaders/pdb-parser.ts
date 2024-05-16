@@ -1,6 +1,6 @@
+import { vec3 } from "gl-matrix";
 import type { ChromatinChunk } from "../chromatin-types";
 import { type LoadOptions, normalize, recenter } from "./loader-utils";
-import { vec3 } from "gl-matrix";
 
 /**
  * The Protein Data Bank (PDB) format is often used for 3D chromatin.

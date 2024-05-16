@@ -1,14 +1,14 @@
+import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
+import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
+import { type Color, Euler, Quaternion, Vector3 } from "three";
+import * as THREE from "three";
 import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
   MarkTypes,
 } from "./chromatin-types";
-import { Vector3, Euler, Quaternion, type Color } from "three";
-import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
-import chroma from "chroma-js";
 import type { VisualAttributes } from "./renderer/renderer-types";
-import * as THREE from "three";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma

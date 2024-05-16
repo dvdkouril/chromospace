@@ -1,16 +1,16 @@
+import { vec3 } from "gl-matrix";
 import type {
   ChromatinChunk,
-  ChromatinPart,
   ChromatinModel,
+  ChromatinPart,
 } from "../chromatin-types";
-import { vec3 } from "gl-matrix";
+import { flattenAllBins } from "../utils";
 import {
   type LoadOptions,
-  normalize,
   computeNormalizationFactor,
+  normalize,
   recenter,
 } from "./loader-utils";
-import { flattenAllBins } from "../utils";
 
 let nextId = -1;
 
