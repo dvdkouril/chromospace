@@ -1,4 +1,5 @@
-import * as THREE from "three";
+// @ts-ignore
+import { N8AOPostPass } from "n8ao";
 import {
   EffectComposer,
   EffectPass,
@@ -6,14 +7,13 @@ import {
   SMAAEffect,
   SMAAPreset,
 } from "postprocessing";
-// @ts-ignore
-import { N8AOPostPass } from "n8ao";
+import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
-  estimateBestSphereSize,
   computeTubes,
   decideColor,
   decideGeometry,
+  estimateBestSphereSize,
 } from "../utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
@@ -31,9 +31,9 @@ export class ChromatinBasicRenderer {
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
 
   //~ dom
-  redrawRequest: number = 0;
+  redrawRequest = 0;
 
-  alwaysRedraw: boolean = false;
+  alwaysRedraw = false;
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -154,7 +154,9 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
-    let sphereRadius = size ? size : estimateBestSphereSize(segment.positions);
+    const sphereRadius = size
+      ? size
+      : estimateBestSphereSize(segment.positions);
     const tubeSize = 0.4 * sphereRadius;
     const geometry = decideGeometry(segment.mark, segment.attributes);
     const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
@@ -212,7 +214,7 @@ export class ChromatinBasicRenderer {
 
     const dummyObj = new THREE.Object3D();
     const colorObj = new THREE.Color();
-    for (let [i, tube] of tubes.entries()) {
+    for (const [i, tube] of tubes.entries()) {
       dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
       dummyObj.rotation.set(
         tube.rotation.x,

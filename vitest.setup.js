@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import { beforeAll } from "vitest";
 import "vitest-canvas-mock";
 
@@ -8,9 +8,9 @@ beforeAll(async () => {
     fs.mkdirSync(testDataDir);
 
     //~ Tan et al. 2018
-    let url =
+    const url =
       "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
-    let filename = "tan2018.tsv";
+    const filename = "tan2018.tsv";
     await downloadFile(url, filename);
   } else {
     console.log("no need to fetch test data");
@@ -18,9 +18,9 @@ beforeAll(async () => {
 });
 
 async function downloadFile(url, filename) {
-  console.log("downloading: " + url);
+  console.log(`downloading: ${url}`);
   const file = await fetchFile(url);
-  const path = testDataDir + "/" + filename;
+  const path = `${testDataDir}/${filename}`;
   fs.writeFileSync(path, file);
 }
 

@@ -1,10 +1,10 @@
+import fs from "node:fs";
 import { expect, test } from "vitest";
-import fs from "fs";
 
-import { coordinateToBin } from "../utils.ts";
+import { fail } from "node:assert";
 import { get } from "../chromatin.ts";
 import { parse3dg } from "../data-loaders/tsv-parser.ts";
-import { fail } from "assert";
+import { coordinateToBin } from "../utils.ts";
 
 test("coordinateToBin simple", () => {
   //~ In an aligned sequence, and for bins with resolution
@@ -23,6 +23,7 @@ test("get chromosome", async () => {
 
   expect(testModel).toBeDefined();
 
+  // biome-ignore lint/style/noNonNullAssertion: We are in a test file
   const chr15patPart = get(testModel!, "15(pat)");
   expect(chr15patPart).toBeDefined();
   expect(chr15patPart).toBeTruthy();
@@ -43,6 +44,7 @@ test("get coordinates", () => {
 
   expect(testModel).toBeDefined();
 
+  // biome-ignore lint/style/noNonNullAssertion: We are in a test file
   const regionPart = get(testModel!, "15(pat):20000000-40000000");
   expect(regionPart).toBeDefined();
   expect(regionPart).toBeTruthy();

@@ -33,7 +33,7 @@ export const recenter = (originalPositions: vec3[]): vec3[] => {
 
 export const normalize = (positions: vec3[], factor?: number): vec3[] => {
   const scaleFactor =
-    factor == undefined ? computeNormalizationFactor(positions) : factor;
+    factor === undefined ? computeNormalizationFactor(positions) : factor;
 
   const positionsNormalized = positions.map((p) =>
     vec3.scale(p, p, scaleFactor),

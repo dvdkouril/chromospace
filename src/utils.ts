@@ -1,14 +1,14 @@
+import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
+import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
-import {
+import { type Color, Euler, Quaternion, Vector3 } from "three";
+import * as THREE from "three";
+import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
   MarkTypes,
 } from "./chromatin-types";
-import { Vector3, Euler, Quaternion, Color } from "three";
-import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
-import chroma from "chroma-js";
-import { VisualAttributes } from "./renderer/renderer-types";
-import * as THREE from "three";
+import type { VisualAttributes } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma
@@ -145,16 +145,16 @@ export function decideVisualParameters(
   let color: ChromaColor | undefined = undefined;
   let scale: ChromaScale | undefined = undefined;
   // let size = 1.0;
-  let size = 0.008; //TODO: estimate
+  const size = 0.008; //TODO: estimate
 
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
   const deemphasizedColor = chroma("#a3a3a3");
   const hasSelection = viewConfig.selections.length > 0;
 
-  if (viewConfig.coloring == "constant") {
+  if (viewConfig.coloring === "constant") {
     color = hasSelection ? deemphasizedColor : chunkColors[i];
-  } else if (viewConfig.coloring == "scale") {
+  } else if (viewConfig.coloring === "scale") {
     color = hasSelection ? deemphasizedColor : undefined;
     scale = hasSelection ? undefined : defaultColorScale;
   }

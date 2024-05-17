@@ -9,7 +9,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest --pool=forks",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "fix": "biome check --apply ."
   },
   "files": ["dist"],
   "main": "./dist/chromospace.umd.cjs",

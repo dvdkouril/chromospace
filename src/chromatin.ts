@@ -1,23 +1,23 @@
-import {
-  ChromatinScene,
+import chroma from "chroma-js";
+import type {
   ChromatinChunk,
-  ChromatinPart,
+  ChromatinChunkViewConfig,
   ChromatinModel,
-  Selection,
+  ChromatinModelViewConfig,
+  ChromatinPart,
+  ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
-  ChromatinModelViewConfig,
-  ChromatinChunkViewConfig,
+  Selection,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import { DrawableMarkSegment } from "./renderer/renderer-types";
+import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   coordinateToBin,
+  customCubeHelix,
   decideVisualParameters,
   defaultColorScale,
-  customCubeHelix,
 } from "./utils";
-import chroma from "chroma-js";
 
 // function initScene(): ChromatinScene;
 // function initScene(chunk: ChromatinChunk): ChromatinScene;
@@ -90,7 +90,7 @@ export function addChunkToScene(
   chunk: ChromatinChunk,
   viewConfig?: ChromatinChunkViewConfig,
 ): ChromatinScene {
-  if (viewConfig == undefined) {
+  if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
       coloring: "constant",
@@ -118,7 +118,7 @@ export function addModelToScene(
   model: ChromatinModel,
   viewConfig?: ChromatinModelViewConfig,
 ) {
-  if (viewConfig == undefined) {
+  if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
       coloring: "constant",
@@ -143,8 +143,8 @@ function getChromosome(
   model: ChromatinModel,
   chrName: string,
 ): [ChromatinPart, Selection] | null {
-  for (let part of model.parts) {
-    if (part.label == chrName) {
+  for (const part of model.parts) {
+    if (part.label === chrName) {
       const selection: Selection = {
         regions: [
           {
@@ -171,9 +171,9 @@ function getChromosomeAtCoordinates(
 ): [ChromatinPart, Selection] | null {
   let newPart: ChromatinPart | null = null;
   let selection: Selection | null = null;
-  for (let part of model.parts) {
+  for (const part of model.parts) {
     //~ first finding the specified chromosome
-    if (chrName != part.label) {
+    if (chrName !== part.label) {
       continue;
     }
 
@@ -217,9 +217,8 @@ function getChromosomeAtCoordinates(
 
   if (!newPart || !selection) {
     return null;
-  } else {
-    return [newPart, selection];
   }
+  return [newPart, selection];
 }
 
 /**
@@ -244,8 +243,8 @@ export function get(
   const toks = coordinates.split(":");
   const chr = toks[0];
   const coords = toks[1];
-  const start = parseInt(coords.split("-")[0]);
-  const end = parseInt(coords.split("-")[1]);
+  const start = Number.parseInt(coords.split("-")[0]);
+  const end = Number.parseInt(coords.split("-")[1]);
 
   return getChromosomeAtCoordinates(model, chr, start, end);
 }
@@ -258,9 +257,8 @@ export function getRegionAsPart(
   if (result) {
     const [part, _] = result;
     return part;
-  } else {
-    return null;
   }
+  return null;
 }
 
 export function getBinsFromPart(
@@ -292,7 +290,7 @@ function buildStructures(
   structures: (DisplayableChunk | DisplayableModel)[],
   renderer: ChromatinBasicRenderer,
 ) {
-  for (let s of structures) {
+  for (const s of structures) {
     switch (s.kind) {
       case "model":
         buildDisplayableModel(s, renderer);
@@ -308,8 +306,8 @@ function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
 ) {
-  let segments: DrawableMarkSegment[] = [];
-  for (let [i, part] of model.structure.parts.entries()) {
+  const segments: DrawableMarkSegment[] = [];
+  for (const [i, part] of model.structure.parts.entries()) {
     const n = model.structure.parts.length;
     const [singleColor, colorScale, _] = decideVisualParameters(
       model.viewConfig,
@@ -346,7 +344,7 @@ function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
 ) {
-  if (chunk.viewConfig.coloring == "constant") {
+  if (chunk.viewConfig.coloring === "constant") {
     //~ A) setting a constant color for whole chunk
     const randColor = customCubeHelix.scale().colors(256, null)[
       Math.floor(Math.random() * 255)
@@ -369,7 +367,7 @@ function buildDisplayableChunk(
       },
     };
     renderer.addSegments([segment]);
-  } else if (chunk.viewConfig.coloring == "scale") {
+  } else if (chunk.viewConfig.coloring === "scale") {
     //~ B) using a color scale with the bin index as lookup
     // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
     const segment: DrawableMarkSegment = {

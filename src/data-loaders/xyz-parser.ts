@@ -1,6 +1,6 @@
-import type { ChromatinChunk } from "../chromatin-types";
 import { vec3 } from "gl-matrix";
-import { LoadOptions, normalize, recenter } from "./loader-utils";
+import type { ChromatinChunk } from "../chromatin-types";
+import { type LoadOptions, normalize, recenter } from "./loader-utils";
 
 let nextId = -1;
 
@@ -14,7 +14,7 @@ export const parseXYZ = (
   let lineNumber = 0;
 
   const firstLine = tsvLines[0];
-  const lineNum = parseInt(firstLine);
+  const lineNum = Number.parseInt(firstLine);
 
   let bins: vec3[] = [];
   tsvLines.forEach((line) => {
@@ -34,9 +34,9 @@ export const parseXYZ = (
       return;
     }
 
-    const x = parseFloat(tokens[1]);
-    const y = parseFloat(tokens[2]);
-    const z = parseFloat(tokens[3]);
+    const x = Number.parseFloat(tokens[1]);
+    const y = Number.parseFloat(tokens[2]);
+    const z = Number.parseFloat(tokens[3]);
 
     bins.push(vec3.fromValues(x, y, z));
   });
