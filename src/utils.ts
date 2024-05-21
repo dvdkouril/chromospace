@@ -1,8 +1,7 @@
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
-import { type Color, Euler, Quaternion, Vector3 } from "three";
-import * as THREE from "three";
+import { type Color } from "three";
 import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
@@ -50,50 +49,6 @@ export const estimateBestSphereSize = (bins: vec3[]): number => {
   return 0.4 * minDist;
 };
 
-export const computeTubes = (
-  bins: vec3[],
-): { position: Vector3; rotation: Euler; scale: number }[] => {
-  const t: { position: Vector3; rotation: Euler; scale: number }[] = [];
-  for (let i = 0; i < bins.length - 1; i++) {
-    const first = new Vector3(bins[i][0], bins[i][1], bins[i][2]);
-    const second = new Vector3(bins[i + 1][0], bins[i + 1][1], bins[i + 1][2]);
-
-    //~ position between the two bins
-    const pos = new Vector3();
-    pos.subVectors(second, first);
-    pos.divideScalar(2);
-    pos.addVectors(first, pos);
-    const tubePosition = pos;
-    //~ rotation
-    const tubeRotation = getRotationFromTwoPositions(first, second);
-    //~ tube length
-    const betweenVec = new Vector3();
-    betweenVec.subVectors(second, first);
-    const tubeScale = betweenVec.length();
-
-    t.push({
-      position: tubePosition,
-      rotation: tubeRotation,
-      scale: tubeScale,
-    });
-  }
-
-  return t;
-};
-
-const getRotationFromTwoPositions = (from: Vector3, to: Vector3) => {
-  const fromCopy = new Vector3(from.x, from.y, from.z);
-  const toCopy = new Vector3(to.x, to.y, to.z);
-  const q = new Quaternion();
-  const u = new Vector3(0, 1, 0);
-  const v = toCopy.sub(fromCopy).normalize();
-
-  q.setFromUnitVectors(u, v);
-
-  const eulers = new Euler();
-  return eulers.setFromQuaternion(q);
-};
-
 export const decideColor = (
   outColor: Color,
   i: number,
@@ -112,31 +67,8 @@ export const decideColor = (
   }
 };
 
-export const decideGeometry = (
-  mark: MarkTypes,
-  attributes: VisualAttributes,
-):
-  | THREE.SphereGeometry
-  | THREE.BoxGeometry
-  | THREE.OctahedronGeometry
-  | undefined => {
-  switch (mark) {
-    case "sphere":
-      return new THREE.SphereGeometry(attributes.size);
-    case "box":
-      return new THREE.BoxGeometry(
-        attributes.size,
-        attributes.size,
-        attributes.size,
-      );
-    case "octahedron":
-      return new THREE.OctahedronGeometry(attributes.size);
-    default:
-      return undefined;
-  }
-};
-
 /* Returns visual attributes of i-th bin (out on n) based on config */
+/* Correction: this is not the i-th bin, but i-th part in a model */
 export function decideVisualParameters(
   viewConfig: ChromatinModelViewConfig,
   i: number,
