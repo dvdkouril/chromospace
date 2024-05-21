@@ -19,60 +19,6 @@ import {
   defaultColorScale,
 } from "./utils";
 
-// function initScene(): ChromatinScene;
-// function initScene(chunk: ChromatinChunk): ChromatinScene;
-// function initScene(model: ChromatinModel): ChromatinScene;
-// function initScene(initStructure?: ChromatinModel | ChromatinChunk | ChromatinModelDisplayable): ChromatinScene {
-//   let scene: ChromatinScene = {
-//     models: [],
-//     chunks: [],
-//     displayables: [],
-//     config: {
-//       layout: "center",
-//     },
-//   };
-//   if (initStructure instanceof ChromatinModel) {
-//     scene = {
-//       ...scene,
-//       models: [...scene.models, model]
-//     }
-//   }
-//
-//   if (chunk != undefined) {
-//     scene = {
-//       ...scene,
-//       chunks: [...scene.chunks, chunk]
-//     }
-//   }
-//
-//   if (displayable != undefined) {
-//     scene = {
-//       ...scene,
-//       displayables: [...scene.displayables, displayable]
-//     }
-//   }
-//   return scene;
-// }
-//
-// const modelA: ChromatinModel = {
-//   parts: [],
-//   assembly: "",
-// };
-// const chunk: ChromatinChunk = {
-//   bins: [],
-//   rawBins: [],
-//   id: 0,
-// };
-// // const displayableModel: ChromatinModelDisplayable = {};
-// // const scene = initScene(modelA, modelB, chunk, displayableModel);
-// const scene = initScene();
-// const sceneB = initScene(modelA);
-// const sceneC = initScene(chunk);
-//
-// console.log(scene);
-// console.log(sceneB);
-// console.log(sceneC);
-
 export function initScene(): ChromatinScene {
   return {
     structures: [],
@@ -313,11 +259,8 @@ function buildDisplayableModel(
       i,
       n,
     );
-    //~ this is a hack: should go inside (?) the decider func above
-    // const marks: MarkTypes[] = ["sphere", "box", "octahedron"];
     const segment: DrawableMarkSegment = {
-      // mark: marks[(i % 3)],
-      mark: "octahedron",
+      mark: "sphere",
       positions: part.chunk.bins,
       attributes: {
         color: singleColor,
@@ -398,7 +341,6 @@ export function display(
   const renderer = new ChromatinBasicRenderer({
     alwaysRedraw: options.alwaysRedraw,
   });
-  // renderer.addScene(scene);
   buildStructures(scene.structures, renderer);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();

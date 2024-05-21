@@ -5,9 +5,7 @@ import { type Color } from "three";
 import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
-  MarkTypes,
 } from "./chromatin-types";
-import type { VisualAttributes } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma
