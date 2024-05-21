@@ -122,7 +122,6 @@ export function addModelToScene(
     viewConfig = {
       binSizeScale: 0.0001,
       coloring: "constant",
-      selections: [],
     };
   }
 

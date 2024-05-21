@@ -81,14 +81,15 @@ export function decideVisualParameters(
 
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-  const deemphasizedColor = chroma("#a3a3a3");
-  const hasSelection = viewConfig.selections.length > 0;
 
   if (viewConfig.coloring === "constant") {
-    color = hasSelection ? deemphasizedColor : chunkColors[i];
+    color = chunkColors[i];
+    if (viewConfig.color) {
+      color = chroma(viewConfig.color);
+    }
   } else if (viewConfig.coloring === "scale") {
-    color = hasSelection ? deemphasizedColor : undefined;
-    scale = hasSelection ? undefined : defaultColorScale;
+    color = undefined;
+    scale = defaultColorScale;
   }
 
   return [color, scale, size];

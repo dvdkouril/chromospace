@@ -75,7 +75,6 @@ export type ChromatinModelViewConfig = {
   coloring?: "constant" | "scale";
   color?: string;
   // signals: []; //~ placeholder: for later when I have genomic signals for coloring the structure too
-  selections: Selection[];
 };
 
 /**
