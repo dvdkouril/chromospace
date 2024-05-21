@@ -308,7 +308,7 @@ function buildDisplayableModel(
   const segments: DrawableMarkSegment[] = [];
   for (const [i, part] of model.structure.parts.entries()) {
     const n = model.structure.parts.length;
-    const [singleColor, colorScale, _] = decideVisualParameters(
+    const [singleColor, colorScale, size] = decideVisualParameters(
       model.viewConfig,
       i,
       n,
@@ -322,8 +322,7 @@ function buildDisplayableModel(
       attributes: {
         color: singleColor,
         colorMap: colorScale,
-        // size: sphereSize,
-        size: 0.01,
+        size: size,
         makeLinks: false,
       },
     };

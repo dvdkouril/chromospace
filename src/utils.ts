@@ -76,8 +76,8 @@ export function decideVisualParameters(
 ): [ChromaColor | undefined, ChromaScale | undefined, number] {
   let color: ChromaColor | undefined = undefined;
   let scale: ChromaScale | undefined = undefined;
-  // let size = 1.0;
-  const size = 0.008; //TODO: estimate
+  const defaultSize = 0.008;
+  const size = viewConfig.binSizeScale || defaultSize;
 
   const needColorsN = n;
   const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
