@@ -14,6 +14,9 @@ export {
   get,
   getBinsFromPart,
 } from "./selections.ts";
+export {
+  embed
+} from "./grammar/grammar.ts";
 
 export {
   parseTsv,
