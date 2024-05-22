@@ -74,8 +74,8 @@ export type ChromatinModelViewConfig = {
   binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
   coloring?: "constant" | "scale";
   color?: string;
+  mark?: MarkTypes;
   // signals: []; //~ placeholder: for later when I have genomic signals for coloring the structure too
-  selections: Selection[];
 };
 
 /**

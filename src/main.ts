@@ -8,10 +8,15 @@ export {
   addChunkToScene,
   addModelToScene,
   display,
-  get,
-  getBinsFromPart,
   initScene,
 } from "./chromatin.ts";
+export {
+  get,
+  getBinsFromPart,
+} from "./selections.ts";
+export {
+  embed
+} from "./grammar/grammar.ts";
 
 export {
   parseTsv,

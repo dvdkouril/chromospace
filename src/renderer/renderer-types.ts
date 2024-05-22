@@ -11,5 +11,5 @@ export type VisualAttributes = {
   color?: ChromaColor;
   colorMap?: ChromaScale;
   size: number;
-  makeLinks: boolean;
+  makeLinks?: boolean;
 };
