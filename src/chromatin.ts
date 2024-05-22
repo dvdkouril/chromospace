@@ -81,6 +81,22 @@ export function addModelToScene(
   return scene;
 }
 
+export type DisplayOptions = {
+  alwaysRedraw?: boolean;
+};
+
+export function display(
+  scene: ChromatinScene,
+  options: DisplayOptions,
+): [ChromatinBasicRenderer, HTMLCanvasElement] {
+  const renderer = new ChromatinBasicRenderer({
+    alwaysRedraw: options.alwaysRedraw,
+  });
+  buildStructures(scene.structures, renderer);
+  renderer.startDrawing();
+  const canvas = renderer.getCanvasElement();
+  return [renderer, canvas];
+}
 
 function buildStructures(
   structures: (DisplayableChunk | DisplayableModel)[],
@@ -174,26 +190,4 @@ function buildDisplayableChunk(
     };
     renderer.addSegments([segment]);
   }
-}
-
-// type DrawableChromatinPart = {
-//   structure: ChromatinChunk;
-//   viewConfig: VisualChannels;
-// };
-
-export type DisplayOptions = {
-  alwaysRedraw?: boolean;
-};
-
-export function display(
-  scene: ChromatinScene,
-  options: DisplayOptions,
-): [ChromatinBasicRenderer, HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer({
-    alwaysRedraw: options.alwaysRedraw,
-  });
-  buildStructures(scene.structures, renderer);
-  renderer.startDrawing();
-  const canvas = renderer.getCanvasElement();
-  return [renderer, canvas];
 }
