@@ -2,7 +2,7 @@
 
 > Visualize chromatin in space!
 
-![chromospace teaser](https://dl.dropboxusercontent.com/scl/fi/qqx2jqmfhh1ydfa6lalrl/chromospace-repo-teaser.png?rlkey=xdhg78qiowzinhcr4kvy8o8yk&dl=0)
+![chromospace teaser](https://dl.dropboxusercontent.com/scl/fi/y03zd8nv53bxohlh9yzqb/chromospace-repo-teaser.png?rlkey=2g7v31wxg79covnatrj2oekei&dl=0)
 
 :warning: **NOTE** :construction:: `chromospace` is still very early in development. Expect breaking changes frequently!
 
