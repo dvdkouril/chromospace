@@ -260,13 +260,13 @@ function buildDisplayableModel(
       n,
     );
     const segment: DrawableMarkSegment = {
-      mark: "sphere",
+      // mark: "sphere",
+      mark: model.viewConfig.mark || "sphere",
       positions: part.chunk.bins,
       attributes: {
         color: singleColor,
         colorMap: colorScale,
         size: size,
-        makeLinks: false,
       },
     };
     segments.push(segment);
