@@ -26,10 +26,9 @@ export function embed(spec: ChromospaceSchema) {
   const container = document.createElement("div");
 
   for (const v of spec.views) {
-    // @ts-ignore: t actually is used in a string template
     for (const t of v.tracks) {
       const p = document.createElement("p");
-      p.innerText = "Found track with mark: {t.mark}";
+      p.innerText = `Found track with mark: ${t.mark}`;
       container.appendChild(p);
     }
   }
