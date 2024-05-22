@@ -1,43 +1,42 @@
-import { MarkTypes } from "../chromatin-types";
+import type { MarkTypes } from "../chromatin-types";
 
 type ChromospaceSchema = {
-  views: ChsView[],
+  views: ChsView[];
 };
 
 type ChsView = {
-  data: string,
-  tracks: ChsTrack[],
+  data: string;
+  tracks: ChsTrack[];
 };
 
 type ChsTrack = {
-  mark: MarkTypes,
+  mark: MarkTypes;
   encoding: {
-    position: string,
-    color: string,
-    size: string,
-  },
+    position: string;
+    color: string;
+    size: string;
+  };
 };
 
 export function embed(spec: ChromospaceSchema) {
-    console.log("embedding spec:");
-    console.log(spec);
-    // return spec;
-    
-    const container = document.createElement('div');
-    
-    for (const v of spec.views) {
-        for (const t of v.tracks) {
-            const p = document.createElement('p');
-            p.innerText = "Found track with mark: " + t.mark;
-            container.appendChild(p);
-        }
-    }
+  console.log("embedding spec:");
+  console.log(spec);
+  // return spec;
 
-    
-    // const canvas = document.createElement('pre');
-    // canvas.innerText = "[insert visualization here]";
-    // return canvas;
-    return container;
+  const container = document.createElement("div");
+
+  for (const v of spec.views) {
+    for (const t of v.tracks) {
+      const p = document.createElement("p");
+      p.innerText = "Found track with mark: {t.mark}";
+      container.appendChild(p);
+    }
+  }
+
+  // const canvas = document.createElement('pre');
+  // canvas.innerText = "[insert visualization here]";
+  // return canvas;
+  return container;
 }
 
 // const vegaExample = `
@@ -56,7 +55,6 @@ export function embed(spec: ChromospaceSchema) {
 //     }
 //   }
 // }`;
-
 
 // const spec = `
 // {

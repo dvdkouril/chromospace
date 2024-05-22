@@ -1,5 +1,5 @@
+import type { vec3 } from "gl-matrix";
 import * as THREE from "three";
-import { vec3 } from "gl-matrix";
 import type { MarkTypes } from "../chromatin-types";
 import type { VisualAttributes } from "./renderer-types";
 
@@ -30,10 +30,15 @@ export const decideGeometry = (
 export const computeTubes = (
   bins: vec3[],
 ): { position: THREE.Vector3; rotation: THREE.Euler; scale: number }[] => {
-  const t: { position: THREE.Vector3; rotation: THREE.Euler; scale: number }[] = [];
+  const t: { position: THREE.Vector3; rotation: THREE.Euler; scale: number }[] =
+    [];
   for (let i = 0; i < bins.length - 1; i++) {
     const first = new THREE.Vector3(bins[i][0], bins[i][1], bins[i][2]);
-    const second = new THREE.Vector3(bins[i + 1][0], bins[i + 1][1], bins[i + 1][2]);
+    const second = new THREE.Vector3(
+      bins[i + 1][0],
+      bins[i + 1][1],
+      bins[i + 1][2],
+    );
 
     //~ position between the two bins
     const pos = new THREE.Vector3();
@@ -58,7 +63,10 @@ export const computeTubes = (
   return t;
 };
 
-const getRotationFromTwoPositions = (from: THREE.Vector3, to: THREE.Vector3) => {
+const getRotationFromTwoPositions = (
+  from: THREE.Vector3,
+  to: THREE.Vector3,
+) => {
   const fromCopy = new THREE.Vector3(from.x, from.y, from.z);
   const toCopy = new THREE.Vector3(to.x, to.y, to.z);
   const q = new THREE.Quaternion();

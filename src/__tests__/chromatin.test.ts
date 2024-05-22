@@ -2,8 +2,8 @@ import fs from "node:fs";
 import { expect, test } from "vitest";
 
 import { fail } from "node:assert";
-import { get } from "../selections.ts";
 import { parse3dg } from "../data-loaders/tsv-parser.ts";
+import { get } from "../selections.ts";
 import { coordinateToBin } from "../utils.ts";
 
 test("coordinateToBin simple", () => {

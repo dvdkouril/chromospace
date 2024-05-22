@@ -1,7 +1,7 @@
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
-import { type Color } from "three";
+import type { Color } from "three";
 import type {
   ChromatinChunk,
   ChromatinModelViewConfig,
