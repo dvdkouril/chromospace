@@ -134,6 +134,7 @@ function buildDisplayableModel(
         color: singleColor,
         colorMap: colorScale,
         size: size,
+        makeLinks: model.viewConfig.makeLinks,
       },
     };
     segments.push(segment);
