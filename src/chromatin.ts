@@ -171,7 +171,7 @@ function buildDisplayableChunk(
       attributes: {
         color: color,
         colorMap: undefined,
-        size: 1.0,
+        size: chunk.viewConfig.binSizeScale || 0.1,
         makeLinks: true,
       },
     };
@@ -185,7 +185,7 @@ function buildDisplayableChunk(
       attributes: {
         color: undefined,
         colorMap: defaultColorScale,
-        size: 1.0,
+        size: chunk.viewConfig.binSizeScale || 0.1,
         makeLinks: true,
       },
     };
