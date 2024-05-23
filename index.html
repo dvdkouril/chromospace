@@ -18,10 +18,9 @@
   </head>
   <body>
     <div id="app">
-      <canvas id="c"></canvas>
     </div>
     <script type="module">
-    import { ChromatinBasicRenderer, parseTsv, parse3dg, addChunkToScene, addModelToScene, getBinsFromPart, initScene } from './src/main.ts';
+    import { parseTsv, parse3dg, addChunkToScene, addModelToScene, initScene, display } from './src/main.ts';
 
       console.log("hello!");
 
@@ -50,40 +49,23 @@
           const tab2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
           
           //~ API testing
-          console.log(tab2018Model);
-          console.log(getBinsFromPart(tab2018Model.parts[0], 0, 200));
-
-          const p = getBinsFromPart(tab2018Model.parts[0], 0, 200);
-
+          //~ this config specifies how the 3D model will look
+          const viewConfig = ({ 
+            binSizeScale: 0.01, 
+            coloring: "constant",
+          });
+          
           //~ create a scene
-          //let chromatinScene = {
-          //    chunks: [testChunk2],
-          //    models: [],
-          //    displayables: [],
-          //};
-          //console.log(chromatinScene);
-
           let chromatinScene = initScene();
-          // chromatinScene = addModelToScene(chromatinScene, tan2018Model);
-          chromatinScene = addChunkToScene(chromatinScene, testChunk2);
-
-          // const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: false});
-
-
-          //~ create renderer
-          const can = document.querySelector( '#c' );
-          const renderer = new ChromatinBasicRenderer({canvas: can});
-          renderer.addScene(chromatinScene);
+          chromatinScene = addChunkToScene(chromatinScene, testChunk, viewConfig);
+          
+          const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: false});
 
           //~ add canvas to the page
           let appEl = document.querySelector('#app');
-          const canvas = renderer.getCanvasElement();
           if (canvas) {
               appEl.appendChild(canvas);
           }
-
-          //~ initialize render loop
-          renderer.startDrawing();
 
       })();
     </script>
