@@ -236,7 +236,7 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
-  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
+  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
     const canvas = renderer.domElement;
     const pixelRatio = window.devicePixelRatio;
     const width = Math.floor(canvas.clientWidth * pixelRatio);

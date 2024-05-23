@@ -60,7 +60,7 @@ export function addModelToScene(
   scene: ChromatinScene,
   model: ChromatinModel,
   viewConfig?: ChromatinModelViewConfig,
-) {
+): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,

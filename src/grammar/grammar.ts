@@ -18,7 +18,7 @@ type ChsTrack = {
   };
 };
 
-export function embed(spec: ChromospaceSchema) {
+export function embed(spec: ChromospaceSchema): HTMLElement {
   console.log("embedding spec:");
   console.log(spec);
   // return spec;

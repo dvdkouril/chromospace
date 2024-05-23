@@ -1,0 +1,5 @@
+{
+  "name": "@chromospace/chromospace",
+  "version": "0.0.9",
+  "exports": "./src/main.ts"
+}
