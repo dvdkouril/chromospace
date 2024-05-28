@@ -1,6 +1,6 @@
 {
   "name": "chromospace",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "author": "David Kouřil <david.kouril@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -12,7 +12,9 @@
     "typecheck": "tsc",
     "fix": "biome check --apply ."
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",
