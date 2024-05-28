@@ -12,9 +12,7 @@
     "typecheck": "tsc",
     "fix": "biome check --apply ."
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",

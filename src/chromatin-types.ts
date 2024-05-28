@@ -43,7 +43,7 @@ export type ChromatinPart = {
 };
 
 /**
- * A full model that contains annotation about which genomic regions the individual parts correspond to 
+ * A full model that contains annotation about which genomic regions the individual parts correspond to
  */
 export type ChromatinModel = {
   /* Distinct, separated parts of a chromatin model. Most often single chromosomes. */
