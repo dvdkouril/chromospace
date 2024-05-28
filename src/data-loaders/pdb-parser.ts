@@ -3,9 +3,8 @@ import type { ChromatinChunk } from "../chromatin-types";
 import { type LoadOptions, normalize, recenter } from "./loader-utils";
 
 /**
- * The Protein Data Bank (PDB) format is often used for 3D chromatin.
+ * Utility function for parsing the Protein Data Bank (PDB) format, which is often used for 3D chromatin.
  */
-
 export const parsePDB = (
   fileContent: string,
   options: LoadOptions,
@@ -55,9 +54,9 @@ export const parsePDB = (
   };
 };
 
-//******
-//MOVEEEEEEE
-
+/**
+ * Utility for parsing a raw array of bytes uploaded through the chromospyce widget as a numpy array.
+ */
 export const parseNumpyArray = (
   fileContent: DataView,
   options: LoadOptions,

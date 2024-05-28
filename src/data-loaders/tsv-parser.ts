@@ -14,6 +14,9 @@ import {
 
 let nextId = -1;
 
+/**
+ * Utility for parsing the 3D coordinates in a tab separated values file format.
+ */
 export const parseTsv = (
   fileContent: string,
   options: LoadOptions,
@@ -59,6 +62,9 @@ const getResolution = (firstLine: string, secondLine: string): number => {
   return startCoord2 - startCoord1;
 };
 
+/**
+ * Utility function for parsing the 3DG format (e.g., the Tan et al. 2018 whole genome model)
+ */
 export const parse3dg = (
   fileContent: string,
   options: LoadOptions,
@@ -124,6 +130,9 @@ export const parse3dg = (
   };
 };
 
+/**
+ * Specific utility function for parsing TSV outputted by MiniMDS software.
+ */
 export const parseWeirdTsvFromMiniMDS = (
   fileContent: string,
   options: LoadOptions,

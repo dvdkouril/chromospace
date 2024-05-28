@@ -4,6 +4,9 @@ import { type LoadOptions, normalize, recenter } from "./loader-utils";
 
 let nextId = -1;
 
+/**
+ * Utility function for parsing an XYZ file, mostly follows the de-facto specification: https://en.wikipedia.org/wiki/XYZ_file_format
+ */
 export const parseXYZ = (
   fileContent: string,
   delimiter: string,

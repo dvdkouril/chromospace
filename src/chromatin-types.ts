@@ -103,6 +103,9 @@ export type TrackViewConfig = {
   color?: string;
 };
 
+/**
+ * ChromatinScene carries the structures to show, plus a configuration mostly describing the layout of the scene (WIP)
+ */
 export type ChromatinScene = {
   structures: (DisplayableChunk | DisplayableModel)[];
   config: ChromatinSceneConfig;

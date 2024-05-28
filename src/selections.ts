@@ -127,6 +127,9 @@ export function getRegionAsPart(
   return null;
 }
 
+/**
+ * Fetching specific bin index range.
+ */
 export function getBinsFromPart(
   part: ChromatinPart,
   start: number,

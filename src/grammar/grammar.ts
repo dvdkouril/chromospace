@@ -18,6 +18,9 @@ type ChsTrack = {
   };
 };
 
+/**
+ * Embedding a visualization specified in a declarative manner into a web page.
+ */
 export function embed(spec: ChromospaceSchema): HTMLElement {
   console.log("embedding spec:");
   console.log(spec);

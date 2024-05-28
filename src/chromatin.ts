@@ -16,6 +16,9 @@ import {
   defaultColorScale,
 } from "./utils";
 
+/**
+ * Simple initializer for the ChromatinScene structure.
+ */
 export function initScene(): ChromatinScene {
   return {
     structures: [],
@@ -81,10 +84,16 @@ export function addModelToScene(
   return scene;
 }
 
+/**
+ * Parameters for the display function
+ */
 export type DisplayOptions = {
   alwaysRedraw?: boolean;
 };
 
+/**
+ * Starts rendering of a scene. Returns a renderer object and a canvas.
+ */
 export function display(
   scene: ChromatinScene,
   options: DisplayOptions,

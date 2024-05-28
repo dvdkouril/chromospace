@@ -16,6 +16,13 @@ import type { DrawableMarkSegment } from "./renderer-types";
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
+/**
+ * Basic implementation of a 3d chromatin renderer. Essentially just wraps THREE.WebGLRenderer but provides semantics for building chromatin visualization.
+ *
+ * Important methods:
+ *  - addSegments: adding segments of chromatin with unified visual properties (e.g., specified by a grammar)
+ *  - buildStructures, buildPart: turns segments with specific visual attributes into THREE primitives
+ */
 export class ChromatinBasicRenderer {
   markSegments: DrawableMarkSegment[] = [];
 
