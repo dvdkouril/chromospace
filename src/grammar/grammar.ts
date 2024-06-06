@@ -35,7 +35,7 @@ async function fetchExampleWholeGenomeModel() {
 /**
  * Embedding a visualization specified in a declarative manner into a web page.
  */
-export function embed(spec: ChromospaceSchema): HTMLElement {
+export async function embed(spec: ChromospaceSchema): Promise<HTMLElement> {
   console.log("embedding spec:");
   console.log(spec);
 
