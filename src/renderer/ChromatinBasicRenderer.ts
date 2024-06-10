@@ -13,7 +13,7 @@ import { decideColor, estimateBestSphereSize, fetchColorFromScale } from "../uti
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { Associated1DData, DrawableMarkSegment } from "./renderer-types";
 
-import type { Color as ChromaColor, Scale as ChromaScale, Color } from "chroma-js";
+import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
