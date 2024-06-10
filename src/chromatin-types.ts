@@ -62,6 +62,8 @@ export type ChromatinChunkViewConfig = {
   binSizeScale?: number;
   coloring?: "constant" | "scale";
   color?: string;
+  mark?: MarkTypes;
+  makeLinks?: boolean;
 };
 
 /**

@@ -175,13 +175,13 @@ function buildDisplayableChunk(
     // this.buildPart(chunk.structure, { color: color });
 
     const segment: DrawableMarkSegment = {
-      mark: "sphere",
+      mark: chunk.viewConfig.mark || "sphere",
       positions: chunk.structure.bins,
       attributes: {
         color: color,
         colorMap: undefined,
         size: chunk.viewConfig.binSizeScale || 0.1,
-        makeLinks: true,
+        makeLinks: chunk.viewConfig.makeLinks,
       },
       associatedValues: undefined,
     };
@@ -193,13 +193,13 @@ function buildDisplayableChunk(
     const num = chunk.structure.bins.length;
     const randomValues = Array.from({ length: num }, () => Math.random() * (max - min) + min);
     const segment: DrawableMarkSegment = {
-      mark: "sphere",
+      mark: chunk.viewConfig.mark || "sphere",
       positions: chunk.structure.bins,
       attributes: {
         color: undefined,
         colorMap: defaultColorScale,
         size: chunk.viewConfig.binSizeScale || 0.1,
-        makeLinks: true,
+        makeLinks: chunk.viewConfig.makeLinks,
       },
       associatedValues: {
         values: randomValues,
