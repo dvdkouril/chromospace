@@ -60,6 +60,12 @@ export const decideColor = (
   }
 };
 
+export const fetchColorFromScale = (binAssocValue: number, minValue: number, maxValue: number, colorMap: ChromaScale) => {
+  const scaledColorMap = colorMap.domain([minValue, maxValue]);
+  return scaledColorMap(binAssocValue);
+};
+
+
 /* Returns visual attributes of i-th bin (out on n) based on config */
 /* Correction: this is not the i-th bin, but i-th part in a model */
 export function decideVisualParameters(

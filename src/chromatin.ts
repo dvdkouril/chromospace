@@ -136,7 +136,6 @@ function buildDisplayableModel(
       n,
     );
     const segment: DrawableMarkSegment = {
-      // mark: "sphere",
       mark: model.viewConfig.mark || "sphere",
       positions: part.chunk.bins,
       attributes: {
@@ -145,6 +144,7 @@ function buildDisplayableModel(
         size: size,
         makeLinks: model.viewConfig.makeLinks,
       },
+      associatedValues: undefined,
     };
     segments.push(segment);
   }
@@ -183,11 +183,15 @@ function buildDisplayableChunk(
         size: chunk.viewConfig.binSizeScale || 0.1,
         makeLinks: true,
       },
+      associatedValues: undefined,
     };
     renderer.addSegments([segment]);
   } else if (chunk.viewConfig.coloring === "scale") {
     //~ B) using a color scale with the bin index as lookup
     // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
+    const max = 100; const min = 0;
+    const num = chunk.structure.bins.length;
+    const randomValues = Array.from({ length: num }, () => Math.random() * (max - min) + min);
     const segment: DrawableMarkSegment = {
       mark: "sphere",
       positions: chunk.structure.bins,
@@ -196,6 +200,9 @@ function buildDisplayableChunk(
         colorMap: defaultColorScale,
         size: chunk.viewConfig.binSizeScale || 0.1,
         makeLinks: true,
+      },
+      associatedValues: {
+        values: randomValues,
       },
     };
     renderer.addSegments([segment]);

@@ -9,9 +9,9 @@ import {
 } from "postprocessing";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { decideColor, estimateBestSphereSize } from "../utils";
+import { decideColor, estimateBestSphereSize, fetchColorFromScale } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
-import type { DrawableMarkSegment } from "./renderer-types";
+import type { Associated1DData, DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import type { vec3 } from "gl-matrix";
@@ -178,14 +178,26 @@ export class ChromatinBasicRenderer {
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
 
-      decideColor(colorObj, i, segment.positions.length, color, colorMap);
+      /** 
+       * Setting the color from a colormap based on associated values
+      */
+      if ((segment.associatedValues !== undefined) && (colorMap !== undefined)) {
+        const binAssocValue = segment.associatedValues.values[i];
+        const minValue = 0; 
+        const maxValue = 100;
+        const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, colorMap);
+        colorObj.set(binColor.hex());
+      } else {
+        decideColor(colorObj, i, segment.positions.length, color, colorMap);
+      }
+
       meshInstcedSpheres.setColorAt(i, colorObj);
       i += 1;
     }
     this.scene.add(meshInstcedSpheres);
 
     if (makeLinks) {
-      this.buildLinks(segment.positions, tubeSize, color, colorMap);
+      this.buildLinks(segment.positions, tubeSize, color, colorMap, segment.associatedValues);
     }
   }
 
@@ -197,6 +209,7 @@ export class ChromatinBasicRenderer {
     tubeSize: number,
     color?: ChromaColor,
     colorMap?: ChromaScale,
+    associatedValues?: Associated1DData,
   ) {
     //~ tubes between tubes
     const tubes = computeTubes(positions);
@@ -227,7 +240,18 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-      decideColor(colorObj, i, positions.length, color, colorMap);
+
+      if ((associatedValues !== undefined) && (colorMap !== undefined)) {
+        const binAssocValue = associatedValues.values[i];
+        const minValue = 0; 
+        const maxValue = 100;
+        const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, colorMap);
+        colorObj.set(binColor.hex());
+      } else {
+        // decideColor(colorObj, i, segment.positions.length, color, colorMap);
+        decideColor(colorObj, i, positions.length, color, colorMap);
+      }
+      // decideColor(colorObj, i, positions.length, color, colorMap);
       meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
       meshInstcedTubes.setColorAt(i, colorObj);
     }
