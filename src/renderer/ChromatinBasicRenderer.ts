@@ -13,7 +13,7 @@ import { decideColor, estimateBestSphereSize, fetchColorFromScale } from "../uti
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { Associated1DData, DrawableMarkSegment } from "./renderer-types";
 
-import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
+import type { Color as ChromaColor, Scale as ChromaScale, Color } from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
@@ -160,43 +160,46 @@ export class ChromatinBasicRenderer {
     const sphereRadius = size
       ? size
       : estimateBestSphereSize(segment.positions);
-    const tubeSize = 0.4 * sphereRadius;
-    const geometry = decideGeometry(segment.mark, segment.attributes);
-    const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
+    const g = decideGeometry(segment.mark, segment.attributes);
+    const m = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
+    const n = segment.positions.length;
 
+    // const colorToUse: ChromaColor | ChromaScale;
+    // const sizeToUse: number;
+    
     //~ bin spheres
-    const meshInstcedSpheres = new THREE.InstancedMesh(
-      geometry,
-      material,
-      segment.positions.length,
-    );
+    const meshInstcedSpheres = new THREE.InstancedMesh(g, m, n);
+
     const dummyObj = new THREE.Object3D();
     const colorObj = new THREE.Color();
-
     for (let [i, b] of segment.positions.entries()) {
-      dummyObj.position.set(b[0], b[1], b[2]);
-      dummyObj.updateMatrix();
-      meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
-
       /** 
        * Setting the color from a colormap based on associated values
       */
+      let scalingFactor = 1.0;
       if ((segment.associatedValues !== undefined) && (colorMap !== undefined)) {
         const binAssocValue = segment.associatedValues.values[i];
         const minValue = 0; 
         const maxValue = 100;
         const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, colorMap);
         colorObj.set(binColor.hex());
+        const valMap = (value: number, x1: number, y1: number, x2: number, y2: number) => (value - x1) * (y2 - x2) / (y1 - x1) + x2;
+        scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
       } else {
         decideColor(colorObj, i, segment.positions.length, color, colorMap);
       }
 
+      dummyObj.position.set(b[0], b[1], b[2]);
+      dummyObj.scale.setScalar(scalingFactor);
+      dummyObj.updateMatrix();
+      meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
       meshInstcedSpheres.setColorAt(i, colorObj);
       i += 1;
     }
     this.scene.add(meshInstcedSpheres);
 
     if (makeLinks) {
+      const tubeSize = 0.4 * sphereRadius;
       this.buildLinks(segment.positions, tubeSize, color, colorMap, segment.associatedValues);
     }
   }
