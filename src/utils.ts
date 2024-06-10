@@ -15,12 +15,7 @@ export const customCubeHelix = chroma
   .gamma(0.8)
   .lightness([0.3, 0.8]);
 
-export const defaultColorScale = chroma.scale([
-  "white",
-  "rgba(245,166,35,1.0)",
-  "rgba(208,2,27,1.0)",
-  "black",
-]);
+export const defaultColorScale = chroma.scale('viridis');
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
