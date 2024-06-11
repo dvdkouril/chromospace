@@ -8,7 +8,7 @@ import type {
   DisplayableModel,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import type { DrawableMarkSegment } from "./renderer/renderer-types";
+import type { Associated1DData, DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   customCubeHelix,
   decideVisualParameters,
@@ -187,11 +187,12 @@ function buildDisplayableChunk(
     renderer.addSegments([segment]);
   } else if (chunk.viewConfig.coloring === "scale") {
     //~ B) using a color scale with the bin index as lookup
-    // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
-    const num = chunk.structure.bins.length;
-    // const max = 100; const min = 0;
-    // const randomValues = Array.from({ length: num }, () => Math.random() * (max - min) + min);
-    const sineWave = (amplitude: number, frequency: number, length: number) => Array.from({ length }, (_, i) => amplitude * Math.sin(frequency * i));
+    let assocValues: Associated1DData | undefined = undefined;
+    if (chunk.viewConfig.associatedValues !== undefined) {
+      assocValues = {
+        values: chunk.viewConfig.associatedValues,
+      }
+    }
     const segment: DrawableMarkSegment = {
       mark: chunk.viewConfig.mark || "sphere",
       positions: chunk.structure.bins,
@@ -201,10 +202,7 @@ function buildDisplayableChunk(
         size: chunk.viewConfig.binSizeScale || 0.1,
         makeLinks: chunk.viewConfig.makeLinks,
       },
-      associatedValues: {
-        // values: randomValues,
-        values: sineWave(100, 0.5, num),
-      },
+      associatedValues: assocValues,
     };
     renderer.addSegments([segment]);
   }
