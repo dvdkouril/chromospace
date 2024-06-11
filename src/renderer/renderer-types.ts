@@ -7,7 +7,7 @@ import type { vec3 } from "gl-matrix";
  */
 export type DrawableMarkSegment = {
   mark: "sphere" | "box" | "octahedron"; //~ TODO: add others based on what's available in three
-                                          //~ TODO: maybe this should rather go to VisualAttributes?
+  //~ TODO: maybe this should rather go to VisualAttributes?
   positions: vec3[];
   attributes: VisualAttributes;
   associatedValues: Associated1DData | undefined;

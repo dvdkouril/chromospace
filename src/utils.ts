@@ -2,10 +2,7 @@ import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import { Color } from "three";
-import type {
-  ChromatinChunk,
-  ViewConfig,
-} from "./chromatin-types";
+import type { ChromatinChunk, ViewConfig } from "./chromatin-types";
 import { DrawableMarkSegment } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
@@ -16,9 +13,14 @@ export const customCubeHelix = chroma
   .gamma(0.8)
   .lightness([0.3, 0.8]);
 
-export const defaultColorScale = chroma.scale('viridis');
+export const defaultColorScale = chroma.scale("viridis");
 
-export const fetchColorFromScale = (binAssocValue: number, minValue: number, maxValue: number, colorMap: ChromaScale) => {
+export const fetchColorFromScale = (
+  binAssocValue: number,
+  minValue: number,
+  maxValue: number,
+  colorMap: ChromaScale,
+) => {
   const scaledColorMap = colorMap.domain([minValue, maxValue]);
   return scaledColorMap(binAssocValue);
 };
@@ -48,20 +50,43 @@ export const estimateBestSphereSize = (bins: vec3[]): number => {
   return 0.4 * minDist;
 };
 
-export const decideVisualParametersBasedOn1DData = (segment: DrawableMarkSegment, binIndex: number): [Color, number] => {
-    let scalingFactor = 1.0;
-    let colorObj = new Color();
-    if ((segment.associatedValues !== undefined) && (segment.attributes.colorMap !== undefined)) {
-      const binAssocValue = segment.associatedValues.values[binIndex];
-      const minValue = 0; 
-      const maxValue = 100;
-      const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, segment.attributes.colorMap);
-      colorObj.set(binColor.hex());
-      const valMap = (value: number, x1: number, y1: number, x2: number, y2: number) => (value - x1) * (y2 - x2) / (y1 - x1) + x2;
-      scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
-    } else {
-      decideColor(colorObj, binIndex, segment.positions.length, segment.attributes.color, segment.attributes.colorMap);
-    }
+export const decideVisualParametersBasedOn1DData = (
+  segment: DrawableMarkSegment,
+  binIndex: number,
+): [Color, number] => {
+  let scalingFactor = 1.0;
+  let colorObj = new Color();
+  if (
+    segment.associatedValues !== undefined &&
+    segment.attributes.colorMap !== undefined
+  ) {
+    const binAssocValue = segment.associatedValues.values[binIndex];
+    const minValue = 0;
+    const maxValue = 100;
+    const binColor = fetchColorFromScale(
+      binAssocValue,
+      minValue,
+      maxValue,
+      segment.attributes.colorMap,
+    );
+    colorObj.set(binColor.hex());
+    const valMap = (
+      value: number,
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number,
+    ) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
+    scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
+  } else {
+    decideColor(
+      colorObj,
+      binIndex,
+      segment.positions.length,
+      segment.attributes.color,
+      segment.attributes.colorMap,
+    );
+  }
   return [colorObj, scalingFactor];
 };
 

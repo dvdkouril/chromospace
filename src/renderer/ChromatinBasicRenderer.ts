@@ -9,7 +9,12 @@ import {
 } from "postprocessing";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { decideColor, estimateBestSphereSize, fetchColorFromScale, decideVisualParametersBasedOn1DData } from "../utils";
+import {
+  decideColor,
+  estimateBestSphereSize,
+  fetchColorFromScale,
+  decideVisualParametersBasedOn1DData,
+} from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { Associated1DData, DrawableMarkSegment } from "./renderer-types";
 
@@ -168,7 +173,8 @@ export class ChromatinBasicRenderer {
 
     //~ iterating over bins in the current segment
     for (let [i, b] of segment.positions.entries()) {
-      const [colorOfThisBin, scaleOfThisBin] = decideVisualParametersBasedOn1DData(segment, i);
+      const [colorOfThisBin, scaleOfThisBin] =
+        decideVisualParametersBasedOn1DData(segment, i);
 
       dummyObj.position.set(b[0], b[1], b[2]);
       dummyObj.scale.setScalar(scaleOfThisBin);
@@ -180,7 +186,13 @@ export class ChromatinBasicRenderer {
 
     if (makeLinks) {
       const tubeSize = 0.4 * sphereRadius;
-      this.buildLinks(segment.positions, tubeSize, color, colorMap, segment.associatedValues);
+      this.buildLinks(
+        segment.positions,
+        tubeSize,
+        color,
+        colorMap,
+        segment.associatedValues,
+      );
     }
   }
 
@@ -224,11 +236,16 @@ export class ChromatinBasicRenderer {
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
 
-      if ((associatedValues !== undefined) && (colorMap !== undefined)) {
+      if (associatedValues !== undefined && colorMap !== undefined) {
         const binAssocValue = associatedValues.values[i];
-        const minValue = 0; 
+        const minValue = 0;
         const maxValue = 100;
-        const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, colorMap);
+        const binColor = fetchColorFromScale(
+          binAssocValue,
+          minValue,
+          maxValue,
+          colorMap,
+        );
         colorObj.set(binColor.hex());
       } else {
         // decideColor(colorObj, i, segment.positions.length, color, colorMap);

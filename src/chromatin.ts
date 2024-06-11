@@ -8,7 +8,10 @@ import type {
   DisplayableModel,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import type { Associated1DData, DrawableMarkSegment } from "./renderer/renderer-types";
+import type {
+  Associated1DData,
+  DrawableMarkSegment,
+} from "./renderer/renderer-types";
 import {
   customCubeHelix,
   decideVisualParameters,
@@ -191,7 +194,7 @@ function buildDisplayableChunk(
     if (chunk.viewConfig.associatedValues !== undefined) {
       assocValues = {
         values: chunk.viewConfig.associatedValues,
-      }
+      };
     }
     const segment: DrawableMarkSegment = {
       mark: chunk.viewConfig.mark || "sphere",
