@@ -1,9 +1,8 @@
 import chroma from "chroma-js";
 import type {
   ChromatinChunk,
-  ChromatinChunkViewConfig,
   ChromatinModel,
-  ChromatinModelViewConfig,
+  ViewConfig,
   ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
@@ -34,7 +33,7 @@ export function initScene(): ChromatinScene {
 export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
-  viewConfig?: ChromatinChunkViewConfig,
+  viewConfig?: ViewConfig,
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
@@ -62,7 +61,7 @@ export function addChunkToScene(
 export function addModelToScene(
   scene: ChromatinScene,
   model: ChromatinModel,
-  viewConfig?: ChromatinModelViewConfig,
+  viewConfig?: ViewConfig,
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {

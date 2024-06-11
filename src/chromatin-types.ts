@@ -55,15 +55,7 @@ export type ChromatinModel = {
 export type DisplayableChunk = {
   kind: "chunk";
   structure: ChromatinChunk;
-  viewConfig: ChromatinChunkViewConfig;
-};
-
-export type ChromatinChunkViewConfig = {
-  binSizeScale?: number;
-  coloring?: "constant" | "scale";
-  color?: string;
-  mark?: MarkTypes;
-  makeLinks?: boolean;
+  viewConfig: ViewConfig;
 };
 
 /**
@@ -74,10 +66,10 @@ export type DisplayableModel = {
   /* The 3D structure, just the raw data, nothing about the visual appearance */
   structure: ChromatinModel;
   // signal: ChromatinMappableSignal; //~ placeholder: in the "displayable" it probably makes sense to have the data by which you'll visually modify the 3D structure
-  viewConfig: ChromatinModelViewConfig; //~ viewConfig then specifies how the `signal` is mapped to visual attributes of the structure
+  viewConfig: ViewConfig; //~ viewConfig then specifies how the `signal` is mapped to visual attributes of the structure
 };
 
-export type ChromatinModelViewConfig = {
+export type ViewConfig = {
   binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
   coloring?: "constant" | "scale";
   color?: string;

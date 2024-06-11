@@ -4,7 +4,7 @@ import { vec3 } from "gl-matrix";
 import type { Color } from "three";
 import type {
   ChromatinChunk,
-  ChromatinModelViewConfig,
+  ViewConfig,
 } from "./chromatin-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
@@ -69,7 +69,7 @@ export const fetchColorFromScale = (binAssocValue: number, minValue: number, max
 /* Returns visual attributes of i-th bin (out on n) based on config */
 /* Correction: this is not the i-th bin, but i-th part in a model */
 export function decideVisualParameters(
-  viewConfig: ChromatinModelViewConfig,
+  viewConfig: ViewConfig,
   i: number,
   n: number,
 ): [ChromaColor | undefined, ChromaScale | undefined, number] {
