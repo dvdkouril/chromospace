@@ -9,7 +9,7 @@ import {
 } from "postprocessing";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { decideColor, estimateBestSphereSize, fetchColorFromScale } from "../utils";
+import { decideColor, estimateBestSphereSize, fetchColorFromScale, decideVisualParametersBasedOn1DData } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { Associated1DData, DrawableMarkSegment } from "./renderer-types";
 
@@ -157,44 +157,24 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
-    const sphereRadius = size
-      ? size
-      : estimateBestSphereSize(segment.positions);
+    const sphereRadius = size || estimateBestSphereSize(segment.positions);
+
+    //~ make the threejs objects
     const g = decideGeometry(segment.mark, segment.attributes);
     const m = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
     const n = segment.positions.length;
-
-    // const colorToUse: ChromaColor | ChromaScale;
-    // const sizeToUse: number;
-    
-    //~ bin spheres
     const meshInstcedSpheres = new THREE.InstancedMesh(g, m, n);
-
     const dummyObj = new THREE.Object3D();
-    const colorObj = new THREE.Color();
+
+    //~ iterating over bins in the current segment
     for (let [i, b] of segment.positions.entries()) {
-      /** 
-       * Setting the color from a colormap based on associated values
-      */
-      let scalingFactor = 1.0;
-      if ((segment.associatedValues !== undefined) && (colorMap !== undefined)) {
-        const binAssocValue = segment.associatedValues.values[i];
-        const minValue = 0; 
-        const maxValue = 100;
-        const binColor = fetchColorFromScale(binAssocValue, minValue, maxValue, colorMap);
-        colorObj.set(binColor.hex());
-        const valMap = (value: number, x1: number, y1: number, x2: number, y2: number) => (value - x1) * (y2 - x2) / (y1 - x1) + x2;
-        scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
-      } else {
-        decideColor(colorObj, i, segment.positions.length, color, colorMap);
-      }
+      const [colorOfThisBin, scaleOfThisBin] = decideVisualParametersBasedOn1DData(segment, i);
 
       dummyObj.position.set(b[0], b[1], b[2]);
-      dummyObj.scale.setScalar(scalingFactor);
+      dummyObj.scale.setScalar(scaleOfThisBin);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
-      meshInstcedSpheres.setColorAt(i, colorObj);
-      i += 1;
+      meshInstcedSpheres.setColorAt(i, colorOfThisBin);
     }
     this.scene.add(meshInstcedSpheres);
 

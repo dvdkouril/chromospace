@@ -188,9 +188,10 @@ function buildDisplayableChunk(
   } else if (chunk.viewConfig.coloring === "scale") {
     //~ B) using a color scale with the bin index as lookup
     // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
-    const max = 100; const min = 0;
     const num = chunk.structure.bins.length;
-    const randomValues = Array.from({ length: num }, () => Math.random() * (max - min) + min);
+    // const max = 100; const min = 0;
+    // const randomValues = Array.from({ length: num }, () => Math.random() * (max - min) + min);
+    const sineWave = (amplitude: number, frequency: number, length: number) => Array.from({ length }, (_, i) => amplitude * Math.sin(frequency * i));
     const segment: DrawableMarkSegment = {
       mark: chunk.viewConfig.mark || "sphere",
       positions: chunk.structure.bins,
@@ -201,7 +202,8 @@ function buildDisplayableChunk(
         makeLinks: chunk.viewConfig.makeLinks,
       },
       associatedValues: {
-        values: randomValues,
+        // values: randomValues,
+        values: sineWave(100, 0.5, num),
       },
     };
     renderer.addSegments([segment]);
