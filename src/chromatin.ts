@@ -13,9 +13,9 @@ import type {
   DrawableMarkSegment,
 } from "./renderer/renderer-types";
 import {
-  customCubeHelix,
-  decideVisualParameters,
-  defaultColorScale,
+  // customCubeHelix,
+  // decideVisualParameters,
+  // defaultColorScale,
   valMap,
 } from "./utils";
 
@@ -129,23 +129,42 @@ function buildDisplayableModel(
   renderer: ChromatinBasicRenderer,
 ) {
   const segments: DrawableMarkSegment[] = [];
-  for (const [i, part] of model.structure.parts.entries()) {
-    const n = model.structure.parts.length;
-    const [singleColor, colorScale, size] = decideVisualParameters(
-      model.viewConfig,
-      i,
-      n,
-    );
+  for (const [_, part] of model.structure.parts.entries()) {
+    const vc = model.viewConfig;
+    
+    let scale: number | number[] = 1.0; //~ default scale
+    if (typeof vc.binSizeScale === "number") {
+      scale = vc.binSizeScale || 1.0;
+    } else {
+      if (vc.binSizeScale !== undefined) {
+        const min = vc.binSizeScale.min;
+        const max = vc.binSizeScale.max;
+        const scaleMin = vc.binSizeScale.scaleMin || 0.0001;
+        const scaleMax = vc.binSizeScale.scaleMax || 0.005;
+        scale = vc.binSizeScale.values.map(v => valMap(v, min, max, scaleMin, scaleMax)); 
+      }
+    }
+
+    let color: ChromaColor | ChromaColor[] = chroma("red"); //~ default color is red
+    if (vc.color !== undefined) {
+      if (typeof vc.color === "string") {
+        color = chroma(vc.color);
+      } else {
+        const min = vc.color.min;
+        const max = vc.color.max;
+        const colorScale = chroma.scale(vc.color.colorScale);
+        color = vc.color.values.map(v => colorScale.domain([min, max])(v));
+      }
+    }
+
     const segment: DrawableMarkSegment = {
       mark: model.viewConfig.mark || "sphere",
       positions: part.chunk.bins,
       attributes: {
-        color: singleColor,
-        colorMap: colorScale,
-        size: size,
-        makeLinks: model.viewConfig.makeLinks,
+        color: color,
+        size: scale,
+        makeLinks: model.viewConfig.makeLinks || false,
       },
-      associatedValues: undefined,
     };
     segments.push(segment);
   }
@@ -169,8 +188,9 @@ function buildDisplayableChunk(
     if (vc.binSizeScale !== undefined) {
       const min = vc.binSizeScale.min;
       const max = vc.binSizeScale.max;
-      //~ TODO: actually also allow the user to set the radius min max?
-      scale = vc.binSizeScale.values.map(v => valMap(v, min, max, 0.001, 0.05)); 
+      const scaleMin = vc.binSizeScale.scaleMin || 0.001;
+      const scaleMax = vc.binSizeScale.scaleMax || 0.05;
+      scale = vc.binSizeScale.values.map(v => valMap(v, min, max, scaleMin, scaleMax)); 
     }
   }
 

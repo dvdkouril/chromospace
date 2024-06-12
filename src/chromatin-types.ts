@@ -79,8 +79,13 @@ export type AssociatedValuesColor = AssociatedValues & {
   colorScale: string,
 };
 
+export type AssociatedValuesScale = AssociatedValues & {
+  scaleMin: number,
+  scaleMax: number,
+};
+
 export type ViewConfig = {
-  binSizeScale?: number | AssociatedValues; //~ we estimate good starting bin sphere radius; this allows to change it
+  binSizeScale?: number | AssociatedValuesScale; 
   color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
   makeLinks?: boolean;
