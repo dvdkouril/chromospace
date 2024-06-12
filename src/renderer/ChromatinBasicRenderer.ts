@@ -169,7 +169,7 @@ export class ChromatinBasicRenderer {
     const dummyObj = new THREE.Object3D();
 
     //~ iterating over bins in the current segment
-    for (let [i, b] of segment.positions.entries()) {
+    for (const [i, b] of segment.positions.entries()) {
       const [colorOfThisBin, scaleOfThisBin] =
         decideVisualParametersBasedOn1DData(segment, i);
 

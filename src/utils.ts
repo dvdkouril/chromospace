@@ -3,7 +3,7 @@ import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import { Color } from "three";
 import type { ChromatinChunk } from "./chromatin-types";
-import { DrawableMarkSegment } from "./renderer/renderer-types";
+import type { DrawableMarkSegment } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma
@@ -55,7 +55,7 @@ export const decideVisualParametersBasedOn1DData = (
   binIndex: number,
 ): [Color, number] => {
   let scalingFactor = 1.0;
-  let colorObj = new Color();
+  const colorObj = new Color();
 
   const attributes = segment.attributes;
 
