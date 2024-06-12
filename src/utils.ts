@@ -1,11 +1,9 @@
 import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
-import type { Color } from "three";
-import type {
-  ChromatinChunk,
-  ChromatinModelViewConfig,
-} from "./chromatin-types";
+import { Color } from "three";
+import type { ChromatinChunk } from "./chromatin-types";
+import type { DrawableMarkSegment } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
 export const customCubeHelix = chroma
@@ -15,12 +13,17 @@ export const customCubeHelix = chroma
   .gamma(0.8)
   .lightness([0.3, 0.8]);
 
-export const defaultColorScale = chroma.scale([
-  "white",
-  "rgba(245,166,35,1.0)",
-  "rgba(208,2,27,1.0)",
-  "black",
-]);
+export const defaultColorScale = chroma.scale("viridis");
+
+export const fetchColorFromScale = (
+  binAssocValue: number,
+  minValue: number,
+  maxValue: number,
+  colorMap: ChromaScale,
+) => {
+  const scaledColorMap = colorMap.domain([minValue, maxValue]);
+  return scaledColorMap(binAssocValue);
+};
 
 export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
   const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
@@ -47,6 +50,32 @@ export const estimateBestSphereSize = (bins: vec3[]): number => {
   return 0.4 * minDist;
 };
 
+export const decideVisualParametersBasedOn1DData = (
+  segment: DrawableMarkSegment,
+  binIndex: number,
+): [Color, number] => {
+  let scalingFactor = 1.0;
+  const colorObj = new Color();
+
+  const attributes = segment.attributes;
+
+  //~ narrowing: ChromaColor or ChromaColor[]
+  if (Array.isArray(attributes.color)) {
+    colorObj.set(attributes.color[binIndex].hex());
+  } else {
+    colorObj.set(attributes.color.hex());
+  }
+
+  //~ narrowing: ChromaColor or ChromaColor[]
+  if (Array.isArray(attributes.size)) {
+    scalingFactor = attributes.size[binIndex]; //~ TODO scaling? or maybe that should be done already
+  } else {
+    scalingFactor = attributes.size;
+  }
+
+  return [colorObj, scalingFactor];
+};
+
 export const decideColor = (
   outColor: Color,
   i: number,
@@ -65,33 +94,13 @@ export const decideColor = (
   }
 };
 
-/* Returns visual attributes of i-th bin (out on n) based on config */
-/* Correction: this is not the i-th bin, but i-th part in a model */
-export function decideVisualParameters(
-  viewConfig: ChromatinModelViewConfig,
-  i: number,
-  n: number,
-): [ChromaColor | undefined, ChromaScale | undefined, number] {
-  let color: ChromaColor | undefined = undefined;
-  let scale: ChromaScale | undefined = undefined;
-  const defaultSize = 0.008;
-  const size = viewConfig.binSizeScale || defaultSize;
-
-  const needColorsN = n;
-  const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-
-  if (viewConfig.coloring === "constant") {
-    color = chunkColors[i];
-    if (viewConfig.color) {
-      color = chroma(viewConfig.color);
-    }
-  } else if (viewConfig.coloring === "scale") {
-    color = undefined;
-    scale = defaultColorScale;
-  }
-
-  return [color, scale, size];
-}
+export const valMap = (
+  value: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
 
 /*
  * Utility function for converting genomic coordinate (i.e., nucleobase position) to bin index, given certain resolution

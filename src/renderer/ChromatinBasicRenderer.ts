@@ -9,11 +9,14 @@ import {
 } from "postprocessing";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { decideColor, estimateBestSphereSize } from "../utils";
+import {
+  decideVisualParametersBasedOn1DData,
+  estimateBestSphereSize,
+} from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
-import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
+import type { Color as ChromaColor } from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
@@ -151,41 +154,36 @@ export class ChromatinBasicRenderer {
    */
   buildPart(segment: DrawableMarkSegment) {
     const {
-      color = undefined,
-      colorMap = undefined,
-      size = undefined,
+      color, //TODO: these don't make sense now to be undefined eveer
+      // size = undefined,
       makeLinks = true,
     } = segment.attributes;
 
-    const sphereRadius = size
-      ? size
-      : estimateBestSphereSize(segment.positions);
-    const tubeSize = 0.4 * sphereRadius;
-    const geometry = decideGeometry(segment.mark, segment.attributes);
-    const material = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
+    const sphereRadius = estimateBestSphereSize(segment.positions);
 
-    //~ bin spheres
-    const meshInstcedSpheres = new THREE.InstancedMesh(
-      geometry,
-      material,
-      segment.positions.length,
-    );
+    //~ make the threejs objects
+    const g = decideGeometry(segment.mark);
+    const m = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
+    const n = segment.positions.length;
+    const meshInstcedSpheres = new THREE.InstancedMesh(g, m, n);
     const dummyObj = new THREE.Object3D();
-    const colorObj = new THREE.Color();
 
-    for (let [i, b] of segment.positions.entries()) {
+    //~ iterating over bins in the current segment
+    for (const [i, b] of segment.positions.entries()) {
+      const [colorOfThisBin, scaleOfThisBin] =
+        decideVisualParametersBasedOn1DData(segment, i);
+
       dummyObj.position.set(b[0], b[1], b[2]);
+      dummyObj.scale.setScalar(scaleOfThisBin);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
-
-      decideColor(colorObj, i, segment.positions.length, color, colorMap);
-      meshInstcedSpheres.setColorAt(i, colorObj);
-      i += 1;
+      meshInstcedSpheres.setColorAt(i, colorOfThisBin);
     }
     this.scene.add(meshInstcedSpheres);
 
     if (makeLinks) {
-      this.buildLinks(segment.positions, tubeSize, color, colorMap);
+      const tubeSize = 0.4 * sphereRadius;
+      this.buildLinks(segment.positions, tubeSize, color);
     }
   }
 
@@ -195,8 +193,7 @@ export class ChromatinBasicRenderer {
   buildLinks(
     positions: vec3[],
     tubeSize: number,
-    color?: ChromaColor,
-    colorMap?: ChromaScale,
+    color: ChromaColor | ChromaColor[],
   ) {
     //~ tubes between tubes
     const tubes = computeTubes(positions);
@@ -227,7 +224,15 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-      decideColor(colorObj, i, positions.length, color, colorMap);
+
+      //~ narrowing: ChromaColor or ChromaColor[]
+      if (Array.isArray(color)) {
+        colorObj.set(color[i].hex());
+        color;
+      } else {
+        colorObj.set(color.hex());
+      }
+
       meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
       meshInstcedTubes.setColorAt(i, colorObj);
     }

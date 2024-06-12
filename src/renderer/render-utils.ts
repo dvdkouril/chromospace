@@ -1,11 +1,9 @@
 import type { vec3 } from "gl-matrix";
 import * as THREE from "three";
 import type { MarkTypes } from "../chromatin-types";
-import type { VisualAttributes } from "./renderer-types";
 
 export const decideGeometry = (
   mark: MarkTypes,
-  attributes: VisualAttributes,
 ):
   | THREE.SphereGeometry
   | THREE.BoxGeometry
@@ -13,15 +11,11 @@ export const decideGeometry = (
   | undefined => {
   switch (mark) {
     case "sphere":
-      return new THREE.SphereGeometry(attributes.size);
+      return new THREE.SphereGeometry(1.0);
     case "box":
-      return new THREE.BoxGeometry(
-        attributes.size,
-        attributes.size,
-        attributes.size,
-      );
+      return new THREE.BoxGeometry(1.0, 1.0, 1.0);
     case "octahedron":
-      return new THREE.OctahedronGeometry(attributes.size);
+      return new THREE.OctahedronGeometry(1.0);
     default:
       return undefined;
   }

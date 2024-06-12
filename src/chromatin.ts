@@ -1,19 +1,20 @@
 import chroma from "chroma-js";
+import type { Color as ChromaColor } from "chroma-js";
 import type {
   ChromatinChunk,
-  ChromatinChunkViewConfig,
   ChromatinModel,
-  ChromatinModelViewConfig,
   ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
+  ViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   customCubeHelix,
-  decideVisualParameters,
-  defaultColorScale,
+  // decideVisualParameters,
+  // defaultColorScale,
+  valMap,
 } from "./utils";
 
 /**
@@ -34,12 +35,11 @@ export function initScene(): ChromatinScene {
 export function addChunkToScene(
   scene: ChromatinScene,
   chunk: ChromatinChunk,
-  viewConfig?: ChromatinChunkViewConfig,
+  viewConfig?: ViewConfig,
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
-      coloring: "constant",
       color: undefined,
     };
   }
@@ -62,12 +62,11 @@ export function addChunkToScene(
 export function addModelToScene(
   scene: ChromatinScene,
   model: ChromatinModel,
-  viewConfig?: ChromatinModelViewConfig,
+  viewConfig?: ViewConfig,
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
       binSizeScale: 0.0001,
-      coloring: "constant",
     };
   }
 
@@ -128,22 +127,48 @@ function buildDisplayableModel(
   renderer: ChromatinBasicRenderer,
 ) {
   const segments: DrawableMarkSegment[] = [];
+
+  const n = model.structure.parts.length;
+  const needColorsN = n;
+  const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
   for (const [i, part] of model.structure.parts.entries()) {
-    const n = model.structure.parts.length;
-    const [singleColor, colorScale, size] = decideVisualParameters(
-      model.viewConfig,
-      i,
-      n,
-    );
+    const vc = model.viewConfig;
+
+    let scale: number | number[] = 0.01; //~ default scale
+    if (typeof vc.binSizeScale === "number") {
+      scale = vc.binSizeScale || 0.01;
+    } else {
+      if (vc.binSizeScale !== undefined) {
+        const min = vc.binSizeScale.min;
+        const max = vc.binSizeScale.max;
+        const scaleMin = vc.binSizeScale.scaleMin || 0.0001;
+        const scaleMax = vc.binSizeScale.scaleMax || 0.005;
+        scale = vc.binSizeScale.values.map((v) =>
+          valMap(v, min, max, scaleMin, scaleMax),
+        );
+      }
+    }
+
+    const defaultColor = defaultChunkColors[i];
+    let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
+    if (vc.color !== undefined) {
+      if (typeof vc.color === "string") {
+        color = chroma(vc.color);
+      } else {
+        const min = vc.color.min;
+        const max = vc.color.max;
+        const colorScale = chroma.scale(vc.color.colorScale);
+        color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
+      }
+    }
+
     const segment: DrawableMarkSegment = {
-      // mark: "sphere",
       mark: model.viewConfig.mark || "sphere",
       positions: part.chunk.bins,
       attributes: {
-        color: singleColor,
-        colorMap: colorScale,
-        size: size,
-        makeLinks: model.viewConfig.makeLinks,
+        color: color,
+        size: scale,
+        makeLinks: model.viewConfig.makeLinks || false,
       },
     };
     segments.push(segment);
@@ -152,52 +177,49 @@ function buildDisplayableModel(
 }
 
 /*
- * chunk options:
- * - custom color
- * - generate color for me
- * - custom scale
- * - default scale
+ * Takes the data and viewConfig and makes specific DrawableSegments that the renderer can directly render (all visual attributes are decided)
  */
 function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
 ) {
-  if (chunk.viewConfig.coloring === "constant") {
-    //~ A) setting a constant color for whole chunk
-    const randColor = customCubeHelix.scale().colors(256, null)[
-      Math.floor(Math.random() * 255)
-    ];
-    let color = randColor;
-    if (chunk.viewConfig.color) {
-      //~ override color if supplied
-      color = chroma(chunk.viewConfig.color);
-    }
-    // this.buildPart(chunk.structure, { color: color });
+  const vc = chunk.viewConfig;
 
-    const segment: DrawableMarkSegment = {
-      mark: "sphere",
-      positions: chunk.structure.bins,
-      attributes: {
-        color: color,
-        colorMap: undefined,
-        size: chunk.viewConfig.binSizeScale || 0.1,
-        makeLinks: true,
-      },
-    };
-    renderer.addSegments([segment]);
-  } else if (chunk.viewConfig.coloring === "scale") {
-    //~ B) using a color scale with the bin index as lookup
-    // this.buildPart(chunk.structure, { colorMap: defaultColorScale });
-    const segment: DrawableMarkSegment = {
-      mark: "sphere",
-      positions: chunk.structure.bins,
-      attributes: {
-        color: undefined,
-        colorMap: defaultColorScale,
-        size: chunk.viewConfig.binSizeScale || 0.1,
-        makeLinks: true,
-      },
-    };
-    renderer.addSegments([segment]);
+  let scale: number | number[] = 0.01; //~ default scale
+  if (typeof vc.binSizeScale === "number") {
+    scale = vc.binSizeScale || 0.01;
+  } else {
+    if (vc.binSizeScale !== undefined) {
+      const min = vc.binSizeScale.min;
+      const max = vc.binSizeScale.max;
+      const scaleMin = vc.binSizeScale.scaleMin || 0.001;
+      const scaleMax = vc.binSizeScale.scaleMax || 0.05;
+      scale = vc.binSizeScale.values.map((v) =>
+        valMap(v, min, max, scaleMin, scaleMax),
+      );
+    }
   }
+
+  let color: ChromaColor | ChromaColor[] = chroma("red"); //~ default color is red
+  if (vc.color !== undefined) {
+    if (typeof vc.color === "string") {
+      color = chroma(vc.color);
+    } else {
+      const min = vc.color.min;
+      const max = vc.color.max;
+      const colorScale = chroma.scale(vc.color.colorScale);
+      color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
+    }
+  }
+
+  const segment: DrawableMarkSegment = {
+    mark: chunk.viewConfig.mark || "sphere",
+    positions: chunk.structure.bins,
+    attributes: {
+      color: color,
+      size: scale,
+      makeLinks: chunk.viewConfig.makeLinks || false,
+    },
+  };
+  renderer.addSegments([segment]);
 }
