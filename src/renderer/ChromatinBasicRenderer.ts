@@ -183,11 +183,7 @@ export class ChromatinBasicRenderer {
 
     if (makeLinks) {
       const tubeSize = 0.4 * sphereRadius;
-      this.buildLinks(
-        segment.positions,
-        tubeSize,
-        color,
-      );
+      this.buildLinks(segment.positions, tubeSize, color);
     }
   }
 
@@ -228,7 +224,7 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-    
+
       //~ narrowing: ChromaColor or ChromaColor[]
       if (Array.isArray(color)) {
         colorObj.set(color[i].hex());

@@ -13,11 +13,7 @@ export const decideGeometry = (
     case "sphere":
       return new THREE.SphereGeometry(1.0);
     case "box":
-      return new THREE.BoxGeometry(
-        1.0,
-        1.0,
-        1.0,
-      );
+      return new THREE.BoxGeometry(1.0, 1.0, 1.0);
     case "octahedron":
       return new THREE.OctahedronGeometry(1.0);
     default:

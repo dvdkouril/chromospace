@@ -9,9 +9,7 @@ import type {
   DisplayableModel,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
-import type {
-  DrawableMarkSegment,
-} from "./renderer/renderer-types";
+import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
   customCubeHelix,
   // decideVisualParameters,
@@ -135,7 +133,7 @@ function buildDisplayableModel(
   const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
   for (const [i, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
-    
+
     let scale: number | number[] = 0.01; //~ default scale
     if (typeof vc.binSizeScale === "number") {
       scale = vc.binSizeScale || 0.01;
@@ -145,7 +143,9 @@ function buildDisplayableModel(
         const max = vc.binSizeScale.max;
         const scaleMin = vc.binSizeScale.scaleMin || 0.0001;
         const scaleMax = vc.binSizeScale.scaleMax || 0.005;
-        scale = vc.binSizeScale.values.map(v => valMap(v, min, max, scaleMin, scaleMax)); 
+        scale = vc.binSizeScale.values.map((v) =>
+          valMap(v, min, max, scaleMin, scaleMax),
+        );
       }
     }
 
@@ -158,7 +158,7 @@ function buildDisplayableModel(
         const min = vc.color.min;
         const max = vc.color.max;
         const colorScale = chroma.scale(vc.color.colorScale);
-        color = vc.color.values.map(v => colorScale.domain([min, max])(v));
+        color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
       }
     }
 
@@ -183,7 +183,6 @@ function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
 ) {
-
   const vc = chunk.viewConfig;
 
   let scale: number | number[] = 0.01; //~ default scale
@@ -195,7 +194,9 @@ function buildDisplayableChunk(
       const max = vc.binSizeScale.max;
       const scaleMin = vc.binSizeScale.scaleMin || 0.001;
       const scaleMax = vc.binSizeScale.scaleMax || 0.05;
-      scale = vc.binSizeScale.values.map(v => valMap(v, min, max, scaleMin, scaleMax)); 
+      scale = vc.binSizeScale.values.map((v) =>
+        valMap(v, min, max, scaleMin, scaleMax),
+      );
     }
   }
 
@@ -207,7 +208,7 @@ function buildDisplayableChunk(
       const min = vc.color.min;
       const max = vc.color.max;
       const colorScale = chroma.scale(vc.color.colorScale);
-      color = vc.color.values.map(v => colorScale.domain([min, max])(v));
+      color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
     }
   }
 

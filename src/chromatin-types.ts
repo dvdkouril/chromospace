@@ -70,22 +70,22 @@ export type DisplayableModel = {
 };
 
 export type AssociatedValues = {
-  values: number[],
-  min: number,
-  max: number,
+  values: number[];
+  min: number;
+  max: number;
 };
 
 export type AssociatedValuesColor = AssociatedValues & {
-  colorScale: string,
+  colorScale: string;
 };
 
 export type AssociatedValuesScale = AssociatedValues & {
-  scaleMin: number,
-  scaleMax: number,
+  scaleMin: number;
+  scaleMax: number;
 };
 
 export type ViewConfig = {
-  binSizeScale?: number | AssociatedValuesScale; 
+  binSizeScale?: number | AssociatedValuesScale;
   color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
   makeLinks?: boolean;
