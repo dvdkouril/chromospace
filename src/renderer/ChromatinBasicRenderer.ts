@@ -10,8 +10,8 @@ import {
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
-  estimateBestSphereSize,
   decideVisualParametersBasedOn1DData,
+  estimateBestSphereSize,
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";

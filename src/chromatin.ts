@@ -3,10 +3,10 @@ import type { Color as ChromaColor } from "chroma-js";
 import type {
   ChromatinChunk,
   ChromatinModel,
-  ViewConfig,
   ChromatinScene,
   DisplayableChunk,
   DisplayableModel,
+  ViewConfig,
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
