@@ -13,7 +13,7 @@ import type {
   DrawableMarkSegment,
 } from "./renderer/renderer-types";
 import {
-  // customCubeHelix,
+  customCubeHelix,
   // decideVisualParameters,
   // defaultColorScale,
   valMap,
@@ -129,7 +129,11 @@ function buildDisplayableModel(
   renderer: ChromatinBasicRenderer,
 ) {
   const segments: DrawableMarkSegment[] = [];
-  for (const [_, part] of model.structure.parts.entries()) {
+
+  const n = model.structure.parts.length;
+  const needColorsN = n;
+  const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
+  for (const [i, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
     
     let scale: number | number[] = 0.01; //~ default scale
@@ -145,7 +149,8 @@ function buildDisplayableModel(
       }
     }
 
-    let color: ChromaColor | ChromaColor[] = chroma("red"); //~ default color is red
+    const defaultColor = defaultChunkColors[i];
+    let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
     if (vc.color !== undefined) {
       if (typeof vc.color === "string") {
         color = chroma(vc.color);
