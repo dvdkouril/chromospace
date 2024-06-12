@@ -56,38 +56,58 @@ export const decideVisualParametersBasedOn1DData = (
 ): [Color, number] => {
   let scalingFactor = 1.0;
   let colorObj = new Color();
-  if (
-    segment.associatedValues !== undefined &&
-    segment.attributes.colorMap !== undefined
-  ) {
-    const binAssocValue = segment.associatedValues.values[binIndex];
-    const minValue = 0;
-    const maxValue = 100;
-    const binColor = fetchColorFromScale(
-      binAssocValue,
-      minValue,
-      maxValue,
-      segment.attributes.colorMap,
-    );
-    colorObj.set(binColor.hex());
-    const valMap = (
-      value: number,
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-    ) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
-    scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
+
+  const attributes = segment.attributes;
+
+  //~ narrowing: ChromaColor or ChromaColor[]
+  if (Array.isArray(attributes.color)) {
+    colorObj.set(attributes.color[binIndex].hex());
   } else {
-    decideColor(
-      colorObj,
-      binIndex,
-      segment.positions.length,
-      segment.attributes.color,
-      segment.attributes.colorMap,
-    );
+    colorObj.set(attributes.color.hex());
   }
+
+  //~ narrowing: ChromaColor or ChromaColor[]
+  if (Array.isArray(attributes.size)) {
+    scalingFactor = attributes.size[binIndex]; //~ TODO scaling? or maybe that should be done already
+  } else {
+    scalingFactor = attributes.size;
+  }
+
   return [colorObj, scalingFactor];
+
+
+  // if (
+  //   segment.associatedValues !== undefined &&
+  //   segment.attributes.colorMap !== undefined
+  // ) {
+  //   const binAssocValue = segment.associatedValues.values[binIndex];
+  //   const minValue = 0;
+  //   const maxValue = 100;
+  //   const binColor = fetchColorFromScale(
+  //     binAssocValue,
+  //     minValue,
+  //     maxValue,
+  //     segment.attributes.colorMap,
+  //   );
+  //   colorObj.set(binColor.hex());
+  //   const valMap = (
+  //     value: number,
+  //     x1: number,
+  //     y1: number,
+  //     x2: number,
+  //     y2: number,
+  //   ) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
+  //   scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
+  // } else {
+  //   decideColor(
+  //     colorObj,
+  //     binIndex,
+  //     segment.positions.length,
+  //     segment.attributes.color,
+  //     segment.attributes.colorMap,
+  //   );
+  // }
+  // return [colorObj, scalingFactor];
 };
 
 export const decideColor = (
@@ -135,6 +155,15 @@ export function decideVisualParameters(
 
   return [color, scale, size];
 }
+
+
+export const valMap = (
+  value: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
 
 /*
  * Utility function for converting genomic coordinate (i.e., nucleobase position) to bin index, given certain resolution

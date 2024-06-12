@@ -69,13 +69,21 @@ export type DisplayableModel = {
   viewConfig: ViewConfig; //~ viewConfig then specifies how the `signal` is mapped to visual attributes of the structure
 };
 
+export type AssociatedValues = {
+  values: number[],
+  min: number,
+  max: number,
+};
+
+export type AssociatedValuesColor = AssociatedValues & {
+  colorScale: string,
+};
+
 export type ViewConfig = {
-  binSizeScale?: number; //~ we estimate good starting bin sphere radius; this allows to change it
-  coloring?: "constant" | "scale";
-  color?: string;
+  binSizeScale?: number | AssociatedValues; //~ we estimate good starting bin sphere radius; this allows to change it
+  color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
   makeLinks?: boolean;
-  associatedValues?: number[];
 };
 
 /**
