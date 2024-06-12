@@ -132,9 +132,9 @@ function buildDisplayableModel(
   for (const [_, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
     
-    let scale: number | number[] = 1.0; //~ default scale
+    let scale: number | number[] = 0.01; //~ default scale
     if (typeof vc.binSizeScale === "number") {
-      scale = vc.binSizeScale || 1.0;
+      scale = vc.binSizeScale || 0.01;
     } else {
       if (vc.binSizeScale !== undefined) {
         const min = vc.binSizeScale.min;
@@ -181,9 +181,9 @@ function buildDisplayableChunk(
 
   const vc = chunk.viewConfig;
 
-  let scale: number | number[] = 1.0; //~ default scale
+  let scale: number | number[] = 0.01; //~ default scale
   if (typeof vc.binSizeScale === "number") {
-    scale = vc.binSizeScale || 1.0;
+    scale = vc.binSizeScale || 0.01;
   } else {
     if (vc.binSizeScale !== undefined) {
       const min = vc.binSizeScale.min;
