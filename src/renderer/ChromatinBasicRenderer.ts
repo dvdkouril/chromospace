@@ -228,23 +228,6 @@ export class ChromatinBasicRenderer {
       );
       dummyObj.scale.setY(tube.scale);
       dummyObj.updateMatrix();
-
-      // if (associatedValues !== undefined && colorMap !== undefined) {
-      //   const binAssocValue = associatedValues.values[i];
-      //   const minValue = 0;
-      //   const maxValue = 100;
-      //   const binColor = fetchColorFromScale(
-      //     binAssocValue,
-      //     minValue,
-      //     maxValue,
-      //     colorMap,
-      //   );
-      //   colorObj.set(binColor.hex());
-      // } else {
-      //   // decideColor(colorObj, i, segment.positions.length, color, colorMap);
-      //   decideColor(colorObj, i, positions.length, color, colorMap);
-      // }
-      // decideColor(colorObj, i, positions.length, color, colorMap);
     
       //~ narrowing: ChromaColor or ChromaColor[]
       if (Array.isArray(color)) {

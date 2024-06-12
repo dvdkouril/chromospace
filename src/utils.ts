@@ -74,40 +74,6 @@ export const decideVisualParametersBasedOn1DData = (
   }
 
   return [colorObj, scalingFactor];
-
-
-  // if (
-  //   segment.associatedValues !== undefined &&
-  //   segment.attributes.colorMap !== undefined
-  // ) {
-  //   const binAssocValue = segment.associatedValues.values[binIndex];
-  //   const minValue = 0;
-  //   const maxValue = 100;
-  //   const binColor = fetchColorFromScale(
-  //     binAssocValue,
-  //     minValue,
-  //     maxValue,
-  //     segment.attributes.colorMap,
-  //   );
-  //   colorObj.set(binColor.hex());
-  //   const valMap = (
-  //     value: number,
-  //     x1: number,
-  //     y1: number,
-  //     x2: number,
-  //     y2: number,
-  //   ) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
-  //   scalingFactor = valMap(binAssocValue, 0, 100, 1, 5);
-  // } else {
-  //   decideColor(
-  //     colorObj,
-  //     binIndex,
-  //     segment.positions.length,
-  //     segment.attributes.color,
-  //     segment.attributes.colorMap,
-  //   );
-  // }
-  // return [colorObj, scalingFactor];
 };
 
 export const decideColor = (
