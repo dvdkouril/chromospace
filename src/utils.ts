@@ -2,7 +2,7 @@ import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import { Color } from "three";
-import type { ChromatinChunk, ViewConfig } from "./chromatin-types";
+import type { ChromatinChunk } from "./chromatin-types";
 import { DrawableMarkSegment } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
@@ -93,35 +93,6 @@ export const decideColor = (
     outColor.set(chroma.random().hex());
   }
 };
-
-/* Returns visual attributes of i-th bin (out on n) based on config */
-/* Correction: this is not the i-th bin, but i-th part in a model */
-export function decideVisualParameters(
-  viewConfig: ViewConfig,
-  i: number,
-  n: number,
-): [ChromaColor | undefined, ChromaScale | undefined, number] {
-  let color: ChromaColor | undefined = undefined;
-  let scale: ChromaScale | undefined = undefined;
-  const defaultSize = 0.008;
-  const size = viewConfig.binSizeScale || defaultSize;
-
-  const needColorsN = n;
-  const chunkColors = customCubeHelix.scale().colors(needColorsN, null);
-
-  if (viewConfig.coloring === "constant") {
-    color = chunkColors[i];
-    if (viewConfig.color) {
-      color = chroma(viewConfig.color);
-    }
-  } else if (viewConfig.coloring === "scale") {
-    color = undefined;
-    scale = defaultColorScale;
-  }
-
-  return [color, scale, size];
-}
-
 
 export const valMap = (
   value: number,
