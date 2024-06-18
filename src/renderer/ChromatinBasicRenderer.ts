@@ -37,6 +37,8 @@ export class ChromatinBasicRenderer {
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
   meshes: THREE.InstancedMesh[] = [];
 
+  hoveredIndicator: THREE.Mesh;
+
   //~ dom
   redrawRequest = 0;
 
@@ -109,6 +111,15 @@ export class ChromatinBasicRenderer {
         }),
       ),
     );
+
+    //~ hovered indicator
+    const a = 0.02;
+    const indicatorGeom = new THREE.BoxGeometry(a, a, a);
+    const m = new THREE.MeshBasicMaterial({ color: "#000000" });
+    m.wireframe = true;
+    this.hoveredIndicator = new THREE.Mesh(indicatorGeom, m);
+    this.hoveredIndicator.position.set(0, 0, 0);
+    this.scene.add(this.hoveredIndicator);
 
     this.render = this.render.bind(this);
     this.update = this.update.bind(this);
@@ -291,6 +302,18 @@ export class ChromatinBasicRenderer {
         this.hoveredBinId = undefined;
       }
     }
+
+    // animate indicator
+    this.hoveredIndicator.rotateX(0.01 * 1.0);
+    this.hoveredIndicator.rotateY(0.01 * 1.0);
+    this.hoveredIndicator.rotateZ(0.01 * 1.0);
+    if (this.hoveredBinId) {
+      const mat = new THREE.Matrix4();
+      this.meshes[0].getMatrixAt(this.hoveredBinId, mat);
+      const pos = new THREE.Vector3();
+      mat.decompose(pos, new THREE.Quaternion(), new THREE.Vector3());
+      this.hoveredIndicator.position.set(pos.x, pos.y, pos.z);
+    }
   }
 
   render() {
@@ -301,7 +324,7 @@ export class ChromatinBasicRenderer {
     // console.log("drawing");
 
     this.update();
-    console.log("hovered bin:" + this.hoveredBinId);
+    // console.log("hovered bin:" + this.hoveredBinId);
 
     //~ from: https://threejs.org/manual/#en/responsive
     if (this.resizeRendererToDisplaySize(this.renderer)) {

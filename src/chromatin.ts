@@ -96,7 +96,7 @@ export type DisplayOptions = {
 export function display(
   scene: ChromatinScene,
   options: DisplayOptions,
-): [ChromatinBasicRenderer, HTMLElement] {
+): [ChromatinBasicRenderer, HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer({
     alwaysRedraw: options.alwaysRedraw,
   });
@@ -105,18 +105,19 @@ export function display(
   const canvas = renderer.getCanvasElement();
 
   //~ create debug info layer
-  const debugInfo = document.createElement("div");
-  debugInfo.innerText = "hello";
-  debugInfo.style.position = 'absolute';
-  debugInfo.style.top = '10px';
+  // const debugInfo = document.createElement("div");
+  // debugInfo.innerText = "hello";
+  // debugInfo.style.position = 'absolute';
+  // debugInfo.style.top = '10px';
+  //
+  // //~ create contaienr
+  // const container = document.createElement("div"); 
+  //
+  // container.appendChild(debugInfo);
+  // container.appendChild(canvas);
 
-  //~ create contaienr
-  const container = document.createElement("div"); 
-
-  container.appendChild(debugInfo);
-  container.appendChild(canvas);
-
-  return [renderer, container];
+  // return [renderer, container];
+  return [renderer, canvas];
 }
 
 function buildStructures(
