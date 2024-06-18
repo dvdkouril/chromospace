@@ -347,7 +347,15 @@ export class ChromatinBasicRenderer {
 
   onMouseMove(event: MouseEvent) {
     event.preventDefault();
-    this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    const canvas = this.renderer.domElement;
+
+    /* deal with canvas that's offset, not fullscreen */
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.x);
+    const y = (event.clientY - rect.y);
+
+    /* mouse.x/y should be both in <-1,1> */
+    this.mouse.x = (x / rect.width) * 2 - 1;
+    this.mouse.y = - (y / rect.height) * 2 + 1;
   }
 }
