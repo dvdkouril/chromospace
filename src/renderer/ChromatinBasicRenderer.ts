@@ -17,6 +17,7 @@ import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
@@ -277,6 +278,24 @@ export class ChromatinBasicRenderer {
     this.scene.add(meshInstcedTubes);
   }
 
+  updateColor(meshIndex: number, color: ChromaColor | ChromaColor[]) {
+    const mesh = this.meshes[meshIndex];
+    const colorObj = new THREE.Color();
+
+    for (let i = 0; i < mesh.count; i++) {
+      //~ narrowing: ChromaColor or ChromaColor[]
+      if (Array.isArray(color)) {
+        colorObj.set(color[i].hex());
+      } else {
+        colorObj.set(color.hex());
+      }
+      mesh.setColorAt(i, colorObj);
+      if (mesh.instanceColor) {
+        mesh.instanceColor.needsUpdate = true;
+      }
+    }
+  }
+
   startDrawing() {
     this.redrawRequest = requestAnimationFrame(this.render);
   }
@@ -330,6 +349,29 @@ export class ChromatinBasicRenderer {
       const pos = new THREE.Vector3();
       mat.decompose(pos, new THREE.Quaternion(), new THREE.Vector3());
       this.hoveredIndicator.position.set(pos.x, pos.y, pos.z);
+    }
+
+    //~ color neighboring sequence
+    if (this.hoveredBinId) {
+      const [segmentId, binId] = this.hoveredBinId;
+      const segment = this.markSegments[segmentId];
+      segment.attributes.color = chroma("blue");
+
+      const min = -100;
+      const max = 100;
+      // const colorScale = chroma.scale(['yellow', '008ae5']);
+      const colorScale = chroma.scale(['yellow', 'red', 'yellow']);
+      const N = segment.positions.length;
+      // const colorScale = chroma.scale(vc.color.colorScale);
+      const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
+      const color = indices.map((v) => colorScale.domain([min, max])(v));
+      // color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
+
+      // this.updateColor(segmentId, chroma("blue"));
+      this.updateColor(segmentId, color);
+
+      // this.scene.clear();
+      // this.buildStructures();
     }
   }
 
