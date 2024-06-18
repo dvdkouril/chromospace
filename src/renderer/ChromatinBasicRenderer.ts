@@ -35,11 +35,17 @@ export class ChromatinBasicRenderer {
   camera: THREE.PerspectiveCamera;
   composer: EffectComposer;
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
+  meshes: THREE.InstancedMesh[] = [];
 
   //~ dom
   redrawRequest = 0;
 
   alwaysRedraw = false;
+
+  //~ interactions
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2( 1, 1 );
+  hoveredBinId: number | undefined = undefined;
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -105,11 +111,13 @@ export class ChromatinBasicRenderer {
     );
 
     this.render = this.render.bind(this);
+    this.update = this.update.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
     this.resizeRendererToDisplaySize =
-      this.resizeRendererToDisplaySize.bind(this);
+    this.resizeRendererToDisplaySize.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
 
     //~ setting size of canvas to fill parent
     const c = this.getCanvasElement();
@@ -120,6 +128,7 @@ export class ChromatinBasicRenderer {
     if (!alwaysRedraw) {
       controls.addEventListener("change", this.render);
     }
+    document.addEventListener( 'mousemove', this.onMouseMove );
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -184,6 +193,7 @@ export class ChromatinBasicRenderer {
       meshInstcedSpheres.setColorAt(i, colorOfThisBin);
     }
     this.scene.add(meshInstcedSpheres);
+    this.meshes.push(meshInstcedSpheres);
 
     if (makeLinks) {
       const tubeSize = 0.4 * sphereRadius;
@@ -268,12 +278,30 @@ export class ChromatinBasicRenderer {
     return needResize;
   }
 
+  update() {
+    this.raycaster.setFromCamera( this.mouse, this.camera );
+
+    for (let m of this.meshes) {
+      const intersection = this.raycaster.intersectObject( m);
+      if (intersection.length > 0) {
+        const instanceId = intersection[0].instanceId;
+        // console.log("hovered: " + instanceId);
+        this.hoveredBinId = instanceId;
+      } else {
+        this.hoveredBinId = undefined;
+      }
+    }
+  }
+
   render() {
     if (this.alwaysRedraw) {
       this.redrawRequest = requestAnimationFrame(this.render);
     }
 
-    console.log("drawing");
+    // console.log("drawing");
+
+    this.update();
+    console.log("hovered bin:" + this.hoveredBinId);
 
     //~ from: https://threejs.org/manual/#en/responsive
     if (this.resizeRendererToDisplaySize(this.renderer)) {
@@ -283,5 +311,11 @@ export class ChromatinBasicRenderer {
     }
 
     this.composer.render();
+  }
+
+  onMouseMove(event: MouseEvent) {
+    event.preventDefault();
+    this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
   }
 }
