@@ -47,7 +47,8 @@ export class ChromatinBasicRenderer {
   //~ interactions
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2( 1, 1 );
-  hoveredBinId: number | undefined = undefined;
+  /* returns a tuple of [segment index, bin index] of hovered bin */
+  hoveredBinId: [number, number] | undefined = undefined;
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -144,6 +145,13 @@ export class ChromatinBasicRenderer {
 
   getCanvasElement(): HTMLCanvasElement {
     return this.renderer.domElement;
+  }
+
+  /**
+   * Returns a pair [segment id, bin id] to identify hovered bin
+   */
+  getHoveredBin(): [number, number] | undefined {
+    return this.hoveredBinId;
   }
 
   /**
@@ -292,14 +300,14 @@ export class ChromatinBasicRenderer {
   update() {
     this.raycaster.setFromCamera( this.mouse, this.camera );
 
-    for (let m of this.meshes) {
+    for (let [i, m] of this.meshes.entries()) {
       const intersection = this.raycaster.intersectObject( m);
+      this.hoveredBinId = undefined;
       if (intersection.length > 0) {
         const instanceId = intersection[0].instanceId;
-        // console.log("hovered: " + instanceId);
-        this.hoveredBinId = instanceId;
-      } else {
-        this.hoveredBinId = undefined;
+        if (instanceId) {
+          this.hoveredBinId = [i, instanceId];
+        }
       }
     }
 
@@ -309,7 +317,8 @@ export class ChromatinBasicRenderer {
     this.hoveredIndicator.rotateZ(0.01 * 1.0);
     if (this.hoveredBinId) {
       const mat = new THREE.Matrix4();
-      this.meshes[0].getMatrixAt(this.hoveredBinId, mat);
+      const [segmentId, binId] = this.hoveredBinId;
+      this.meshes[segmentId].getMatrixAt(binId, mat);
       const pos = new THREE.Vector3();
       mat.decompose(pos, new THREE.Quaternion(), new THREE.Vector3());
       this.hoveredIndicator.position.set(pos.x, pos.y, pos.z);
