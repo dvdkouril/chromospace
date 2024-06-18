@@ -113,6 +113,12 @@ export function display(
     debugInfo.style.position = 'absolute';
     debugInfo.style.top = '10px';
 
+    const updateHUDText = (text: string) => {
+      debugInfo.innerText = text;
+    }
+
+    renderer.addUpdateHUDCallback(updateHUDText);
+
     //~ create contaienr
     const container = document.createElement("div"); 
     container.appendChild(debugInfo);

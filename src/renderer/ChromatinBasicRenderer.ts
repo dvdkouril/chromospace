@@ -41,6 +41,7 @@ export class ChromatinBasicRenderer {
 
   //~ dom
   redrawRequest = 0;
+  updateCallback: ((text: string) => void) | undefined;
 
   alwaysRedraw = false;
 
@@ -152,6 +153,10 @@ export class ChromatinBasicRenderer {
    */
   getHoveredBin(): [number, number] | undefined {
     return this.hoveredBinId;
+  }
+
+  addUpdateHUDCallback(cb: (text: string) => void) {
+    this.updateCallback = cb;
   }
 
   /**
@@ -307,6 +312,9 @@ export class ChromatinBasicRenderer {
         const instanceId = intersection[0].instanceId;
         if (instanceId) {
           this.hoveredBinId = [i, instanceId];
+          if (this.updateCallback) {
+            this.updateCallback("Hovered: " + i + ", " + instanceId);
+          }
         }
       }
     }
