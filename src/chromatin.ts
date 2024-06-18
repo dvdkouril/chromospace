@@ -88,6 +88,7 @@ export function addModelToScene(
  */
 export type DisplayOptions = {
   alwaysRedraw?: boolean;
+  withHUD?: boolean;
 };
 
 /**
@@ -96,7 +97,7 @@ export type DisplayOptions = {
 export function display(
   scene: ChromatinScene,
   options: DisplayOptions,
-): [ChromatinBasicRenderer, HTMLCanvasElement] {
+): [ChromatinBasicRenderer, HTMLElement | HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer({
     alwaysRedraw: options.alwaysRedraw,
   });
@@ -104,20 +105,22 @@ export function display(
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
 
-  //~ create debug info layer
-  // const debugInfo = document.createElement("div");
-  // debugInfo.innerText = "hello";
-  // debugInfo.style.position = 'absolute';
-  // debugInfo.style.top = '10px';
-  //
-  // //~ create contaienr
-  // const container = document.createElement("div"); 
-  //
-  // container.appendChild(debugInfo);
-  // container.appendChild(canvas);
+  let elementToReturn: HTMLElement | HTMLCanvasElement = canvas;
+  if (options.withHUD) {
+    //~ create debug info layer
+    const debugInfo = document.createElement("div");
+    debugInfo.innerText = "hello";
+    debugInfo.style.position = 'absolute';
+    debugInfo.style.top = '10px';
 
-  // return [renderer, container];
-  return [renderer, canvas];
+    //~ create contaienr
+    const container = document.createElement("div"); 
+    container.appendChild(debugInfo);
+    container.appendChild(canvas);
+    elementToReturn = container;
+  }
+
+  return [renderer, elementToReturn];
 }
 
 function buildStructures(
