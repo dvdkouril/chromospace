@@ -110,17 +110,17 @@ export function display(
     //~ create debug info layer
     const debugInfo = document.createElement("div");
     debugInfo.innerText = "hello";
-    debugInfo.style.position = 'absolute';
-    debugInfo.style.top = '10px';
+    debugInfo.style.position = "absolute";
+    debugInfo.style.top = "10px";
 
     const updateHUDText = (text: string) => {
       debugInfo.innerText = text;
-    }
+    };
 
     renderer.addUpdateHUDCallback(updateHUDText);
 
     //~ create contaienr
-    const container = document.createElement("div"); 
+    const container = document.createElement("div");
     container.appendChild(debugInfo);
     container.appendChild(canvas);
     elementToReturn = container;

@@ -48,7 +48,7 @@ export class ChromatinBasicRenderer {
 
   //~ interactions
   raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2( 1, 1 );
+  mouse = new THREE.Vector2(1, 1);
   /* returns a tuple of [segment index, bin index] of hovered bin */
   hoveredBinId: [number, number] | undefined = undefined;
 
@@ -130,7 +130,7 @@ export class ChromatinBasicRenderer {
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
     this.resizeRendererToDisplaySize =
-    this.resizeRendererToDisplaySize.bind(this);
+      this.resizeRendererToDisplaySize.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
 
     //~ setting size of canvas to fill parent
@@ -142,7 +142,7 @@ export class ChromatinBasicRenderer {
     if (!alwaysRedraw) {
       controls.addEventListener("change", this.render);
     }
-    document.addEventListener( 'mousemove', this.onMouseMove );
+    document.addEventListener("mousemove", this.onMouseMove);
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -322,11 +322,11 @@ export class ChromatinBasicRenderer {
   }
 
   update() {
-    this.raycaster.setFromCamera( this.mouse, this.camera );
+    this.raycaster.setFromCamera(this.mouse, this.camera);
 
     this.hoveredBinId = undefined;
     for (const [i, m] of this.meshes.entries()) {
-      const intersection = this.raycaster.intersectObject( m);
+      const intersection = this.raycaster.intersectObject(m);
       if (intersection.length > 0) {
         const instanceId = intersection[0].instanceId;
         if (instanceId) {
@@ -358,7 +358,7 @@ export class ChromatinBasicRenderer {
 
       const min = -50;
       const max = 50;
-      const colorScale = chroma.scale(['yellow', 'red', 'yellow']);
+      const colorScale = chroma.scale(["yellow", "red", "yellow"]);
       const N = segment.positions.length;
       const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
       const color = indices.map((v) => colorScale.domain([min, max])(v));
@@ -398,11 +398,11 @@ export class ChromatinBasicRenderer {
 
     /* deal with canvas that's offset, not fullscreen */
     const rect = canvas.getBoundingClientRect();
-    const x = (event.clientX - rect.x);
-    const y = (event.clientY - rect.y);
+    const x = event.clientX - rect.x;
+    const y = event.clientY - rect.y;
 
     /* mouse.x/y should be both in <-1,1> */
     this.mouse.x = (x / rect.width) * 2 - 1;
-    this.mouse.y = - (y / rect.height) * 2 + 1;
+    this.mouse.y = -(y / rect.height) * 2 + 1;
   }
 }
