@@ -325,7 +325,7 @@ export class ChromatinBasicRenderer {
     this.raycaster.setFromCamera( this.mouse, this.camera );
 
     this.hoveredBinId = undefined;
-    for (let [i, m] of this.meshes.entries()) {
+    for (const [i, m] of this.meshes.entries()) {
       const intersection = this.raycaster.intersectObject( m);
       if (intersection.length > 0) {
         const instanceId = intersection[0].instanceId;
