@@ -355,23 +355,20 @@ export class ChromatinBasicRenderer {
     if (this.hoveredBinId) {
       const [segmentId, binId] = this.hoveredBinId;
       const segment = this.markSegments[segmentId];
-      segment.attributes.color = chroma("blue");
 
-      const min = -100;
-      const max = 100;
-      // const colorScale = chroma.scale(['yellow', '008ae5']);
+      const min = -50;
+      const max = 50;
       const colorScale = chroma.scale(['yellow', 'red', 'yellow']);
       const N = segment.positions.length;
-      // const colorScale = chroma.scale(vc.color.colorScale);
       const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
       const color = indices.map((v) => colorScale.domain([min, max])(v));
-      // color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
 
-      // this.updateColor(segmentId, chroma("blue"));
       this.updateColor(segmentId, color);
-
-      // this.scene.clear();
-      // this.buildStructures();
+    } else {
+      //~ reset all
+      for (const [i, s] of this.markSegments.entries()) {
+        this.updateColor(i, s.attributes.color);
+      }
     }
   }
 
