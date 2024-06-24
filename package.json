@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest --pool=forks",
     "typecheck": "tsc",
-    "fix": "biome check --apply ."
+    "fix": "biome check --write ."
   },
   "files": ["dist"],
   "main": "./dist/chromospace.umd.cjs",
