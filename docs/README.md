@@ -12,7 +12,7 @@
 
 ```typescript 
 //~ load test data 
-testChunk = chs.parseTsv(text, { center: true, normalize: true });
+const testChunk = chs.parseTsv(text, { center: true, normalize: true });
 
 //~ config specifies how the 3D model will look 
 const viewConfig = {
@@ -20,8 +20,9 @@ const viewConfig = {
     coloring: "constant", 
 };
 
-//~ create a scene let chromatinScene = chs.initScene(); chromatinScene =
-chs.addChunkToScene(chromatinScene, testChunk, viewConfig);
+//~ create a scene 
+let chromatinScene = chs.initScene(); 
+chromatinScene = chs.addChunkToScene(chromatinScene, testChunk, viewConfig);
 
 const [renderer, canvas] = chs.display(chromatinScene, { alwaysRedraw: false});
 
@@ -74,7 +75,8 @@ type ChromatinModel = {
 ## View Config 
 
 The main data loaded from a file is a sequence of XYZ coordinates of bins.
-Several other tools make assumptions about the visual representation of bins.
+Points in space have no real appearance. Several other tools make assumptions
+about the visual representation of bins.
 We use a `ViewConfig` structure to define how a certain chromatin segment
 should be displayed. 
 
@@ -88,3 +90,8 @@ export type ViewConfig = {
 
 The type unions with `AssociatedValuesScale` and `AssociatedValuesColor` are to
 support binding other data onto these visual channels.
+
+## Selections
+
+In order to filter 3D models based on genomic coordinates, we provide functions
+to select subparts of a chunk or model.
