@@ -82,16 +82,22 @@ should be displayed.
 
 ```typescript 
 export type ViewConfig = {
-    binSizeScale?: number | AssociatedValuesScale; 
-    color?: string | AssociatedValuesColor; 
-    mark?: MarkTypes; makeLinks?: boolean; 
+  binSizeScale?: number | AssociatedValuesScale; 
+  color?: string | AssociatedValuesColor; 
+  mark?: MarkTypes; 
+  makeLinks?: boolean; 
 }; 
 ```
 
-The type unions with `AssociatedValuesScale` and `AssociatedValuesColor` are to
-support binding other data onto these visual channels.
+The type unions with `AssociatedValuesScale` and `AssociatedValuesColor` exist
+to support binding other genomic data values onto these visual channels,
+instead of only setting them to constant value.
 
 ## Selections
 
 In order to filter 3D models based on genomic coordinates, we provide functions
-to select subparts of a chunk or model.
+to select subparts of a chunk or model. Chunks allow only simple fetching by
+bin indices.
+
+Models, on the other hand, can be filtered based on genomic coordinates, thanks
+to the fact that we know precisely which genomic parts a model represents.
