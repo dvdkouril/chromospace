@@ -13,9 +13,9 @@ export const parsePDB = (
 
   const hetatms: vec3[] = [];
   let bins: vec3[] = [];
-  pdbLines.forEach((line) => {
-    const lineAnnot = line.substring(0, 6);
-    if (lineAnnot === "HETATM") {
+  for (const line of pdbLines) {
+    const lineAnnot = line.substring(0, 6).trim();
+    if ((lineAnnot === "HETATM") || (lineAnnot === "ATOM")) {
       const x = Number.parseFloat(line.substring(30, 38));
       const y = Number.parseFloat(line.substring(38, 46));
       const z = Number.parseFloat(line.substring(46, 54));
@@ -36,7 +36,7 @@ export const parsePDB = (
       // const next  = parseInt(line.substring(16, 21));
       bins.push(hetatms[current - 1]);
     }
-  });
+  }
 
   const rawBins = bins;
 
