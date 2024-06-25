@@ -135,6 +135,7 @@ export class ChromatinBasicRenderer {
    * Turns all drawable segments into THREE objects to be rendered
    */
   buildStructures() {
+    this.scene.clear();
     for (const segment of this.markSegments) {
       this.buildPart(segment);
     }
