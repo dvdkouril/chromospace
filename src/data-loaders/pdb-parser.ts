@@ -15,7 +15,7 @@ export const parsePDB = (
   let bins: vec3[] = [];
   for (const line of pdbLines) {
     const lineAnnot = line.substring(0, 6).trim();
-    if ((lineAnnot === "HETATM") || (lineAnnot === "ATOM")) {
+    if (lineAnnot === "HETATM" || lineAnnot === "ATOM") {
       const x = Number.parseFloat(line.substring(30, 38));
       const y = Number.parseFloat(line.substring(38, 46));
       const z = Number.parseFloat(line.substring(46, 54));
