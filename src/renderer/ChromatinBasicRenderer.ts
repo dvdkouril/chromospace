@@ -12,6 +12,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   decideVisualParametersBasedOn1DData,
   estimateDefaultTubeSize,
+  estimateBestSphereSize
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
@@ -195,6 +196,11 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
+    const rndNum = Math.random() * 4 - 1;
+    const gPos = vec3.fromValues(rndNum, 0, 0);
+
+    const sphereRadius = estimateBestSphereSize(segment.positions);
+
     //~ make the threejs objects
     const g = decideGeometry(segment.mark);
     const m = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
@@ -207,7 +213,7 @@ export class ChromatinBasicRenderer {
       const [colorOfThisBin, scaleOfThisBin] =
         decideVisualParametersBasedOn1DData(segment, i);
 
-      dummyObj.position.set(b[0], b[1], b[2]);
+      dummyObj.position.set(gPos[0] + b[0], gPos[1] + b[1], gPos[2] + b[2]);
       dummyObj.scale.setScalar(scaleOfThisBin);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);

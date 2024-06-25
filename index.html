@@ -104,14 +104,7 @@
           //~ create a scene
           let chromatinScene = initScene();
           chromatinScene = addChunkToScene(chromatinScene, testChunk, viewConfig);
-          // chromatinScene = addModelToScene(chromatinScene, tan2018Model, viewConfig);
-
-          // const [selectedPartA, selectionA] = get(tan2018Model, "1(pat)");
-          // const selectedModelA = {
-          //   parts: [selectedPartA],
-          // };
-          // chromatinScene = addModelToScene(chromatinScene, tan2018Model, unselected_ViewConfig);
-          // chromatinScene = addModelToScene(chromatinScene, selectedModelA, selected_viewConfig);
+          chromatinScene = addChunkToScene(chromatinScene, testChunk2, viewConfig);
           
           const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: true, withHUD: true});
 
