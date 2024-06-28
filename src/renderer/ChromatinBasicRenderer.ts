@@ -52,9 +52,12 @@ export class ChromatinBasicRenderer {
       antialias: false,
       stencil: false,
       depth: false,
+      alpha: true,
+      premultipliedAlpha: false,
       canvas,
     });
-    this.renderer.setClearColor("#eeeeee");
+    // this.renderer.setClearColor("#00eeee");
+    this.renderer.setClearAlpha(0.0);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);

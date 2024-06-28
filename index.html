@@ -14,14 +14,23 @@
         height: 100%;
         background-color: #fdf2f8;
       }
+      #test-box {
+        position: absolute;
+        display: block;
+        width: 400px;
+        height: 300px;
+        background-color: red;
+        z-index: -1;
+      }
     </style>
   </head>
   <body>
     <button id="screenshot" type="button">Save...</button>
+    <div id="test-box"></div>
     <div id="app">
     </div>
     <script type="module">
-    import { parseTsv, parse3dg, addChunkToScene, addModelToScene, initScene, display } from './src/main.ts';
+    import { parseTsv, parse3dg, addChunkToScene, addModelToScene, initScene, display, get } from './src/main.ts';
 
       console.log("hello!");
 
@@ -47,18 +56,43 @@
 
           const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
           const fileTan2018 = await fetchTsv(urlTan2018);
-          const tab2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
+          const tan2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
           
           //~ API testing
           //~ this config specifies how the 3D model will look
           const viewConfig = ({ 
-            binSizeScale: 0.01, 
+            binSizeScale: 0.005, 
             coloring: "constant",
+          });
+
+          // Used for the de-emphasized rest of the model
+          const unselected_ViewConfig = ({ 
+            binSizeScale: 0.005, 
+            coloring: "constant", 
+            color: "#a3a3a3",
+            makeLinks: false,
+          });
+
+          // Used for highlighted region
+          const selected_viewConfig = ({ 
+            binSizeScale: 0.02, 
+            coloring: "constant", 
+            color: "orange",
+            mark: "box",
+            makeLinks: true,
           });
           
           //~ create a scene
           let chromatinScene = initScene();
-          chromatinScene = addChunkToScene(chromatinScene, testChunk, viewConfig);
+          // chromatinScene = addChunkToScene(chromatinScene, testChunk, viewConfig);
+          chromatinScene = addModelToScene(chromatinScene, tan2018Model, viewConfig);
+
+          const [selectedPartA, selectionA] = get(tan2018Model, "1(pat)");
+          const selectedModelA = {
+            parts: [selectedPartA],
+          };
+          chromatinScene = addModelToScene(chromatinScene, tan2018Model, unselected_ViewConfig);
+          chromatinScene = addModelToScene(chromatinScene, selectedModelA, selected_viewConfig);
           
           const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: false});
 
