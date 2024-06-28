@@ -14,6 +14,37 @@
                 const fileContent = await response.text();
                 return fileContent;
         };
+
+        let chromatinScene = initScene();
+
+        let [renderer, canvas] = display(chromatinScene, {
+                alwaysRedraw: false,
+        });
+
+        export const saveScreenshot = () => {
+                console.log("saving screenshot");
+
+                renderer.render();
+                canvas.toBlob((blob) => {
+                        saveBlob(
+                                blob,
+                                `screencapture-${canvas.width}x${canvas.height}.png`,
+                        );
+                });
+
+                const saveBlob = function () {
+                        const a = document.createElement("a");
+                        document.body.appendChild(a);
+                        a.style.display = "none";
+                        return function saveData(blob, fileName) {
+                                const url = window.URL.createObjectURL(blob);
+                                a.href = url;
+                                a.download = fileName;
+                                a.click();
+                        };
+                };
+        };
+
         onMount(async () => {
                 const url =
                         "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
@@ -70,4 +101,3 @@
 </script>
 
 <div id="app"></div>
-<canvas />
