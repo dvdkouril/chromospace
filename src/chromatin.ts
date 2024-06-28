@@ -4,6 +4,7 @@ import type {
   ChromatinChunk,
   ChromatinModel,
   ChromatinScene,
+  ChromatinSceneConfig,
   DisplayableChunk,
   DisplayableModel,
   ViewConfig,
@@ -100,7 +101,7 @@ export function display(
     hoverEffect: options.hoverEffect,
     canvas: targetCanvas,
   });
-  buildStructures(scene.structures, renderer);
+  buildStructures(scene.structures, renderer, scene.config);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
 
@@ -137,6 +138,7 @@ export function display(
 function buildStructures(
   structures: (DisplayableChunk | DisplayableModel)[],
   renderer: ChromatinBasicRenderer,
+  sceneConfig: ChromatinSceneConfig,
 ) {
   for (const s of structures) {
     switch (s.kind) {
@@ -148,6 +150,7 @@ function buildStructures(
         break;
     }
   }
+  renderer.setConfig(sceneConfig);
 }
 
 function resolveScale(
