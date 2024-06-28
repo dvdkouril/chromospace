@@ -69,5 +69,5 @@
         });
 </script>
 
-<div id="app">sup from chromospace.</div>
+<div id="app"></div>
 <canvas />
