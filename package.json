@@ -24,15 +24,15 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.2",
+    "@biomejs/biome": "1.8.3",
     "@types/chroma-js": "^2.4.4",
-    "@types/node": "^20.14.8",
+    "@types/node": "^20.14.11",
     "@types/three": "^0.165.0",
     "happy-dom": "^14.12.3",
-    "jsdom": "^24.1.0",
-    "typescript": "^5.5.2",
-    "vite": "^5.3.1",
-    "vitest": "^1.6.0",
+    "jsdom": "^24.1.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
+    "vitest": "^2.0.4",
     "vitest-canvas-mock": "^0.3.3"
   },
   "dependencies": {
