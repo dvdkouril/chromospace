@@ -17,7 +17,7 @@
 
         let chromatinScene = initScene();
 
-        let [renderer, canvas] = display(chromatinScene, {
+        $: [renderer, canvas] = display(chromatinScene, {
                 alwaysRedraw: false,
         });
 
