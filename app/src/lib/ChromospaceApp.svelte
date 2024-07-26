@@ -5,7 +5,7 @@
                 addChunkToScene,
                 initScene,
                 display,
-        } from "../../../src/main";
+        } from "../../../src/main"; //~ TODO: this sucks, figure out how to use bare specifiers (via workspaces?)
 
         const fetchTsv = async (url: string) => {
                 const response = await fetch(url);
