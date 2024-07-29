@@ -15,36 +15,31 @@
 	/>
 </svelte:head>
 
-<h1 class="text-5xl">chromospace</h1>
-<nav>
-	<ul class="flex space-x-4">
-		<li>
-			<a
-				href="/"
-				class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-				>home</a
-			>
-		</li>
-		<li>
-			<a
-				href="/playground"
-				class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-				>playground</a
-			>
-		</li>
-		<li>
-			<a
-				href="/examples"
-				class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-				>examples</a
-			>
-		</li>
-	</ul>
-</nav>
+<div class="w-1/2 flex flex-col m-5">
+	<h1 class="text-5xl">chromospace</h1>
+	<nav>
+		<ul class="flex space-x-4">
+			<li>
+				<a
+					href="/"
+					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
+					>home</a
+				>
+			</li>
+			<li>
+				<a
+					href="/examples"
+					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
+					>examples</a
+				>
+			</li>
+		</ul>
+	</nav>
 
-<slot />
+	<slot />
+</div>
 
-<style lang="postcss">
+<style>
 	* {
 		font-family: "Dosis", sans-serif;
 	}
