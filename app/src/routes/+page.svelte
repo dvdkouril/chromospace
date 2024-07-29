@@ -14,6 +14,6 @@
 	version of the chromospace app where you should be able to load up your
 	models, specify the view configs, and make screenshots and stuff.
 </p>
-<button class="btn" on:click={onScreenshotButtonClick}>Save Screenshot</button>
+<button on:click={onScreenshotButtonClick}>Save Screenshot</button>
 
 <ChromospaceApp bind:this={chsApp} />

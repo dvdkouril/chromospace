@@ -49,6 +49,6 @@
 		font-family: "Dosis", sans-serif;
 	}
 	:global(html) {
-		background-color: theme(colors.gray.100);
+		background-color: #ffffff;
 	}
 </style>
