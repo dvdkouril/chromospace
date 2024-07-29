@@ -8,9 +8,9 @@ jobs:
   build_site:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./app
+    # defaults:
+    #   run:
+    #     working-directory: ./app
     
     steps:
       - name: Checkout
