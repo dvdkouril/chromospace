@@ -27,6 +27,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - name: Install chromospace dependencies
+        run: npm install
 
       - name: Build chromospace lib
         run: npm run build
