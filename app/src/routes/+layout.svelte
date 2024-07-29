@@ -21,14 +21,14 @@
 		<ul class="flex space-x-4">
 			<li>
 				<a
-					href="/"
+					href="./"
 					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
 					>home</a
 				>
 			</li>
 			<li>
 				<a
-					href="/examples"
+					href="./examples"
 					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
 					>examples</a
 				>
