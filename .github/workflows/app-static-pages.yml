@@ -23,17 +23,16 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Change to directory to app
-        run: cd app
-
       - name: Install dependencies
         run: npm install
+        working-directory: ./app
 
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
         run: |
           npm run build
+        working-directory: ./app
 
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v3
