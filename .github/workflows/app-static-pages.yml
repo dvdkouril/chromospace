@@ -23,6 +23,9 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Change to directory to app
+        run: cd app
+
       - name: Install dependencies
         run: npm install
 
