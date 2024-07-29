@@ -3,6 +3,9 @@
   "organizeImports": {
     "enabled": true
   },
+  "files": {
+    "ignore": ["app/*"]
+  },
   "linter": {
     "enabled": true,
     "rules": {
