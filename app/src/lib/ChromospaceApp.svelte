@@ -5,7 +5,7 @@
                 addChunkToScene,
                 initScene,
                 display,
-        } from "../../../src/main"; //~ TODO: this sucks, figure out how to use bare specifiers (via workspaces?)
+        } from "chromospace";
 
         const fetchTsv = async (url: string) => {
                 const response = await fetch(url);
