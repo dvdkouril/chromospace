@@ -123,6 +123,10 @@ export function display(
 
     //~ create contaienr
     const container = document.createElement("div");
+    container.style.position = "relative";
+    container.style.width = "100%";
+    container.style.height = "100%";
+
     container.appendChild(debugInfo);
     container.appendChild(canvas);
     elementToReturn = container;
