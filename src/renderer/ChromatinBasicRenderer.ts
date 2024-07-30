@@ -129,7 +129,8 @@ export class ChromatinBasicRenderer {
 
     this.alwaysRedraw = alwaysRedraw;
     if (!alwaysRedraw) {
-      controls.addEventListener("change", this.render);
+      //~ re-render on mouse move: initially, I had redraw on camera change, but since I'm doing effects on hover, I need to redraw more frequently
+      document.addEventListener("mousemove", this.render);
     }
     document.addEventListener("mousemove", this.onMouseMove);
   }
@@ -357,7 +358,6 @@ export class ChromatinBasicRenderer {
       this.redrawRequest = requestAnimationFrame(this.render);
     }
 
-    // console.log("drawing");
 
     this.update();
     // console.log("hovered bin:" + this.hoveredBinId);
