@@ -1,11 +1,5 @@
 <script lang="ts">
 	import ChromospaceApp from "$lib/ChromospaceApp.svelte";
-
-	let chsApp: ChromospaceApp;
-
-	function onScreenshotButtonClick() {
-		chsApp.saveScreenshot();
-	}
 </script>
 
 <div class="text-xl">
@@ -29,5 +23,4 @@
 	</p>
 </div>
 
-<ChromospaceApp bind:this={chsApp} />
-<button on:click={onScreenshotButtonClick}>Save Screenshot</button>
+<ChromospaceApp />
