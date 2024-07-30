@@ -113,7 +113,7 @@ export function display(
     debugInfo.style.position = "absolute";
     debugInfo.style.top = "10px";
     debugInfo.style.left = "10px";
-    debugInfo.style.fontFamily = "\'Courier New\', monospace";
+    debugInfo.style.fontFamily = "'Courier New', monospace";
 
     const updateHUDText = (text: string) => {
       debugInfo.innerText = text;
