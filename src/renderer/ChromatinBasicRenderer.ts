@@ -17,6 +17,7 @@ import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
@@ -35,11 +36,19 @@ export class ChromatinBasicRenderer {
   camera: THREE.PerspectiveCamera;
   composer: EffectComposer;
   ssaoPasses: [N8AOPostPass, N8AOPostPass];
+  meshes: THREE.InstancedMesh[] = [];
 
   //~ dom
   redrawRequest = 0;
+  updateCallback: ((text: string) => void) | undefined;
 
   alwaysRedraw = false;
+
+  //~ interactions
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2(1, 1);
+  /* returns a tuple of [segment index, bin index] of hovered bin */
+  hoveredBinId: [number, number] | undefined = undefined;
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -105,11 +114,13 @@ export class ChromatinBasicRenderer {
     );
 
     this.render = this.render.bind(this);
+    this.update = this.update.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
     this.resizeRendererToDisplaySize =
       this.resizeRendererToDisplaySize.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
 
     //~ setting size of canvas to fill parent
     const c = this.getCanvasElement();
@@ -118,12 +129,25 @@ export class ChromatinBasicRenderer {
 
     this.alwaysRedraw = alwaysRedraw;
     if (!alwaysRedraw) {
-      controls.addEventListener("change", this.render);
+      //~ re-render on mouse move: initially, I had redraw on camera change, but since I'm doing effects on hover, I need to redraw more frequently
+      document.addEventListener("mousemove", this.render);
     }
+    document.addEventListener("mousemove", this.onMouseMove);
   }
 
   getCanvasElement(): HTMLCanvasElement {
     return this.renderer.domElement;
+  }
+
+  /**
+   * Returns a pair [segment id, bin id] to identify hovered bin
+   */
+  getHoveredBin(): [number, number] | undefined {
+    return this.hoveredBinId;
+  }
+
+  addUpdateHUDCallback(cb: (text: string) => void) {
+    this.updateCallback = cb;
   }
 
   /**
@@ -184,6 +208,7 @@ export class ChromatinBasicRenderer {
       meshInstcedSpheres.setColorAt(i, colorOfThisBin);
     }
     this.scene.add(meshInstcedSpheres);
+    this.meshes.push(meshInstcedSpheres);
 
     if (makeLinks) {
       const tubeSize = 0.4 * sphereRadius;
@@ -243,6 +268,24 @@ export class ChromatinBasicRenderer {
     this.scene.add(meshInstcedTubes);
   }
 
+  updateColor(meshIndex: number, color: ChromaColor | ChromaColor[]) {
+    const mesh = this.meshes[meshIndex];
+    const colorObj = new THREE.Color();
+
+    for (let i = 0; i < mesh.count; i++) {
+      //~ narrowing: ChromaColor or ChromaColor[]
+      if (Array.isArray(color)) {
+        colorObj.set(color[i].hex());
+      } else {
+        colorObj.set(color.hex());
+      }
+      mesh.setColorAt(i, colorObj);
+      if (mesh.instanceColor) {
+        mesh.instanceColor.needsUpdate = true;
+      }
+    }
+  }
+
   startDrawing() {
     this.redrawRequest = requestAnimationFrame(this.render);
   }
@@ -268,12 +311,55 @@ export class ChromatinBasicRenderer {
     return needResize;
   }
 
+  update() {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    this.hoveredBinId = undefined;
+    for (const [i, m] of this.meshes.entries()) {
+      const intersection = this.raycaster.intersectObject(m);
+      if (intersection.length > 0) {
+        const instanceId = intersection[0].instanceId;
+        if (instanceId) {
+          this.hoveredBinId = [i, instanceId];
+          if (this.updateCallback) {
+            this.updateCallback(`Hovered: part ${i}, bin ${instanceId}`);
+          }
+        }
+      } else {
+        if (this.updateCallback) {
+          this.updateCallback("");
+        }
+      }
+    }
+
+    //~ color neighboring sequence
+    if (this.hoveredBinId) {
+      const [segmentId, binId] = this.hoveredBinId;
+      const segment = this.markSegments[segmentId];
+
+      const min = -50;
+      const max = 50;
+      const colorScale = chroma.scale(["yellow", "red", "yellow"]);
+      const N = segment.positions.length;
+      const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
+      const color = indices.map((v) => colorScale.domain([min, max])(v));
+
+      this.updateColor(segmentId, color);
+    } else {
+      //~ reset all
+      for (const [i, s] of this.markSegments.entries()) {
+        this.updateColor(i, s.attributes.color);
+      }
+    }
+  }
+
   render() {
     if (this.alwaysRedraw) {
       this.redrawRequest = requestAnimationFrame(this.render);
     }
 
-    console.log("drawing");
+    this.update();
+    // console.log("hovered bin:" + this.hoveredBinId);
 
     //~ from: https://threejs.org/manual/#en/responsive
     if (this.resizeRendererToDisplaySize(this.renderer)) {
@@ -283,5 +369,19 @@ export class ChromatinBasicRenderer {
     }
 
     this.composer.render();
+  }
+
+  onMouseMove(event: MouseEvent) {
+    event.preventDefault();
+    const canvas = this.renderer.domElement;
+
+    /* deal with canvas that's offset, not fullscreen */
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.x;
+    const y = event.clientY - rect.y;
+
+    /* mouse.x/y should be both in <-1,1> */
+    this.mouse.x = (x / rect.width) * 2 - 1;
+    this.mouse.y = -(y / rect.height) * 2 + 1;
   }
 }
