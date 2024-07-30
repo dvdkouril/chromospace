@@ -358,7 +358,6 @@ export class ChromatinBasicRenderer {
       this.redrawRequest = requestAnimationFrame(this.render);
     }
 
-
     this.update();
     // console.log("hovered bin:" + this.hoveredBinId);
 
