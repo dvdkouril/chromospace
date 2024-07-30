@@ -321,8 +321,12 @@ export class ChromatinBasicRenderer {
         if (instanceId) {
           this.hoveredBinId = [i, instanceId];
           if (this.updateCallback) {
-            this.updateCallback(`Hovered:·${i},·${instanceId}`);
+            this.updateCallback(`Hovered: part ${i}, bin ${instanceId}`);
           }
+        }
+      } else {
+        if (this.updateCallback) {
+          this.updateCallback("");
         }
       }
     }

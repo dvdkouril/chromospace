@@ -109,9 +109,11 @@ export function display(
   if (options.withHUD) {
     //~ create debug info layer
     const debugInfo = document.createElement("div");
-    debugInfo.innerText = "hello";
+    debugInfo.innerText = "";
     debugInfo.style.position = "absolute";
     debugInfo.style.top = "10px";
+    debugInfo.style.left = "10px";
+    debugInfo.style.fontFamily = "\'Courier New\', monospace";
 
     const updateHUDText = (text: string) => {
       debugInfo.innerText = text;
