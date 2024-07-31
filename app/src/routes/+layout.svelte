@@ -1,4 +1,5 @@
 <script>
+	import { base } from "$app/paths";
 	import "../app.css";
 </script>
 
@@ -15,20 +16,20 @@
 	/>
 </svelte:head>
 
-<div class="w-1/2 flex flex-col m-5">
+<div class="flex flex-col m-5">
 	<h1 class="text-5xl">chromospace</h1>
 	<nav>
 		<ul class="flex space-x-4">
 			<li>
 				<a
-					href="./"
+					href="{base}/"
 					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
 					>home</a
 				>
 			</li>
 			<li>
 				<a
-					href="./examples"
+					href="{base}/examples"
 					class="text-2xl text-blue-600 dark:text-blue-500 hover:underline"
 					>examples</a
 				>

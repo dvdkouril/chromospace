@@ -2,7 +2,7 @@
 	import ChromospaceApp from "$lib/ChromospaceApp.svelte";
 </script>
 
-<div class="text-xl">
+<div class="w-1/2 text-xl">
 	<p class="py-2">
 		<b>chromospace</b> is a javascript library for visualization of three-dimensional
 		chromatin models.
