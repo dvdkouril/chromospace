@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "app": "npm run dev --workspace=app",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest --pool=forks",
@@ -24,7 +23,6 @@
       "require": "./dist/chromospace.umd.cjs"
     }
   },
-  "workspaces": ["app", "."],
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@types/chroma-js": "^2.4.4",
