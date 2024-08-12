@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import { beforeAll } from "vitest";
-import "vitest-canvas-mock";
 
 const testDataDir = "test-data";
 beforeAll(async () => {
