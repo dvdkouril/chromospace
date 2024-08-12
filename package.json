@@ -24,7 +24,6 @@
       "require": "./dist/chromospace.umd.cjs"
     }
   },
-  "workspaces": ["app", "."],
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@types/chroma-js": "^2.4.4",
