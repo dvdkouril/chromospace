@@ -11,13 +11,13 @@
 In ObservableHQ:
 [https://observablehq.com/@david-kouril/chromospace-playground](https://observablehq.com/@david-kouril/chromospace-playground),
 
-or locally:
+or locally (using `pnpm`, not `npm`!):
 
 ```
 git clone git@github.com:dvdkouril/chromospace.git
 cd chromospace
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ## Key concepts
