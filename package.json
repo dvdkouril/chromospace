@@ -36,7 +36,7 @@
   "dependencies": {
     "chroma-js": "^2.6.0",
     "gl-matrix": "^3.4.3",
-    "n8ao": "^1.8.2",
+    "n8ao": "^1.8.4",
     "postprocessing": "^6.35.5",
     "three": "^0.167.1"
   }

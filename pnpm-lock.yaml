@@ -15,8 +15,8 @@ importers:
         specifier: ^3.4.3
         version: 3.4.3
       n8ao:
-        specifier: ^1.8.2
-        version: 1.8.3(postprocessing@6.36.0(three@0.167.1))(three@0.167.1)
+        specifier: ^1.8.4
+        version: 1.8.4(postprocessing@6.36.0(three@0.167.1))(three@0.167.1)
       postprocessing:
         specifier: ^6.35.5
         version: 6.36.0(three@0.167.1)
@@ -960,8 +960,8 @@ packages:
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
-  n8ao@1.8.3:
-    resolution: {integrity: sha512-ARbRL2j1iWEI6PuPd3TaasvGa3QXeBn9bPgPKTeTxMOwwejxcwIlUiQLrk8xbr2M22vbE5ePQYcYj28YNeI5kA==}
+  n8ao@1.8.4:
+    resolution: {integrity: sha512-xaPub6na6jGAW7rbANcMcnKNhNa3Fmsbe1WY5mzI9bDuBTQmP6X2G1Xq1t2Si8dxJjqYPvNZX3xhXfkNw8jQBQ==}
     peerDependencies:
       postprocessing: '>=6.30.0'
       three: '>=0.137'
@@ -2142,7 +2142,7 @@ snapshots:
 
   ms@2.1.2: {}
 
-  n8ao@1.8.3(postprocessing@6.36.0(three@0.167.1))(three@0.167.1):
+  n8ao@1.8.4(postprocessing@6.36.0(three@0.167.1))(three@0.167.1):
     dependencies:
       postprocessing: 6.36.0(three@0.167.1)
       three: 0.167.1
