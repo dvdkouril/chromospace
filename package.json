@@ -26,11 +26,11 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@types/chroma-js": "^2.4.4",
-    "@types/node": "^22.2.0",
+    "@types/node": "^22.4.1",
     "@types/three": "^0.167.1",
     "jsdom": "^24.1.0",
     "typescript": "^5.5.2",
-    "vite": "^5.4.0",
+    "vite": "^5.4.1",
     "vitest": "^2.0.5"
   },
   "dependencies": {
