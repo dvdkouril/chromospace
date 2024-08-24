@@ -23,4 +23,6 @@ export {
 export { parsePDB, parseNumpyArray } from "./data-loaders/pdb-parser.ts";
 export { parseXYZ } from "./data-loaders/xyz-parser.ts";
 
+export { load, loadFromURL } from "./data-loaders/arrow.ts";
+
 export { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer.ts";

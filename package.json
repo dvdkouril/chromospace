@@ -12,7 +12,9 @@
     "typecheck": "tsc",
     "fix": "biome check --write ."
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",
@@ -34,7 +36,8 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
-    "chroma-js": "^3.0.0",
+    "apache-arrow": "^17.0.0",
+    "chroma-js": "^2.6.0",
     "gl-matrix": "^3.4.3",
     "n8ao": "^1.8.4",
     "postprocessing": "^6.35.5",
