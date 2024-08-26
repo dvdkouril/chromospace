@@ -4,7 +4,7 @@
     "enabled": true
   },
   "files": {
-    "ignore": ["app/*"]
+    "ignore": ["app/*", "data/*"]
   },
   "linter": {
     "enabled": true,
