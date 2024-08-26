@@ -1,14 +1,26 @@
-import { Table, Schema, Float, tableFromIPC } from 'apache-arrow';
-import { type LoadOptions, computeNormalizationFactor, normalize, recenter } from "./loader-utils";
-import { ChromatinChunk, ChromatinModel, ChromatinPart } from '../chromatin-types';
-import { vec3 } from 'gl-matrix';
+import { Table, Schema, Float, tableFromIPC } from "apache-arrow";
+import {
+  type LoadOptions,
+  computeNormalizationFactor,
+  normalize,
+  recenter,
+} from "./loader-utils";
+import {
+  ChromatinChunk,
+  ChromatinModel,
+  ChromatinPart,
+} from "../chromatin-types";
+import { vec3 } from "gl-matrix";
 import { flattenAllBins } from "../utils";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
  */
 
-export async function loadFromURL(url: string, options: LoadOptions): Promise<ChromatinChunk | ChromatinModel | undefined> {
+export async function loadFromURL(
+  url: string,
+  options: LoadOptions,
+): Promise<ChromatinChunk | ChromatinModel | undefined> {
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -29,14 +41,16 @@ function isChunk(tableSchema: Schema): boolean {
   return tableSchema.fields.length === 3 && hasXYZ(tableSchema);
 }
 
-/** 
+/**
  * Returns true when table schema contains x, y, z fields
  */
 function hasXYZ(tableSchema: Schema): boolean {
-  const columnNames = tableSchema.fields.map(f => f.name);
-  return columnNames.includes("x") &&
+  const columnNames = tableSchema.fields.map((f) => f.name);
+  return (
+    columnNames.includes("x") &&
     columnNames.includes("y") &&
-    columnNames.includes("z");
+    columnNames.includes("z")
+  );
 }
 
 /**
@@ -58,8 +72,11 @@ function processBins(bins: vec3[], options: LoadOptions): vec3[] {
 /**
  * Turns the Arrow Table into a ChromatinChunk object
  */
-function processTableAsChunk(table: Table<any>, options?: LoadOptions): ChromatinChunk {
-  const typedTable = table as Table<{ x: Float, y: Float, z: Float }>;
+function processTableAsChunk(
+  table: Table<any>,
+  options?: LoadOptions,
+): ChromatinChunk {
+  const typedTable = table as Table<{ x: Float; y: Float; z: Float }>;
   let bins: vec3[] = [];
   for (let i = 0; i < typedTable.numRows; i++) {
     const row = typedTable.get(i);
@@ -84,7 +101,10 @@ function processTableAsChunk(table: Table<any>, options?: LoadOptions): Chromati
 /**
  * TODO:Turns the Arrow Table into a ChromatinModel object
  */
-function processTableAsModel(table: Table<any>, options?: LoadOptions): ChromatinModel {
+function processTableAsModel(
+  table: Table<any>,
+  options?: LoadOptions,
+): ChromatinModel {
   const parts: ChromatinPart[] = [];
   let currentPart: ChromatinPart | undefined = undefined;
   let prevChrom = "";
@@ -94,8 +114,13 @@ function processTableAsModel(table: Table<any>, options?: LoadOptions): Chromati
   const zCol = table.getChild("z");
   const chrCol = table.getChild("chr");
   const coordCol = table.getChild("coord");
-  if ((xCol === null) || (yCol === null) ||
-    (zCol === null) || (chrCol === null) || (coordCol === null)) {
+  if (
+    xCol === null ||
+    yCol === null ||
+    zCol === null ||
+    chrCol === null ||
+    coordCol === null
+  ) {
     return { parts: [] };
   }
   for (let i = 0; i < table.numRows; i++) {
@@ -129,7 +154,6 @@ function processTableAsModel(table: Table<any>, options?: LoadOptions): Chromati
     prevChrom = chrom;
   }
 
-
   // const rawBins = bins; //~ saving the original, unprocessed data
   // TODO: I'm not saving rawBins for ChromatinModels atm?
   options = options || { center: true, normalize: true };
@@ -153,19 +177,26 @@ function processTableAsModel(table: Table<any>, options?: LoadOptions): Chromati
 }
 
 /**
-  * Loads a 3D chromatin model from memory using Apache Arrow
-  */
+ * Loads a 3D chromatin model from memory using Apache Arrow
+ */
 export function load(
   buffer: ArrayBuffer,
   options?: LoadOptions,
 ): ChromatinChunk | ChromatinModel {
   const bytes = new Uint8Array(buffer);
   const table = tableFromIPC(bytes);
-  console.log("loaded Array table, with #cols: " + table.numCols + " and #row: " + table.numRows);
+  console.log(
+    "loaded Array table, with #cols: " +
+      table.numCols +
+      " and #row: " +
+      table.numRows,
+  );
 
-  if (isChunk(table.schema)) { // -> ChromatinChunk
+  if (isChunk(table.schema)) {
+    // -> ChromatinChunk
     return processTableAsChunk(table, options);
-  } else { // -> ChromatinModel
+  } else {
+    // -> ChromatinModel
     return processTableAsModel(table, options);
   }
 }
