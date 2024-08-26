@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "apache-arrow": "^17.0.0",
-    "chroma-js": "^2.6.0",
+    "chroma-js": "^3.0.0",
     "gl-matrix": "^3.4.3",
     "n8ao": "^1.8.4",
     "postprocessing": "^6.35.5",
