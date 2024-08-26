@@ -148,7 +148,7 @@ function processTableAsModel(table: Table<any>, options?: LoadOptions): Chromati
   }
 
   return {
-    parts: [],
+    parts: parts,
   };
 }
 
