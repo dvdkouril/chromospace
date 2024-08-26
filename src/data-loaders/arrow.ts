@@ -80,7 +80,7 @@ function processBins(bins: vec3[], options: LoadOptions): vec3[] {
  * Turns the Arrow Table into a ChromatinChunk object
  */
 function processTableAsChunk(
-  table: Table<any>,
+  table: Table,
   options?: LoadOptions,
 ): ChromatinChunk {
   const typedTable = table as Table<{ x: Float; y: Float; z: Float }>;
@@ -109,7 +109,7 @@ function processTableAsChunk(
  * TODO:Turns the Arrow Table into a ChromatinModel object
  */
 function processTableAsModel(
-  table: Table<any>,
+  table: Table,
   options?: LoadOptions,
 ): ChromatinModel {
   const parts: ChromatinPart[] = [];
