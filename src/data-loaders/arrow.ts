@@ -1,7 +1,8 @@
 import { Table, Schema, Float, tableFromIPC } from 'apache-arrow';
-import { type LoadOptions, normalize, recenter } from "./loader-utils";
-import { ChromatinChunk, ChromatinModel } from '../chromatin-types';
+import { type LoadOptions, computeNormalizationFactor, normalize, recenter } from "./loader-utils";
+import { ChromatinChunk, ChromatinModel, ChromatinPart } from '../chromatin-types';
 import { vec3 } from 'gl-matrix';
+import { flattenAllBins } from "../utils";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
@@ -83,7 +84,69 @@ function processTableAsChunk(table: Table<any>, options?: LoadOptions): Chromati
 /**
  * TODO:Turns the Arrow Table into a ChromatinModel object
  */
-function processTableAsModel(): ChromatinModel {
+function processTableAsModel(table: Table<any>, options?: LoadOptions): ChromatinModel {
+  const parts: ChromatinPart[] = [];
+  let currentPart: ChromatinPart | undefined = undefined;
+  let prevChrom = "";
+
+  const xCol = table.getChild("x");
+  const yCol = table.getChild("y");
+  const zCol = table.getChild("z");
+  const chrCol = table.getChild("chr");
+  const coordCol = table.getChild("coord");
+  if ((xCol === null) || (yCol === null) ||
+    (zCol === null) || (chrCol === null) || (coordCol === null)) {
+    return { parts: [] };
+  }
+  for (let i = 0; i < table.numRows; i++) {
+    const chrom = chrCol?.get(i) as string;
+    const startCoord = coordCol.get(i) as string;
+    const x = xCol.get(i) as number;
+    const y = yCol.get(i) as number;
+    const z = zCol.get(i) as number;
+
+    if (chrom !== prevChrom || currentPart === undefined) {
+      // new part
+      currentPart = {
+        chunk: {
+          bins: [],
+          rawBins: [],
+          id: 0, // TODO:
+        },
+        coordinates: {
+          start: Number.parseInt(startCoord),
+          end: Number.parseInt(startCoord),
+          chromosome: chrom,
+        },
+        resolution: 0, // TODO: delete if I'm not actually using it anywhere
+        label: chrom,
+      };
+      parts.push(currentPart);
+    }
+
+    currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
+    currentPart.coordinates.end = Number.parseInt(startCoord); //~ keep pushing the end of this part bin by bin
+    prevChrom = chrom;
+  }
+
+
+  // const rawBins = bins; //~ saving the original, unprocessed data
+  // TODO: I'm not saving rawBins for ChromatinModels atm?
+  options = options || { center: true, normalize: true };
+  if (options.center) {
+    console.log("TODO: center bins when loading model");
+  }
+
+  if (options.normalize) {
+    //~ parts.bins -> allBins
+    const allBins: vec3[] = flattenAllBins(parts.map((p) => p.chunk));
+    const scaleFactor = computeNormalizationFactor(allBins);
+    for (let i = 0; i < parts.length; i++) {
+      const bins = parts[i].chunk.bins;
+      parts[i].chunk.bins = normalize(bins, scaleFactor);
+    }
+  }
+
   return {
     parts: [],
   };
@@ -103,6 +166,6 @@ export function load(
   if (isChunk(table.schema)) { // -> ChromatinChunk
     return processTableAsChunk(table, options);
   } else { // -> ChromatinModel
-    return processTableAsModel();
+    return processTableAsModel(table, options);
   }
 }
