@@ -1,17 +1,22 @@
-import { Table, Schema, Float, tableFromIPC } from "apache-arrow";
+import {
+  type Float,
+  type Schema,
+  type Table,
+  tableFromIPC,
+} from "apache-arrow";
+import { vec3 } from "gl-matrix";
+import type {
+  ChromatinChunk,
+  ChromatinModel,
+  ChromatinPart,
+} from "../chromatin-types";
+import { flattenAllBins } from "../utils";
 import {
   type LoadOptions,
   computeNormalizationFactor,
   normalize,
   recenter,
 } from "./loader-utils";
-import {
-  ChromatinChunk,
-  ChromatinModel,
-  ChromatinPart,
-} from "../chromatin-types";
-import { vec3 } from "gl-matrix";
-import { flattenAllBins } from "../utils";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
@@ -28,8 +33,10 @@ export async function loadFromURL(
     }
     const buffer = await response.arrayBuffer();
     return load(buffer, options);
-  } catch (err: any) {
-    console.error(err.message);
+  } catch (err) {
+    let message = "Unknown Error";
+    if (err instanceof Error) message = err.message;
+    console.error(message);
     return undefined;
   }
 }
@@ -186,17 +193,13 @@ export function load(
   const bytes = new Uint8Array(buffer);
   const table = tableFromIPC(bytes);
   console.log(
-    "loaded Array table, with #cols: " +
-      table.numCols +
-      " and #row: " +
-      table.numRows,
+    `loaded Array table, with #cols: ${table.numCols} and #row: ${table.numRows}`,
   );
 
   if (isChunk(table.schema)) {
     // -> ChromatinChunk
     return processTableAsChunk(table, options);
-  } else {
-    // -> ChromatinModel
-    return processTableAsModel(table, options);
   }
+  // -> ChromatinModel
+  return processTableAsModel(table, options);
 }
