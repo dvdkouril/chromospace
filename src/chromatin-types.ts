@@ -85,10 +85,10 @@ export type AssociatedValuesScale = AssociatedValues & {
 };
 
 export type ViewConfig = {
-  binSizeScale?: number | AssociatedValuesScale;
+  scale?: number | AssociatedValuesScale;
   color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
-  makeLinks?: boolean;
+  links?: boolean;
 };
 
 /**

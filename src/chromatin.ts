@@ -39,7 +39,7 @@ export function addChunkToScene(
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
-      binSizeScale: 0.0001,
+      scale: 0.0001,
       color: undefined,
     };
   }
@@ -66,7 +66,7 @@ export function addModelToScene(
 ): ChromatinScene {
   if (viewConfig === undefined) {
     viewConfig = {
-      binSizeScale: 0.0001,
+      scale: 0.0001,
     };
   }
 
@@ -164,15 +164,15 @@ function buildDisplayableModel(
     const vc = model.viewConfig;
 
     let scale: number | number[] = 0.01; //~ default scale
-    if (typeof vc.binSizeScale === "number") {
-      scale = vc.binSizeScale || 0.01;
+    if (typeof vc.scale === "number") {
+      scale = vc.scale || 0.01;
     } else {
-      if (vc.binSizeScale !== undefined) {
-        const min = vc.binSizeScale.min;
-        const max = vc.binSizeScale.max;
-        const scaleMin = vc.binSizeScale.scaleMin || 0.0001;
-        const scaleMax = vc.binSizeScale.scaleMax || 0.005;
-        scale = vc.binSizeScale.values.map((v) =>
+      if (vc.scale !== undefined) {
+        const min = vc.scale.min;
+        const max = vc.scale.max;
+        const scaleMin = vc.scale.scaleMin || 0.0001;
+        const scaleMax = vc.scale.scaleMax || 0.005;
+        scale = vc.scale.values.map((v) =>
           valMap(v, min, max, scaleMin, scaleMax),
         );
       }
@@ -197,7 +197,7 @@ function buildDisplayableModel(
       attributes: {
         color: color,
         size: scale,
-        makeLinks: model.viewConfig.makeLinks || false,
+        makeLinks: model.viewConfig.links || false,
       },
     };
     segments.push(segment);
@@ -215,15 +215,15 @@ function buildDisplayableChunk(
   const vc = chunk.viewConfig;
 
   let scale: number | number[] = 0.01; //~ default scale
-  if (typeof vc.binSizeScale === "number") {
-    scale = vc.binSizeScale || 0.01;
+  if (typeof vc.scale === "number") {
+    scale = vc.scale || 0.01;
   } else {
-    if (vc.binSizeScale !== undefined) {
-      const min = vc.binSizeScale.min;
-      const max = vc.binSizeScale.max;
-      const scaleMin = vc.binSizeScale.scaleMin || 0.001;
-      const scaleMax = vc.binSizeScale.scaleMax || 0.05;
-      scale = vc.binSizeScale.values.map((v) =>
+    if (vc.scale !== undefined) {
+      const min = vc.scale.min;
+      const max = vc.scale.max;
+      const scaleMin = vc.scale.scaleMin || 0.001;
+      const scaleMax = vc.scale.scaleMax || 0.05;
+      scale = vc.scale.values.map((v) =>
         valMap(v, min, max, scaleMin, scaleMax),
       );
     }
@@ -247,7 +247,7 @@ function buildDisplayableChunk(
     attributes: {
       color: color,
       size: scale,
-      makeLinks: chunk.viewConfig.makeLinks || false,
+      makeLinks: chunk.viewConfig.links || false,
     },
   };
   renderer.addSegments([segment]);

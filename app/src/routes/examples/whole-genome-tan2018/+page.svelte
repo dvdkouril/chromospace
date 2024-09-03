@@ -43,8 +43,8 @@
 		});
 
 		const viewConfig = {
-			binSizeScale: 0.005,
-			makeLinks: true,
+			scale: 0.005,
+			links: true,
 			mark: "sphere",
 		};
 		let chromatinScene = initScene();

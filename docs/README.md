@@ -16,8 +16,8 @@ const testChunk = chs.parseTsv(text, { center: true, normalize: true });
 
 //~ config specifies how the 3D model will look 
 const viewConfig = {
-    binSizeScale: 0.01, 
-    coloring: "constant", 
+    scale: 0.01, 
+    color: "red", 
 };
 
 //~ create a scene 
@@ -82,10 +82,10 @@ should be displayed.
 
 ```typescript 
 export type ViewConfig = {
-  binSizeScale?: number | AssociatedValuesScale; 
+  scale?: number | AssociatedValuesScale; 
   color?: string | AssociatedValuesColor; 
   mark?: MarkTypes; 
-  makeLinks?: boolean; 
+  links?: boolean; 
 }; 
 ```
 
