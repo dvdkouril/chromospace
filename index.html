@@ -61,26 +61,22 @@
           
           //~ API testing
           //~ this config specifies how the 3D model will look
-          // const viewConfig = ({ 
-            // binSizeScale: 0.005, 
-            // coloring: "constant",
-          // });
 
           // Used for the de-emphasized rest of the model
           const unselected_ViewConfig = ({ 
-            binSizeScale: 0.005, 
+            scale: 0.005, 
             coloring: "constant", 
             color: "#a3a3a3",
-            makeLinks: false,
+            links: false,
           });
 
           // Used for highlighted region
           const selected_viewConfig = ({ 
-            binSizeScale: 0.02, 
+            scale: 0.02, 
             coloring: "constant", 
             color: "orange",
             mark: "box",
-            makeLinks: true,
+            links: true,
           });
 
           const num = testChunk.bins.length;
@@ -88,14 +84,14 @@
           const sineValues = sineWave(100, 0.2, num);
 
           const viewConfig = ({ 
-            binSizeScale: {
+            scale: {
               values: sineValues,
               min: -100,
               max: 100,
               scaleMin: 0.01,
               scaleMax: 0.03,
             },
-            makeLinks: false,
+            links: false,
             mark: "sphere",
             color: {
               values: sineValues,

@@ -66,14 +66,14 @@
                 const sineValues = sineWave(100, 0.2, num);
 
                 const viewConfig = {
-                        binSizeScale: {
+                        scale: {
                                 values: sineValues,
                                 min: -100,
                                 max: 100,
                                 scaleMin: 0.01,
                                 scaleMax: 0.03,
                         },
-                        makeLinks: false,
+                        links: false,
                         mark: "sphere",
                         color: {
                                 values: sineValues,
