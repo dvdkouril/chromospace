@@ -89,6 +89,7 @@ export function addModelToScene(
 export type DisplayOptions = {
   alwaysRedraw?: boolean;
   withHUD?: boolean;
+  hoverEffect?: boolean;
 };
 
 /**
@@ -100,6 +101,7 @@ export function display(
 ): [ChromatinBasicRenderer, HTMLElement | HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer({
     alwaysRedraw: options.alwaysRedraw,
+    hoverEffect: options.hoverEffect,
   });
   buildStructures(scene.structures, renderer);
   renderer.startDrawing();

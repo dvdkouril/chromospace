@@ -43,6 +43,7 @@ export class ChromatinBasicRenderer {
   updateCallback: ((text: string) => void) | undefined;
 
   alwaysRedraw = false;
+  hoverEffect = false;
 
   //~ interactions
   raycaster = new THREE.Raycaster();
@@ -53,8 +54,13 @@ export class ChromatinBasicRenderer {
   constructor(params?: {
     canvas?: HTMLCanvasElement;
     alwaysRedraw?: boolean;
+    hoverEffect?: boolean;
   }) {
-    const { canvas = undefined, alwaysRedraw = true } = params || {};
+    const {
+      canvas = undefined,
+      alwaysRedraw = true,
+      hoverEffect = false,
+    } = params || {};
 
     this.renderer = new THREE.WebGLRenderer({
       powerPreference: "high-performance",
@@ -127,6 +133,7 @@ export class ChromatinBasicRenderer {
     c.style.width = "100%";
     c.style.height = "100%";
 
+    this.hoverEffect = hoverEffect;
     this.alwaysRedraw = alwaysRedraw;
     if (!alwaysRedraw) {
       //~ re-render on mouse move: initially, I had redraw on camera change, but since I'm doing effects on hover, I need to redraw more frequently
@@ -333,22 +340,24 @@ export class ChromatinBasicRenderer {
     }
 
     //~ color neighboring sequence
-    if (this.hoveredBinId) {
-      const [segmentId, binId] = this.hoveredBinId;
-      const segment = this.markSegments[segmentId];
+    if (this.hoverEffect) {
+      if (this.hoveredBinId) {
+        const [segmentId, binId] = this.hoveredBinId;
+        const segment = this.markSegments[segmentId];
 
-      const min = -50;
-      const max = 50;
-      const colorScale = chroma.scale(["yellow", "red", "yellow"]);
-      const N = segment.positions.length;
-      const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
-      const color = indices.map((v) => colorScale.domain([min, max])(v));
+        const min = -50;
+        const max = 50;
+        const colorScale = chroma.scale(["yellow", "red", "yellow"]);
+        const N = segment.positions.length;
+        const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
+        const color = indices.map((v) => colorScale.domain([min, max])(v));
 
-      this.updateColor(segmentId, color);
-    } else {
-      //~ reset all
-      for (const [i, s] of this.markSegments.entries()) {
-        this.updateColor(i, s.attributes.color);
+        this.updateColor(segmentId, color);
+      } else {
+        //~ reset all
+        for (const [i, s] of this.markSegments.entries()) {
+          this.updateColor(i, s.attributes.color);
+        }
       }
     }
   }
