@@ -1,7 +1,9 @@
 import * as pa from "npm:apache-arrow@17.0.0";
 
-if (Deno.args.length < 2) {
-  throw new Error("Not enough params! Need input and output path");
+if (Deno.args.length < 3) {
+  throw new Error(
+    "Not enough params! Need input and output path, and file format",
+  );
 }
 
 const inputFormat = Deno.args[2];
@@ -12,30 +14,56 @@ const outputPath = Deno.args[1];
 const content = await Deno.readTextFile(inputPath);
 
 //~ Parse the XYZ file
-let xArr: number[] = [];
-let yArr: number[] = [];
-let zArr: number[] = [];
 //~ TODO: sense these from the file extension
-if (inputFormat === "tsv") {
-  [xArr, yArr, zArr] = parseTsv(content);
-} else if (inputFormat === "xyz") {
-  [xArr, yArr, zArr] = parseXYZ(content, "\t");
-} else if (inputFormat === "pdb") {
-  [xArr, yArr, zArr] = parsePDB(content);
+if (inputFormat === "3dg") {
+  // => load MODEL
+  let xArr: number[] = [];
+  let yArr: number[] = [];
+  let zArr: number[] = [];
+  let chrArr: string[] = [];
+  let coordArr: number[] = [];
+  [xArr, yArr, zArr, chrArr, coordArr] = parse3dg(content);
+
+  //~ Make the Arrow Table, convert to IPC, write to binary file
+  const table = pa.tableFromArrays({
+    x: xArr,
+    y: yArr,
+    z: zArr,
+    chr: chrArr,
+    coord: coordArr,
+  });
+  const ipc = pa.tableToIPC(table);
+
+  //~ TODO: check if outputPath ends with '.arrow'
+  await Deno.writeFile(outputPath, ipc);
+
+  console.log(`Writing to ${outputPath}.`);
+} else {
+  // => load CHUNK
+  let xArr: number[] = [];
+  let yArr: number[] = [];
+  let zArr: number[] = [];
+  if (inputFormat === "tsv") {
+    [xArr, yArr, zArr] = parseTsv(content);
+  } else if (inputFormat === "xyz") {
+    [xArr, yArr, zArr] = parseXYZ(content, "\t");
+  } else if (inputFormat === "pdb") {
+    [xArr, yArr, zArr] = parsePDB(content);
+  }
+
+  //~ Make the Arrow Table, convert to IPC, write to binary file
+  const table = pa.tableFromArrays({
+    x: xArr,
+    y: yArr,
+    z: zArr,
+  });
+  const ipc = pa.tableToIPC(table);
+
+  //~ TODO: check if outputPath ends with '.arrow'
+  await Deno.writeFile(outputPath, ipc);
+
+  console.log(`Writing to ${outputPath}.`);
 }
-
-//~ Make the Arrow Table, convert to IPC, write to binary file
-const table = pa.tableFromArrays({
-  x: xArr,
-  y: yArr,
-  z: zArr,
-});
-const ipc = pa.tableToIPC(table);
-
-//~ TODO: check if outputPath ends with '.arrow'
-await Deno.writeFile(outputPath, ipc);
-
-console.log(`Writing to ${outputPath}.`);
 
 //~ Test that the file has been written correctly: load back and log
 const arrow = await Deno.readFile(outputPath);
@@ -93,6 +121,9 @@ function parseXYZ(
 function parseTsv(fileContent: string): [number[], number[], number[]] {
   const tsvLines = fileContent.split("\n");
 
+  const xArr: number[] = [];
+  const yArr: number[] = [];
+  const zArr: number[] = [];
   tsvLines.forEach((line) => {
     const tokens = line.split("\t");
     if (tokens.length < 3) {
@@ -151,4 +182,39 @@ function parsePDB(fileContent: string): [number[], number[], number[]] {
   }
 
   return [xArr, yArr, zArr];
+}
+/**
+ * Utility function for parsing the 3DG format (e.g., the Tan et al. 2018 whole genome model)
+ */
+function parse3dg(
+  fileContent: string,
+): [number[], number[], number[], string[], number[]] {
+  const tsvLines = fileContent.split("\n");
+
+  const xArr: number[] = [];
+  const yArr: number[] = [];
+  const zArr: number[] = [];
+  const chrArr: string[] = [];
+  const coordArr: number[] = [];
+
+  tsvLines.forEach((line) => {
+    const tokens = line.split("\t");
+    if (tokens.length < 5) {
+      return;
+    }
+
+    const chrom = tokens[0];
+    const startCoord = Number.parseInt(tokens[1]);
+    const x = Number.parseFloat(tokens[2]);
+    const y = Number.parseFloat(tokens[3]);
+    const z = Number.parseFloat(tokens[4]);
+
+    xArr.push(x);
+    yArr.push(y);
+    zArr.push(z);
+    chrArr.push(chrom);
+    coordArr.push(startCoord);
+  });
+
+  return [xArr, yArr, zArr, chrArr, coordArr];
 }
