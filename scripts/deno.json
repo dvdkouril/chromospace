@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "xyz2arrow": "deno run --allow-read --allow-write xyz2arrow.ts"
+    "convert": "deno run --allow-read --allow-write convert2arrow.ts"
   }
 }
