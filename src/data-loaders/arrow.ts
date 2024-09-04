@@ -106,7 +106,7 @@ function processTableAsChunk(
 }
 
 /**
- * TODO:Turns the Arrow Table into a ChromatinModel object
+ * Turns the Arrow Table into a ChromatinModel object
  */
 function processTableAsModel(
   table: Table,
@@ -130,6 +130,14 @@ function processTableAsModel(
   ) {
     return { parts: [] };
   }
+  let modelResolution = 123;
+  const firstRow = table.get(0);
+  const secondRow = table.get(1);
+  if (firstRow && secondRow) {
+    const firstCoord = Number.parseInt(firstRow.coord);
+    const secondCoord = Number.parseInt(secondRow.coord);
+    modelResolution = secondCoord - firstCoord;
+  }
   for (let i = 0; i < table.numRows; i++) {
     const chrom = chrCol?.get(i) as string;
     const startCoord = coordCol.get(i) as string;
@@ -150,7 +158,7 @@ function processTableAsModel(
           end: Number.parseInt(startCoord),
           chromosome: chrom,
         },
-        resolution: 0, // TODO: delete if I'm not actually using it anywhere
+        resolution: modelResolution,
         label: chrom,
       };
       parts.push(currentPart);

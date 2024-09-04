@@ -1,8 +1,9 @@
-import fs from "node:fs";
 import { expect, test } from "vitest";
 
 import { fail } from "node:assert";
-import { parse3dg } from "../data-loaders/tsv-parser.ts";
+import type { ChromatinModel } from "../chromatin-types.ts";
+// import { parse3dg } from "../data-loaders/tsv-parser.ts";
+import { loadFromURL } from "../data-loaders/arrow.ts";
 import { get } from "../selections.ts";
 import { coordinateToBin } from "../utils.ts";
 
@@ -17,10 +18,10 @@ test("coordinateToBin with start offset", () => {
 });
 
 test("get chromosome", async () => {
-  const filename = "test-data/tan2018.tsv";
-  const fileTan2018 = fs.readFileSync(filename).toString();
-  const testModel = parse3dg(fileTan2018, { center: true, normalize: true });
-
+  const testModel = (await loadFromURL(
+    "https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/main/model/model.arrow",
+    { center: true, normalize: true },
+  )) as ChromatinModel;
   expect(testModel).toBeDefined();
 
   // biome-ignore lint/style/noNonNullAssertion: We are in a test file
@@ -37,10 +38,12 @@ test("get chromosome", async () => {
   }
 });
 
-test("get coordinates", () => {
-  const filename = "test-data/tan2018.tsv";
-  const fileTan2018 = fs.readFileSync(filename).toString();
-  const testModel = parse3dg(fileTan2018, { center: true, normalize: true });
+test("get coordinates", async () => {
+  const testModel = (await loadFromURL(
+    "https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/main/model/model.arrow",
+    { center: true, normalize: true },
+  )) as ChromatinModel;
+  expect(testModel).toBeDefined();
 
   expect(testModel).toBeDefined();
 
