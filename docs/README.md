@@ -68,7 +68,7 @@ We provide also provide a script (written in JS, using
 [deno](https://docs.deno.com)) for converting some of the above-mentioned file
 formats to `.arrow` files.
 
-More info: [scripts folder](scripts)
+More info: [scripts folder](/scripts)
 
 ## Core concepts
 
