@@ -6,6 +6,10 @@ if (Deno.args.length < 3) {
   );
 }
 
+if (Deno.args.length > 3) {
+  throw new Error("Too many parameters!");
+}
+
 const inputFormat = Deno.args[2];
 const inputPath = Deno.args[0];
 const outputPath = Deno.args[1];

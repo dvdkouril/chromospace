@@ -106,7 +106,7 @@ function processTableAsChunk(
 }
 
 /**
- * TODO:Turns the Arrow Table into a ChromatinModel object
+ * Turns the Arrow Table into a ChromatinModel object
  */
 function processTableAsModel(
   table: Table,
@@ -158,7 +158,7 @@ function processTableAsModel(
           end: Number.parseInt(startCoord),
           chromosome: chrom,
         },
-        resolution: modelResolution, // TODO: delete if I'm not actually using it anywhere
+        resolution: modelResolution,
         label: chrom,
       };
       parts.push(currentPart);
