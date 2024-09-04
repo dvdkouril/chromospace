@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { parse3dg, initScene, display, addModelToScene } from "chromospace";
+	import {
+		initScene,
+		display,
+		addModelToScene,
+		loadFromURL,
+		type ChromatinModel,
+	} from "chromospace";
 
 	let chromatinScene = initScene();
 
@@ -33,14 +39,13 @@
 	};
 
 	onMount(async () => {
-		const urlTan2018 =
-			"https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
-		const response = await fetch(urlTan2018);
-		const fileText = await response.text();
-		const tan2018Model = parse3dg(fileText, {
-			center: true,
-			normalize: true,
-		});
+		const tan2018Model = (await loadFromURL(
+			"https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/main/model/model.arrow",
+			{
+				center: true,
+				normalize: true,
+			},
+		)) as ChromatinModel;
 
 		const viewConfig = {
 			scale: 0.005,
