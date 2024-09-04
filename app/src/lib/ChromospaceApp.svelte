@@ -49,7 +49,7 @@
 
         onMount(async () => {
                 const testChunk = (await loadFromURL(
-                        "https://raw.githubusercontent.com/dvdkouril/chromospace/main/data/dros.3.arrow",
+                        "https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/main/data/dros.3.arrow",
                         { center: true, normalize: true },
                 )) as ChromatinChunk;
                 const num = testChunk.bins.length;
