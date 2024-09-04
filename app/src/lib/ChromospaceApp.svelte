@@ -5,6 +5,8 @@
                 addChunkToScene,
                 initScene,
                 display,
+                loadFromURL,
+                type ChromatinChunk,
         } from "chromospace";
 
         const fetchTsv = async (url: string) => {
@@ -46,13 +48,10 @@
         };
 
         onMount(async () => {
-                const url =
-                        "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
-                const fileContent = await fetchTsv(url);
-                const testChunk = parseTsv(fileContent, {
-                        center: true,
-                        normalize: true,
-                }); //~ parseTsv(data, center = true) ?
+                const testChunk = (await loadFromURL(
+                        "https://raw.githubusercontent.com/dvdkouril/chromospace/main/data/dros.3.arrow",
+                        { center: true, normalize: true },
+                )) as ChromatinChunk;
                 const num = testChunk.bins.length;
                 const sineWave = (
                         amplitude: number,
