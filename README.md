@@ -28,4 +28,4 @@ pnpm dev
 
 ## Authors
 
-Led by [David Kouril](http://davidkouril.com) @ [HIDIVE lab](http://hidivelab.org) (Harvard Medical School).
+Led by [David Kouřil](http://davidkouril.com) @ [HIDIVE lab](http://hidivelab.org) (Harvard Medical School).
