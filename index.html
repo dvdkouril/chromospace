@@ -113,7 +113,7 @@
           // chromatinScene = addModelToScene(chromatinScene, tan2018Model, unselected_ViewConfig);
           // chromatinScene = addModelToScene(chromatinScene, selectedModelA, selected_viewConfig);
           
-          const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: false, withHUD: true});
+          const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: true, withHUD: true});
 
           //~ add canvas to the page
           let appEl = document.querySelector('#app');

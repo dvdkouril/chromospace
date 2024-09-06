@@ -19,7 +19,7 @@
         let chromatinScene = initScene();
 
         $: [renderer, canvas] = display(chromatinScene, {
-                alwaysRedraw: false,
+                alwaysRedraw: true,
         });
 
         export const saveScreenshot = () => {
@@ -87,7 +87,7 @@
                         viewConfig,
                 );
                 const [renderer, canvas] = display(chromatinScene, {
-                        alwaysRedraw: false,
+                        alwaysRedraw: true,
                 });
 
                 //~ add canvas to the page
