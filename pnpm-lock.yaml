@@ -12,17 +12,17 @@ importers:
         specifier: ^17.0.0
         version: 17.0.0
       chroma-js:
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.1.1
+        version: 3.1.1
       gl-matrix:
         specifier: ^3.4.3
         version: 3.4.3
       n8ao:
-        specifier: ^1.8.4
-        version: 1.8.4(postprocessing@6.36.0(three@0.168.0))(three@0.168.0)
+        specifier: ^1.9.0
+        version: 1.9.0(postprocessing@6.36.1(three@0.168.0))(three@0.168.0)
       postprocessing:
-        specifier: ^6.35.5
-        version: 6.36.0(three@0.168.0)
+        specifier: ^6.36.1
+        version: 6.36.1(three@0.168.0)
       three:
         specifier: ^0.168.0
         version: 0.168.0
@@ -646,8 +646,8 @@ packages:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
 
-  chroma-js@3.0.0:
-    resolution: {integrity: sha512-ZFn4qxtZTvRJ7XatOLgaHGJYN10LoS6T0EMsu7IVayFG5+b6Yw8wCGQL5qLgo4B+wrRZ9niCrozOQ4a584bvaA==}
+  chroma-js@3.1.1:
+    resolution: {integrity: sha512-CGr6w73Gi86142RWqZ1RjED/CyduYw2vMTikQZUvr2jGIihnZlMo/Kzm9rYHWDP2pJc6eebwc8CkX0iteBon+A==}
 
   code-red@1.0.4:
     resolution: {integrity: sha512-7qJWqItLA8/VPVlKJlFXU+NBlo/qyfs39aJcuMT/2ere32ZqvF5OSxgdM5xOfJJ7O429gg2HM47y8v9P+9wrNw==}
@@ -992,8 +992,8 @@ packages:
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
-  n8ao@1.8.4:
-    resolution: {integrity: sha512-xaPub6na6jGAW7rbANcMcnKNhNa3Fmsbe1WY5mzI9bDuBTQmP6X2G1Xq1t2Si8dxJjqYPvNZX3xhXfkNw8jQBQ==}
+  n8ao@1.9.0:
+    resolution: {integrity: sha512-J1zR58hG6c6Pdzq9UnPHihjYV2d08Ex2NjWlW5zVQxRld39w9iQsM5G1Q/KnRTyXA7BcO9nTXS5t+qaahTWbfA==}
     peerDependencies:
       postprocessing: '>=6.30.0'
       three: '>=0.137'
@@ -1081,10 +1081,10 @@ packages:
     resolution: {integrity: sha512-7KTLTdzdZZYscUc65XmjFiB73vBhBfbPztCYdUNvlaso9PrzjzcmjqBPR0lNGkcVlcO4BjiO5rK/qNz+XAen1Q==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postprocessing@6.36.0:
-    resolution: {integrity: sha512-7V2t8Yi+Edh0FybErMdBV3CCJ/tTeNeLh6z+i0VczwZ6HGV3XyRfC8v4Ps9a6tjawcTvatLptQzX8QnDlU8BXw==}
+  postprocessing@6.36.1:
+    resolution: {integrity: sha512-V4THKWPZjRUC40OiTWhlzJCWyEkRYeAvMtYVdpi2pcQxAD2qTDm48UB2tZRTW+QdAw80P8Ut7IeKV6J1Gvac9w==}
     peerDependencies:
-      three: '>= 0.157.0 < 0.168.0'
+      three: '>= 0.157.0 < 0.169.0'
 
   psl@1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
@@ -1851,7 +1851,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  chroma-js@3.0.0: {}
+  chroma-js@3.1.1: {}
 
   code-red@1.0.4:
     dependencies:
@@ -2175,9 +2175,9 @@ snapshots:
 
   ms@2.1.2: {}
 
-  n8ao@1.8.4(postprocessing@6.36.0(three@0.168.0))(three@0.168.0):
+  n8ao@1.9.0(postprocessing@6.36.1(three@0.168.0))(three@0.168.0):
     dependencies:
-      postprocessing: 6.36.0(three@0.168.0)
+      postprocessing: 6.36.1(three@0.168.0)
       three: 0.168.0
 
   nanoid@3.3.7: {}
@@ -2236,7 +2236,7 @@ snapshots:
       picocolors: 1.1.0
       source-map-js: 1.2.1
 
-  postprocessing@6.36.0(three@0.168.0):
+  postprocessing@6.36.1(three@0.168.0):
     dependencies:
       three: 0.168.0
 
