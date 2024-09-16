@@ -50,6 +50,18 @@ export const estimateBestSphereSize = (bins: vec3[]): number => {
   return 0.4 * minDist;
 };
 
+export const estimateDefaultTubeSize = (
+  segment: DrawableMarkSegment,
+): number => {
+  const scale = segment.attributes.size;
+
+  if (Array.isArray(scale)) {
+    const average = scale.reduce((sum, num) => sum + num, 0) / scale.length;
+    return average;
+  }
+  return scale;
+};
+
 export const decideVisualParametersBasedOn1DData = (
   segment: DrawableMarkSegment,
   binIndex: number,
