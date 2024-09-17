@@ -137,6 +137,7 @@ export class ChromatinBasicRenderer {
     this.alwaysRedraw = alwaysRedraw;
     if (!alwaysRedraw) {
       //~ re-render on mouse move: initially, I had redraw on camera change, but since I'm doing effects on hover, I need to redraw more frequently
+      document.addEventListener("wheel", this.render);
       document.addEventListener("mousemove", this.render);
     }
     document.addEventListener("mousemove", this.onMouseMove);
