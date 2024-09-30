@@ -27,7 +27,7 @@
     "@biomejs/biome": "1.9.2",
     "@types/chroma-js": "^2.4.4",
     "@types/node": "^22.7.4",
-    "@types/three": "^0.168.0",
+    "@types/three": "^0.169.0",
     "jsdom": "^25.0.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
@@ -38,7 +38,7 @@
     "chroma-js": "^3.1.1",
     "gl-matrix": "^3.4.3",
     "n8ao": "^1.9.2",
-    "postprocessing": "^6.36.2",
-    "three": "^0.168.0"
+    "postprocessing": "^6.36.3",
+    "three": "^0.169.0"
   }
 }
