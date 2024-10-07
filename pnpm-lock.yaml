@@ -61,8 +61,8 @@ importers:
         specifier: workspace:^
         version: link:..
       tailwindcss:
-        specifier: ^4.0.0-alpha.25
-        version: 4.0.0-alpha.25
+        specifier: ^4.0.0-alpha.26
+        version: 4.0.0-alpha.26
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.2.5
@@ -1094,6 +1094,9 @@ packages:
 
   tailwindcss@4.0.0-alpha.25:
     resolution: {integrity: sha512-nysTVicWw8JC06+EAJvT8+4RAV7qZpuKwz0QOpfL88/+XKG+HIrawSz5XxXigF48l37ehZfREbqGiS7cCN90jg==}
+
+  tailwindcss@4.0.0-alpha.26:
+    resolution: {integrity: sha512-jHLs/18tHTLWkuaWMrTFdeF8qM0ZqCtZHo/YvtZOuhZGA9wW1TVpIvPkAHECXRSp4JiTKBkCzUPdv505kMkgow==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -2165,6 +2168,8 @@ snapshots:
       wordwrapjs: 5.1.0
 
   tailwindcss@4.0.0-alpha.25: {}
+
+  tailwindcss@4.0.0-alpha.26: {}
 
   tapable@2.2.1: {}
 
