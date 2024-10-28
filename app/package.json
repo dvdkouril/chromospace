@@ -23,7 +23,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@tailwindcss/vite": "^4.0.0-alpha.26",
+		"@tailwindcss/vite": "^4.0.0-alpha.30",
 		"chromospace": "workspace:^",
 		"tailwindcss": "^4.0.0-alpha.26"
 	}
