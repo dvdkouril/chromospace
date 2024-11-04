@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       apache-arrow:
-        specifier: ^17.0.0
-        version: 17.0.0
+        specifier: ^18.0.0
+        version: 18.0.0
       chroma-js:
         specifier: ^3.1.2
         version: 3.1.2
@@ -601,8 +601,8 @@ packages:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
 
-  apache-arrow@17.0.0:
-    resolution: {integrity: sha512-X0p7auzdnGuhYMVKYINdQssS4EcKec9TCXyez/qtJt32DrIMGbzqiaMiQ0X6fQlQpw8Fl0Qygcv4dfRAr5Gu9Q==}
+  apache-arrow@18.0.0:
+    resolution: {integrity: sha512-gFlPaqN9osetbB83zC29AbbZqGiCuFH1vyyPseJ+B7SIbfBtESV62mMT/CkiIt77W6ykC/nTWFzTXFs0Uldg4g==}
     hasBin: true
 
   aria-query@5.3.2:
@@ -1658,7 +1658,7 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
 
-  apache-arrow@17.0.0:
+  apache-arrow@18.0.0:
     dependencies:
       '@swc/helpers': 0.5.12
       '@types/command-line-args': 5.2.3
