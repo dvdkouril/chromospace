@@ -37,8 +37,8 @@
     "apache-arrow": "^17.0.0",
     "chroma-js": "^3.1.2",
     "gl-matrix": "^3.4.3",
-    "n8ao": "^1.9.2",
+    "n8ao": "^1.9.3",
     "postprocessing": "^6.36.3",
-    "three": "^0.169.0"
+    "three": "^0.170.0"
   }
 }
