@@ -12,9 +12,9 @@
 
 	let chromatinScene = initScene();
 
-	$: [renderer, canvas] = display(chromatinScene, {
-		alwaysRedraw: false,
-	});
+	// $: [renderer, canvas] = display(chromatinScene, {
+	// 	alwaysRedraw: false,
+	// });
 
 	onMount(async () => {
 		const tan2018Model = (await loadFromURL(
@@ -29,7 +29,7 @@
 		// let appEl = document.querySelector("#app");
 		let appEl = document.querySelector("#grid-test");
 
-		const numOfViews = 50;
+		const numOfViews = 20;
 		for (let i = 0; i < numOfViews; i++) {
 			const viewConfig = {
 				scale: 0.005,

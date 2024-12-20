@@ -17,7 +17,7 @@ import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor } from "chroma-js";
-import chroma from "chroma-js";
+// import chroma from "chroma-js";
 import type { vec3 } from "gl-matrix";
 
 /**
@@ -30,12 +30,15 @@ import type { vec3 } from "gl-matrix";
 export class ChromatinBasicRenderer {
   markSegments: DrawableMarkSegment[] = [];
 
+  scenes: THREE.Scene[] = [];
+  composers: EffectComposer[] = []; //~ TODO: two possible improvements: 1) reuse composers and only change camera/scene, 2) store the composer with the scene somehow?
+
   //~ threejs stuff
   renderer: THREE.WebGLRenderer;
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  composer: EffectComposer;
-  ssaoPasses: [N8AOPostPass, N8AOPostPass];
+  // scene: THREE.Scene;
+  // camera: THREE.PerspectiveCamera;
+  // composer: EffectComposer;
+  // ssaoPasses: [N8AOPostPass, N8AOPostPass];
   meshes: THREE.InstancedMesh[] = [];
 
   //~ dom
@@ -73,65 +76,27 @@ export class ChromatinBasicRenderer {
     });
     // this.renderer.setClearColor("#00eeee");
     this.renderer.setClearAlpha(0.0);
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
-
-    this.camera.position.z = 3.0;
-    controls.update();
-
-    const lightA = new THREE.DirectionalLight();
-    lightA.position.set(3, 10, 10);
-    lightA.castShadow = true;
-    const lightB = new THREE.DirectionalLight();
-    lightB.position.set(-3, 10, -10);
-    lightB.intensity = 0.2;
-    const lightC = new THREE.AmbientLight();
-    lightC.intensity = 0.2;
-    this.scene.add(lightA, lightB, lightC);
-
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    // N8AOPass replaces RenderPass
-    const w = 1920;
-    const h = 1080;
-    const n8aopass = new N8AOPostPass(this.scene, this.camera, w, h);
-    n8aopass.configuration.aoRadius = 0.1;
-    n8aopass.configuration.distanceFalloff = 1.0;
-    n8aopass.configuration.intensity = 2.0;
-    this.composer.addPass(n8aopass);
-
-    const n8aopassBigger = new N8AOPostPass(this.scene, this.camera, w, h);
-    n8aopassBigger.configuration.aoRadius = 1.0;
-    n8aopassBigger.configuration.distanceFalloff = 1.0;
-    n8aopassBigger.configuration.intensity = 2.0;
-    this.composer.addPass(n8aopass);
-
-    this.ssaoPasses = [n8aopass, n8aopassBigger];
-
-    /* SMAA Recommended */
-    this.composer.addPass(
-      new EffectPass(
-        this.camera,
-        new SMAAEffect({
-          preset: SMAAPreset.ULTRA,
-        }),
-      ),
-    );
 
     this.render = this.render.bind(this);
     this.update = this.update.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
-    this.resizeRendererToDisplaySize =
-      this.resizeRendererToDisplaySize.bind(this);
+    // this.resizeRendererToDisplaySize =
+    //   this.resizeRendererToDisplaySize.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.setupSSAOPasses = this.setupSSAOPasses.bind(this);
 
     //~ setting size of canvas to fill parent
     const c = this.getCanvasElement();
+    c.id = "global-canvas";
+    c.style.position = "fixed"; //~ overlay over the whole viewport
+    c.style.left = "0";
+    c.style.top = "0";
     c.style.width = "100%";
     c.style.height = "100%";
+    c.style.zIndex = "9999"; //~ making sure it is on top of everything (if possible)
+    c.style.border = "10px solid black"; //~ debug:
 
     this.hoverEffect = hoverEffect;
     this.alwaysRedraw = alwaysRedraw;
@@ -141,6 +106,65 @@ export class ChromatinBasicRenderer {
       document.addEventListener("mousemove", this.render);
     }
     document.addEventListener("mousemove", this.onMouseMove);
+  }
+
+  initNewScene(): THREE.Scene {
+    const newScene = new THREE.Scene();
+    const newCamera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
+    const newControls = new OrbitControls(newCamera, this.renderer.domElement);
+
+    newCamera.position.z = 3.0;
+    newControls.update();
+
+    const lightA = new THREE.DirectionalLight();
+    lightA.position.set(3, 10, 10);
+    lightA.castShadow = true;
+    const lightB = new THREE.DirectionalLight();
+    lightB.position.set(-3, 10, -10);
+    lightB.intensity = 0.2;
+    const lightC = new THREE.AmbientLight();
+    lightC.intensity = 0.2;
+    newScene.add(lightA, lightB, lightC);
+
+    const newComposer = this.setupSSAOPasses(newScene, newCamera);
+
+    this.scenes.push(newScene);
+    this.composers.push(newComposer);
+
+    return newScene;
+  }
+
+  setupSSAOPasses(scene: THREE.Scene, camera: THREE.Camera): EffectComposer {
+    const newComposer = new EffectComposer(this.renderer);
+    newComposer.addPass(new RenderPass(scene, camera));
+    // N8AOPass replaces RenderPass
+    const w = 1920;
+    const h = 1080;
+    const n8aopass = new N8AOPostPass(scene, camera, w, h);
+    n8aopass.configuration.aoRadius = 0.1;
+    n8aopass.configuration.distanceFalloff = 1.0;
+    n8aopass.configuration.intensity = 2.0;
+    newComposer.addPass(n8aopass);
+
+    const n8aopassBigger = new N8AOPostPass(scene, camera, w, h);
+    n8aopassBigger.configuration.aoRadius = 1.0;
+    n8aopassBigger.configuration.distanceFalloff = 1.0;
+    n8aopassBigger.configuration.intensity = 2.0;
+    newComposer.addPass(n8aopass);
+
+    // this.ssaoPasses = [n8aopass, n8aopassBigger]; //~ TODO: deal with
+
+    /* SMAA Recommended */
+    newComposer.addPass(
+      new EffectPass(
+        camera,
+        new SMAAEffect({
+          preset: SMAAPreset.ULTRA,
+        }),
+      ),
+    );
+
+    return newComposer;
   }
 
   getCanvasElement(): HTMLCanvasElement {
@@ -161,18 +185,18 @@ export class ChromatinBasicRenderer {
   /**
    * Entrypoint for adding actual data to show
    */
-  addSegments(newSegments: DrawableMarkSegment[]) {
+  addSegments(newSegments: DrawableMarkSegment[], forScene: THREE.Scene) {
     this.markSegments = [...this.markSegments, ...newSegments];
-    this.buildStructures();
+    this.buildStructures(forScene);
   }
 
   /**
    * Turns all drawable segments into THREE objects to be rendered
    */
-  buildStructures() {
-    this.scene.clear();
+  buildStructures(forScene: THREE.Scene) {
+    forScene.clear();
     for (const segment of this.markSegments) {
-      this.buildPart(segment);
+      this.buildPart(segment, forScene);
     }
   }
 
@@ -180,15 +204,17 @@ export class ChromatinBasicRenderer {
    * Meant to be called directly from client (eg, Observable notebook) to request redraw
    */
   updateViewConfig() {
-    this.scene.clear();
-    this.buildStructures();
-    this.redrawRequest = requestAnimationFrame(this.render);
+    //~ TODO: deal with this
+    //
+    // this.scene.clear();
+    // this.buildStructures();
+    // this.redrawRequest = requestAnimationFrame(this.render);
   }
 
   /**
    * Turns a singular segment (ie, position+mark+attributes) into THREEjs objects for rendering
    */
-  buildPart(segment: DrawableMarkSegment) {
+  buildPart(segment: DrawableMarkSegment, forScene: THREE.Scene) {
     const {
       color, //TODO: these don't make sense now to be undefined eveer
       // size = undefined,
@@ -213,12 +239,12 @@ export class ChromatinBasicRenderer {
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
       meshInstcedSpheres.setColorAt(i, colorOfThisBin);
     }
-    this.scene.add(meshInstcedSpheres);
+    forScene.add(meshInstcedSpheres);
     this.meshes.push(meshInstcedSpheres);
 
     if (makeLinks) {
       const tubeSize = estimateDefaultTubeSize(segment);
-      this.buildLinks(segment.positions, tubeSize, color);
+      this.buildLinks(segment.positions, tubeSize, color, forScene);
     }
   }
 
@@ -229,6 +255,7 @@ export class ChromatinBasicRenderer {
     positions: vec3[],
     tubeSize: number,
     color: ChromaColor | ChromaColor[],
+    forScene: THREE.Scene,
   ) {
     //~ tubes between tubes
     const tubes = computeTubes(positions);
@@ -271,7 +298,7 @@ export class ChromatinBasicRenderer {
       meshInstcedTubes.setMatrixAt(i, dummyObj.matrix);
       meshInstcedTubes.setColorAt(i, colorObj);
     }
-    this.scene.add(meshInstcedTubes);
+    forScene.add(meshInstcedTubes);
   }
 
   updateColor(meshIndex: number, color: ChromaColor | ChromaColor[]) {
@@ -301,82 +328,127 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
-  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
-    const canvas = renderer.domElement;
-    const pixelRatio = window.devicePixelRatio;
-    const width = Math.floor(canvas.clientWidth * pixelRatio);
-    const height = Math.floor(canvas.clientHeight * pixelRatio);
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-      this.composer.setSize(width, height);
-      const [pass1, pass2] = this.ssaoPasses;
-      pass1.setSize(width, height);
-      pass2.setSize(width, height);
-    }
-    return needResize;
-  }
+  // resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
+  //   const canvas = renderer.domElement;
+  //   const pixelRatio = window.devicePixelRatio;
+  //   const width = Math.floor(canvas.clientWidth * pixelRatio);
+  //   const height = Math.floor(canvas.clientHeight * pixelRatio);
+  //   const needResize = canvas.width !== width || canvas.height !== height;
+  //   if (needResize) {
+  //     renderer.setSize(width, height, false);
+  //     this.composer.setSize(width, height);
+  //     const [pass1, pass2] = this.ssaoPasses;
+  //     pass1.setSize(width, height);
+  //     pass2.setSize(width, height);
+  //   }
+  //   return needResize;
+  // }
 
   update() {
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-
-    this.hoveredBinId = undefined;
-    for (const [i, m] of this.meshes.entries()) {
-      const intersection = this.raycaster.intersectObject(m);
-      if (intersection.length > 0) {
-        const instanceId = intersection[0].instanceId;
-        if (instanceId) {
-          this.hoveredBinId = [i, instanceId];
-          if (this.updateCallback) {
-            this.updateCallback(`Hovered: part ${i}, bin ${instanceId}`);
-          }
-        }
-      } else {
-        if (this.updateCallback) {
-          this.updateCallback("");
-        }
-      }
-    }
-
-    //~ color neighboring sequence
-    if (this.hoverEffect) {
-      if (this.hoveredBinId) {
-        const [segmentId, binId] = this.hoveredBinId;
-        const segment = this.markSegments[segmentId];
-
-        const min = -50;
-        const max = 50;
-        const colorScale = chroma.scale(["yellow", "red", "yellow"]);
-        const N = segment.positions.length;
-        const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
-        const color = indices.map((v) => colorScale.domain([min, max])(v));
-
-        this.updateColor(segmentId, color);
-      } else {
-        //~ reset all
-        for (const [i, s] of this.markSegments.entries()) {
-          this.updateColor(i, s.attributes.color);
-        }
-      }
-    }
+    //~ TODO: deal with, if we want to keep...
+    //
+    // this.raycaster.setFromCamera(this.mouse, this.camera);
+    //
+    // this.hoveredBinId = undefined;
+    // for (const [i, m] of this.meshes.entries()) {
+    //   const intersection = this.raycaster.intersectObject(m);
+    //   if (intersection.length > 0) {
+    //     const instanceId = intersection[0].instanceId;
+    //     if (instanceId) {
+    //       this.hoveredBinId = [i, instanceId];
+    //       if (this.updateCallback) {
+    //         this.updateCallback(`Hovered: part ${i}, bin ${instanceId}`);
+    //       }
+    //     }
+    //   } else {
+    //     if (this.updateCallback) {
+    //       this.updateCallback("");
+    //     }
+    //   }
+    // }
+    //
+    // //~ color neighboring sequence
+    // if (this.hoverEffect) {
+    //   if (this.hoveredBinId) {
+    //     const [segmentId, binId] = this.hoveredBinId;
+    //     const segment = this.markSegments[segmentId];
+    //
+    //     const min = -50;
+    //     const max = 50;
+    //     const colorScale = chroma.scale(["yellow", "red", "yellow"]);
+    //     const N = segment.positions.length;
+    //     const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
+    //     const color = indices.map((v) => colorScale.domain([min, max])(v));
+    //
+    //     this.updateColor(segmentId, color);
+    //   } else {
+    //     //~ reset all
+    //     for (const [i, s] of this.markSegments.entries()) {
+    //       this.updateColor(i, s.attributes.color);
+    //     }
+    //   }
+    // }
   }
 
   render() {
-    if (this.alwaysRedraw) {
-      this.redrawRequest = requestAnimationFrame(this.render);
+    // this.canvas.style.transform = `translateY(${window.scrollY}px)`;
+    const c = this.getCanvasElement();
+    c.style.transform = `translateY(${window.scrollY}px)`;
+
+    this.renderer.setClearColor(0xffffff);
+    this.renderer.setScissorTest(false);
+    this.renderer.clear();
+
+    this.renderer.setClearColor(0xe0e0e0);
+    this.renderer.setScissorTest(true);
+
+    //~ from: https://github.com/mrdoob/three.js/blob/master/examples/webgl_multiple_elements.html
+    for (const [i, s] of this.scenes.entries()) {
+      // get the element that is a place holder for where we want to
+      // draw the scene
+      const element = s.userData.element;
+
+      // get its position relative to the page's viewport
+      const rect = element.getBoundingClientRect();
+      // check if it's offscreen. If so skip it
+      if (
+        rect.bottom < 0 ||
+        rect.top > this.renderer.domElement.clientHeight ||
+        rect.right < 0 ||
+        rect.left > this.renderer.domElement.clientWidth
+      ) {
+        continue; // it's off screen
+      }
+      // set the viewport
+      const width = rect.right - rect.left;
+      const height = rect.bottom - rect.top;
+      const left = rect.left;
+      const bottom = this.renderer.domElement.clientHeight - rect.bottom;
+
+      this.renderer.setViewport(left, bottom, width, height);
+      this.renderer.setScissor(left, bottom, width, height);
+
+      // const camera = s.userData.camera;
+      const composer = this.composers[i];
+      composer.render();
     }
 
-    this.update();
-    // console.log("hovered bin:" + this.hoveredBinId);
-
-    //~ from: https://threejs.org/manual/#en/responsive
-    if (this.resizeRendererToDisplaySize(this.renderer)) {
-      const canvas = this.renderer.domElement;
-      this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      this.camera.updateProjectionMatrix();
-    }
-
-    this.composer.render();
+    //~ TODO: is there anything that I still need here?
+    //
+    // if (this.alwaysRedraw) {
+    //   this.redrawRequest = requestAnimationFrame(this.render);
+    // }
+    //
+    // this.update();
+    //
+    // //~ from: https://threejs.org/manual/#en/responsive
+    // if (this.resizeRendererToDisplaySize(this.renderer)) {
+    //   const canvas = this.renderer.domElement;
+    //   this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    //   this.camera.updateProjectionMatrix();
+    // }
+    //
+    // this.composer.render();
   }
 
   onMouseMove(event: MouseEvent) {

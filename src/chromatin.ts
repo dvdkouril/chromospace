@@ -16,6 +16,15 @@ import {
   // defaultColorScale,
   valMap,
 } from "./utils";
+import type { Scene } from "three";
+
+export let viewportCounter = 0;
+const renderer = new ChromatinBasicRenderer({
+  // alwaysRedraw: options.alwaysRedraw,
+  // hoverEffect: options.hoverEffect,
+  alwaysRedraw: true,
+  hoverEffect: false,
+});
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -99,55 +108,55 @@ export function display(
   scene: ChromatinScene,
   options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLElement | HTMLCanvasElement] {
-  const renderer = new ChromatinBasicRenderer({
-    alwaysRedraw: options.alwaysRedraw,
-    hoverEffect: options.hoverEffect,
-  });
-  buildStructures(scene.structures, renderer);
+  console.log(options); //~ just to shut of the lsp
+  const threeScene = renderer.initNewScene();
+  buildStructures(scene.structures, renderer, threeScene);
   renderer.startDrawing();
   const canvas = renderer.getCanvasElement();
 
-  let elementToReturn: HTMLElement | HTMLCanvasElement = canvas;
-  if (options.withHUD) {
-    //~ create debug info layer
-    const debugInfo = document.createElement("div");
-    debugInfo.innerText = "";
-    debugInfo.style.position = "absolute";
-    debugInfo.style.top = "10px";
-    debugInfo.style.left = "10px";
-    debugInfo.style.fontFamily = "'Courier New', monospace";
+  console.log("DISPLAY___________________!");
 
-    const updateHUDText = (text: string) => {
-      debugInfo.innerText = text;
-    };
-
-    renderer.addUpdateHUDCallback(updateHUDText);
-
-    //~ create contaienr
-    const container = document.createElement("div");
-    container.style.position = "relative";
-    container.style.width = "100%";
-    container.style.height = "100%";
-
-    container.appendChild(debugInfo);
-    container.appendChild(canvas);
-    elementToReturn = container;
-  }
+  // const elementToReturn: HTMLCanvasElement = canvas;
+  const elementToReturn = decideElementToReturn(viewportCounter, canvas);
+  //~ add the dummy element (in wrapper) to the scene (so that we can grab its rect during rendering)
+  threeScene.userData.element = elementToReturn;
+  console.log(`viewportCounter = ${viewportCounter}`);
+  viewportCounter += 1;
 
   return [renderer, elementToReturn];
+}
+
+function decideElementToReturn(
+  counter: number,
+  canvas: HTMLCanvasElement,
+): HTMLCanvasElement | HTMLElement {
+  const dummyDiv = document.createElement("div");
+  dummyDiv.style.width = "200px";
+  dummyDiv.style.height = "200px";
+  dummyDiv.style.backgroundColor = "purple";
+  const wrapperDiv = document.createElement("div");
+  wrapperDiv.appendChild(dummyDiv);
+  if (counter < 1) {
+    wrapperDiv.appendChild(canvas);
+    console.log("returning CANVAS, too.");
+  } else {
+    console.log("returning only dummy DIV.");
+  }
+  return wrapperDiv;
 }
 
 function buildStructures(
   structures: (DisplayableChunk | DisplayableModel)[],
   renderer: ChromatinBasicRenderer,
+  scene: Scene,
 ) {
   for (const s of structures) {
     switch (s.kind) {
       case "model":
-        buildDisplayableModel(s, renderer);
+        buildDisplayableModel(s, renderer, scene);
         break;
       case "chunk":
-        buildDisplayableChunk(s, renderer);
+        buildDisplayableChunk(s, renderer, scene);
         break;
     }
   }
@@ -156,6 +165,7 @@ function buildStructures(
 function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
+  scene: Scene,
 ) {
   const segments: DrawableMarkSegment[] = [];
 
@@ -204,7 +214,7 @@ function buildDisplayableModel(
     };
     segments.push(segment);
   }
-  renderer.addSegments(segments);
+  renderer.addSegments(segments, scene);
 }
 
 /*
@@ -213,6 +223,7 @@ function buildDisplayableModel(
 function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
+  scene: Scene,
 ) {
   const vc = chunk.viewConfig;
 
@@ -252,5 +263,5 @@ function buildDisplayableChunk(
       makeLinks: chunk.viewConfig.links || false,
     },
   };
-  renderer.addSegments([segment]);
+  renderer.addSegments([segment], scene);
 }
