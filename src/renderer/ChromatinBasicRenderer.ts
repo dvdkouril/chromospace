@@ -85,6 +85,7 @@ export class ChromatinBasicRenderer {
     // this.resizeRendererToDisplaySize =
     //   this.resizeRendererToDisplaySize.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.onKeyPress = this.onKeyPress.bind(this);
     this.setupSSAOPasses = this.setupSSAOPasses.bind(this);
 
     //~ setting size of canvas to fill parent
@@ -106,6 +107,8 @@ export class ChromatinBasicRenderer {
       document.addEventListener("mousemove", this.render);
     }
     document.addEventListener("mousemove", this.onMouseMove);
+    //~ debug: trigger render only on keypress
+    document.addEventListener("keypress", this.onKeyPress);
   }
 
   initNewScene(): THREE.Scene {
@@ -115,6 +118,7 @@ export class ChromatinBasicRenderer {
 
     newCamera.position.z = 3.0;
     newControls.update();
+    newScene.userData.camera = newCamera;
 
     const lightA = new THREE.DirectionalLight();
     lightA.position.set(3, 10, 10);
@@ -328,21 +332,23 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
-  // resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
-  //   const canvas = renderer.domElement;
-  //   const pixelRatio = window.devicePixelRatio;
-  //   const width = Math.floor(canvas.clientWidth * pixelRatio);
-  //   const height = Math.floor(canvas.clientHeight * pixelRatio);
-  //   const needResize = canvas.width !== width || canvas.height !== height;
-  //   if (needResize) {
-  //     renderer.setSize(width, height, false);
-  //     this.composer.setSize(width, height);
-  //     const [pass1, pass2] = this.ssaoPasses;
-  //     pass1.setSize(width, height);
-  //     pass2.setSize(width, height);
-  //   }
-  //   return needResize;
-  // }
+  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width = Math.floor(canvas.clientWidth * pixelRatio);
+    const height = Math.floor(canvas.clientHeight * pixelRatio);
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+      for (const c of this.composers) {
+        c.setSize(width, height);
+      }
+      // const [pass1, pass2] = this.ssaoPasses;
+      // pass1.setSize(width, height);
+      // pass2.setSize(width, height);
+    }
+    return needResize;
+  }
 
   update() {
     //~ TODO: deal with, if we want to keep...
@@ -392,44 +398,71 @@ export class ChromatinBasicRenderer {
 
   render() {
     // this.canvas.style.transform = `translateY(${window.scrollY}px)`;
+    console.log("ChromatinBasicRenderer::render()");
+    // this.redrawRequest = requestAnimationFrame(this.render);
     const c = this.getCanvasElement();
     c.style.transform = `translateY(${window.scrollY}px)`;
+    // console.log(this.renderer.getSize());
 
     this.renderer.setClearColor(0xffffff);
+    this.renderer.setClearAlpha(0.0); //~
     this.renderer.setScissorTest(false);
     this.renderer.clear();
 
-    this.renderer.setClearColor(0xe0e0e0);
+    // this.renderer.setClearColor(0xe0e0e0);
+    this.renderer.setClearColor(0x00aa00);
     this.renderer.setScissorTest(true);
 
     //~ from: https://github.com/mrdoob/three.js/blob/master/examples/webgl_multiple_elements.html
     for (const [i, s] of this.scenes.entries()) {
       // get the element that is a place holder for where we want to
       // draw the scene
-      const element = s.userData.element;
+      const element = s.userData.element as HTMLElement;
+      // console.log("s.userData.element");
+      // console.log(element);
 
       // get its position relative to the page's viewport
       const rect = element.getBoundingClientRect();
       // check if it's offscreen. If so skip it
-      if (
-        rect.bottom < 0 ||
-        rect.top > this.renderer.domElement.clientHeight ||
-        rect.right < 0 ||
-        rect.left > this.renderer.domElement.clientWidth
-      ) {
-        continue; // it's off screen
-      }
+      // if (
+      //   rect.bottom < 0 ||
+      //   rect.top > this.renderer.domElement.clientHeight ||
+      //   rect.right < 0 ||
+      //   rect.left > this.renderer.domElement.clientWidth
+      // ) {
+      //   continue; // it's off screen
+      // }
       // set the viewport
       const width = rect.right - rect.left;
       const height = rect.bottom - rect.top;
       const left = rect.left;
       const bottom = this.renderer.domElement.clientHeight - rect.bottom;
 
+      // const width = 280;
+      // const height = 200;
+      // const left = 22;
+      // // const bottom = 103;
+      // const bottom = 0;
+      // // l: 22, b: 103, w: 280.6640625, h: 200
+
       this.renderer.setViewport(left, bottom, width, height);
       this.renderer.setScissor(left, bottom, width, height);
+      console.log(`l: ${left}, b: ${bottom}, w: ${width}, h: ${height}`);
 
       // const camera = s.userData.camera;
       const composer = this.composers[i];
+      // composer.getRenderer().setViewport(left, bottom, width, height);
+      // composer.getRenderer().setScissor(left, bottom, width, height);
+      //
+      //
+      //~ from: https://threejs.org/manual/#en/responsive
+      const camera = s.userData.camera as THREE.PerspectiveCamera;
+      if (this.resizeRendererToDisplaySize(this.renderer)) {
+        const canvas = this.renderer.domElement;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+      }
+
       composer.render();
     }
 
@@ -463,5 +496,12 @@ export class ChromatinBasicRenderer {
     /* mouse.x/y should be both in <-1,1> */
     this.mouse.x = (x / rect.width) * 2 - 1;
     this.mouse.y = -(y / rect.height) * 2 + 1;
+  }
+
+  onKeyPress(event: KeyboardEvent) {
+    if (event.key === "r") {
+      console.log("rendering triggered...");
+      this.render();
+    }
   }
 }
