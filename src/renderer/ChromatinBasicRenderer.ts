@@ -332,30 +332,15 @@ export class ChromatinBasicRenderer {
     this.renderer.dispose();
   }
 
-  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
-    const canvas = renderer.domElement;
-    const pixelRatio = window.devicePixelRatio;
-    const width = Math.floor(canvas.clientWidth * pixelRatio);
-    const height = Math.floor(canvas.clientHeight * pixelRatio);
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-      for (const c of this.composers) {
-        c.setSize(width, height);
-      }
-      // const [pass1, pass2] = this.ssaoPasses;
-      // pass1.setSize(width, height);
-      // pass2.setSize(width, height);
-    }
-    return needResize;
-  }
-
   render() {
     // this.canvas.style.transform = `translateY(${window.scrollY}px)`;
     console.log("ChromatinBasicRenderer::render()");
     // this.redrawRequest = requestAnimationFrame(this.render);
     const c = this.getCanvasElement();
     c.style.transform = `translateY(${window.scrollY}px)`;
+    const size = new THREE.Vector2();
+    this.renderer.getSize(size);
+    console.log(`renderer.size = ${size.x}, ${size.y}`);
 
     //~ Clearing the whole fullscreen canvas (can be multiple scene)
     this.renderer.setClearColor(0xffffff); //~ this is essentially useless because...
@@ -363,7 +348,6 @@ export class ChromatinBasicRenderer {
     this.renderer.setScissorTest(false);
     this.renderer.clear();
 
-    // this.renderer.setClearColor(0xe0e0e0);
     this.renderer.setClearColor(0xffe4e1); //~ this determines the background of the scene
     this.renderer.setScissorTest(true);
 
@@ -372,11 +356,6 @@ export class ChromatinBasicRenderer {
       // get the element that is a place holder for where we want to
       // draw the scene
       const element = s.userData.element as HTMLElement;
-      console.log(`rendering scene ${i} (${s.uuid})`);
-      console.log(`objects in scene: ${s.children.length}`);
-      for (const [i, o] of s.children.entries()) {
-        console.log(`[${i}]: ${o.type} ${o.uuid}`);
-      }
 
       // get its position relative to the page's viewport
       const rect = element.getBoundingClientRect();
@@ -400,41 +379,42 @@ export class ChromatinBasicRenderer {
 
       this.renderer.setViewport(left, bottom, width, height);
       this.renderer.setScissor(left, bottom, width, height);
-      console.log(`l: ${left}, b: ${bottom}, w: ${width}, h: ${height}`);
 
       // const camera = s.userData.camera;
       const composer = this.composers[i];
-      // composer.getRenderer().setViewport(left, bottom, width, height);
-      // composer.getRenderer().setScissor(left, bottom, width, height);
-      //
-      //
+
       //~ from: https://threejs.org/manual/#en/responsive
       const camera = s.userData.camera as THREE.PerspectiveCamera;
-      if (this.resizeRendererToDisplaySize(this.renderer)) {
-        const canvas = this.renderer.domElement;
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
-        camera.updateProjectionMatrix();
-      }
+      // if (this.resizeRendererToDisplaySize(this.renderer)) {
+      console.log("resizeRendererToDisplaySize ran!");
+      this.resizeRendererToDisplaySize(this.renderer);
+      // const canvas = this.renderer.domElement;
+      // camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      // composer.setSize(width, height);
+      // }
 
       composer.render();
     }
+  }
 
-    //~ TODO: is there anything that I still need here?
-    //
-    // if (this.alwaysRedraw) {
-    //   this.redrawRequest = requestAnimationFrame(this.render);
-    // }
-    //
-    // this.update();
-    //
-    // //~ from: https://threejs.org/manual/#en/responsive
-    // if (this.resizeRendererToDisplaySize(this.renderer)) {
-    //   const canvas = this.renderer.domElement;
-    //   this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    //   this.camera.updateProjectionMatrix();
-    // }
-    //
-    // this.composer.render();
+  resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer): boolean {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width = Math.floor(canvas.clientWidth * pixelRatio);
+    const height = Math.floor(canvas.clientHeight * pixelRatio);
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+      for (const c of this.composers) {
+        c.setSize(width, height);
+      }
+      // const [pass1, pass2] = this.ssaoPasses;
+      // pass1.setSize(width, height);
+      // pass2.setSize(width, height);
+    }
+    return needResize;
   }
 
   onMouseMove(event: MouseEvent) {
