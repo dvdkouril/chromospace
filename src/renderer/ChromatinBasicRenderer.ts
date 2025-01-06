@@ -28,7 +28,7 @@ import type { vec3 } from "gl-matrix";
  *  - buildStructures, buildPart: turns segments with specific visual attributes into THREE primitives
  */
 export class ChromatinBasicRenderer {
-  markSegments: DrawableMarkSegment[] = [];
+  markSegments = new Map<string, DrawableMarkSegment[]>();
 
   scenes: THREE.Scene[] = [];
   composers: EffectComposer[] = []; //~ TODO: two possible improvements: 1) reuse composers and only change camera/scene, 2) store the composer with the scene somehow?
@@ -120,17 +120,9 @@ export class ChromatinBasicRenderer {
     newControls.update();
     newScene.userData.camera = newCamera;
 
-    const lightA = new THREE.DirectionalLight();
-    lightA.position.set(3, 10, 10);
-    lightA.castShadow = true;
-    const lightB = new THREE.DirectionalLight();
-    lightB.position.set(-3, 10, -10);
-    lightB.intensity = 0.2;
-    const lightC = new THREE.AmbientLight();
-    lightC.intensity = 0.2;
-    newScene.add(lightA, lightB, lightC);
-
     const newComposer = this.setupSSAOPasses(newScene, newCamera);
+
+    // this.markSegments = []; //~ TODO: temporary solution to solve the structures accumulating with mulptiple scenes
 
     this.scenes.push(newScene);
     this.composers.push(newComposer);
@@ -190,7 +182,10 @@ export class ChromatinBasicRenderer {
    * Entrypoint for adding actual data to show
    */
   addSegments(newSegments: DrawableMarkSegment[], forScene: THREE.Scene) {
-    this.markSegments = [...this.markSegments, ...newSegments];
+    // this.markSegments = [...this.markSegments, ...newSegments];
+    const key = forScene.uuid; //~ gonna use the uuid as a key for storing the segments
+    const existingSegments = this.markSegments.get(key) || [];
+    this.markSegments.set(key, [...existingSegments, ...newSegments]);
     this.buildStructures(forScene);
   }
 
@@ -199,8 +194,14 @@ export class ChromatinBasicRenderer {
    */
   buildStructures(forScene: THREE.Scene) {
     forScene.clear();
-    for (const segment of this.markSegments) {
-      this.buildPart(segment, forScene);
+    const key = forScene.uuid;
+    const markSegments = this.markSegments.get(key);
+    if (markSegments) {
+      for (const segment of markSegments) {
+        this.buildPart(segment, forScene);
+      }
+    } else {
+      console.log("trying to build an empty scene...");
     }
   }
 
@@ -418,6 +419,11 @@ export class ChromatinBasicRenderer {
       // get the element that is a place holder for where we want to
       // draw the scene
       const element = s.userData.element as HTMLElement;
+      console.log(`rendering scene ${i} (${s.uuid})`);
+      console.log(`objects in scene: ${s.children.length}`);
+      for (const [i, o] of s.children.entries()) {
+        console.log(`[${i}]: ${o.type} ${o.uuid}`);
+      }
 
       // get its position relative to the page's viewport
       const rect = element.getBoundingClientRect();
