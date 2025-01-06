@@ -116,9 +116,8 @@ export function display(
 
   console.log("DISPLAY___________________!");
 
-  // const elementToReturn: HTMLCanvasElement = canvas;
   const elementToReturn = decideElementToReturn(viewportCounter, canvas);
-  //~ add the dummy element (in wrapper) to the scene (so that we can grab its rect during rendering)
+  //~ store the dummy element (in wrapper) in the scene's userData (so that we can grab its rect during rendering)
   threeScene.userData.element = elementToReturn;
   console.log(`viewportCounter = ${viewportCounter}`);
   viewportCounter += 1;
@@ -129,12 +128,13 @@ export function display(
 function decideElementToReturn(
   counter: number,
   canvas: HTMLCanvasElement,
-): HTMLCanvasElement | HTMLElement {
+): HTMLElement {
   const dummyDiv = document.createElement("div");
-  dummyDiv.style.width = "200px";
-  dummyDiv.style.height = "200px";
-  dummyDiv.style.backgroundColor = "purple";
   const wrapperDiv = document.createElement("div");
+  //~ dummy div element should be defined by the size of its parent
+  dummyDiv.style.width = "100%";
+  dummyDiv.style.height = "100%";
+  dummyDiv.style.backgroundColor = "purple"; //~ debug
   wrapperDiv.appendChild(dummyDiv);
   if (counter < 1) {
     wrapperDiv.appendChild(canvas);

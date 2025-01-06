@@ -54,7 +54,8 @@
 <style>
 	#grid-test {
 		display: grid;
-		grid-template-columns: repeat(5, 1fr);
+		grid-template-columns: repeat(3, 1fr);
+		grid-auto-rows: 500px;
 		gap: 10px; /* Spacing between grid items */
 		border: 2px solid black;
 	}
