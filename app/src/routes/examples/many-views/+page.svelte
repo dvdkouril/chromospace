@@ -22,7 +22,7 @@
 		// let appEl = document.querySelector("#app");
 		let appEl = document.querySelector("#grid-test");
 
-		const numOfViews = 6;
+		const numOfViews = 4;
 		for (let i = 0; i < numOfViews; i++) {
 			const viewConfig = {
 				scale: 0.005,
