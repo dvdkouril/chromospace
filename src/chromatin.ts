@@ -109,16 +109,17 @@ export function display(
   options: DisplayOptions,
 ): [ChromatinBasicRenderer, HTMLElement | HTMLCanvasElement] {
   console.log(options); //~ just to shut of the lsp
-  const threeScene = renderer.initNewScene();
-  buildStructures(scene.structures, renderer, threeScene);
-  renderer.startDrawing();
-  const canvas = renderer.getCanvasElement();
-
   console.log("DISPLAY___________________!");
 
+  const canvas = renderer.getCanvasElement();
+  canvas.style.pointerEvents = "none";
+
   const elementToReturn = decideElementToReturn(viewportCounter, canvas);
+  const threeScene = renderer.initNewScene(elementToReturn);
   //~ store the dummy element (in wrapper) in the scene's userData (so that we can grab its rect during rendering)
-  threeScene.userData.element = elementToReturn;
+  buildStructures(scene.structures, renderer, threeScene);
+  renderer.startDrawing();
+
   console.log(`viewportCounter = ${viewportCounter}`);
   viewportCounter += 1;
 

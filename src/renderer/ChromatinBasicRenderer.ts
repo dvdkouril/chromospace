@@ -110,14 +110,15 @@ export class ChromatinBasicRenderer {
    * Creates and returns a new scene within this Renderer.
    *
    */
-  initNewScene(): THREE.Scene {
+  initNewScene(domElement: HTMLElement): THREE.Scene {
     const newScene = new THREE.Scene();
     const newCamera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
-    const newControls = new OrbitControls(newCamera, this.renderer.domElement);
+    const newControls = new OrbitControls(newCamera, domElement);
 
     newCamera.position.z = 3.0;
     newControls.update();
     newScene.userData.camera = newCamera;
+    newScene.userData.element = domElement;
 
     const newComposer = this.setupSSAOPasses(newScene, newCamera);
 
@@ -335,7 +336,7 @@ export class ChromatinBasicRenderer {
   render() {
     // this.canvas.style.transform = `translateY(${window.scrollY}px)`;
     console.log("ChromatinBasicRenderer::render()");
-    // this.redrawRequest = requestAnimationFrame(this.render);
+    this.redrawRequest = requestAnimationFrame(this.render);
     const c = this.getCanvasElement();
     c.style.transform = `translateY(${window.scrollY}px)`;
     const size = new THREE.Vector2();
