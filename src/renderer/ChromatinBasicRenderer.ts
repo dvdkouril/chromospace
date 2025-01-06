@@ -97,7 +97,7 @@ export class ChromatinBasicRenderer {
     c.style.width = "100%";
     c.style.height = "100%";
     c.style.zIndex = "9999"; //~ making sure it is on top of everything (if possible)
-    c.style.border = "10px solid black"; //~ debug:
+    // c.style.border = "10px solid black"; //~ debug:
 
     this.hoverEffect = hoverEffect;
     this.alwaysRedraw = alwaysRedraw;
@@ -418,8 +418,6 @@ export class ChromatinBasicRenderer {
       // get the element that is a place holder for where we want to
       // draw the scene
       const element = s.userData.element as HTMLElement;
-      // console.log("s.userData.element");
-      // console.log(element);
 
       // get its position relative to the page's viewport
       const rect = element.getBoundingClientRect();
@@ -433,17 +431,13 @@ export class ChromatinBasicRenderer {
       //   continue; // it's off screen
       // }
       // set the viewport
-      const width = rect.right - rect.left;
-      const height = rect.bottom - rect.top;
-      const left = rect.left;
-      const bottom = this.renderer.domElement.clientHeight - rect.bottom;
 
-      // const width = 280;
-      // const height = 200;
-      // const left = 22;
-      // // const bottom = 103;
-      // const bottom = 0;
-      // // l: 22, b: 103, w: 280.6640625, h: 200
+      const pixelRatio = window.devicePixelRatio;
+      const width = (rect.right - rect.left) * pixelRatio;
+      const height = (rect.bottom - rect.top) * pixelRatio;
+      const left = rect.left * pixelRatio;
+      const bottom =
+        pixelRatio * (this.renderer.domElement.clientHeight - rect.bottom);
 
       this.renderer.setViewport(left, bottom, width, height);
       this.renderer.setScissor(left, bottom, width, height);
