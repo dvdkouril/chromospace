@@ -3,18 +3,11 @@
 	import {
 		initScene,
 		display,
-		addModelToScene,
 		loadFromURL,
 		type ChromatinModel,
 		addChunkToScene,
 	} from "chromospace";
 	import chroma from "chroma-js";
-
-	let chromatinScene = initScene();
-
-	// $: [renderer, canvas] = display(chromatinScene, {
-	// 	alwaysRedraw: false,
-	// });
 
 	onMount(async () => {
 		const tan2018Model = (await loadFromURL(
@@ -29,7 +22,7 @@
 		// let appEl = document.querySelector("#app");
 		let appEl = document.querySelector("#grid-test");
 
-		const numOfViews = 20;
+		const numOfViews = 6;
 		for (let i = 0; i < numOfViews; i++) {
 			const viewConfig = {
 				scale: 0.005,
@@ -41,12 +34,12 @@
 			//~ take individual parts as chunks only
 			const chunk = tan2018Model.parts[i].chunk;
 			chromatinScene = addChunkToScene(chromatinScene, chunk, viewConfig);
-			const [renderer, canvas] = display(chromatinScene, {
+			const [renderer, el] = display(chromatinScene, {
 				alwaysRedraw: false,
 			});
 
-			if (canvas && appEl) {
-				appEl.appendChild(canvas);
+			if (el && appEl) {
+				appEl.appendChild(el);
 			}
 		}
 	});
@@ -61,16 +54,8 @@
 <style>
 	#grid-test {
 		display: grid;
-		/* background-color: red; */
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(5, 1fr);
 		gap: 10px; /* Spacing between grid items */
 		border: 2px solid black;
-	}
-	.grid-item {
-		background-color: lightblue;
-		border: 1px solid darkblue;
-		text-align: center;
-		line-height: 100px; /* Center text vertically for this example */
-		height: 300px;
 	}
 </style>
