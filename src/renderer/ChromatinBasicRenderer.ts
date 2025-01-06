@@ -409,10 +409,11 @@ export class ChromatinBasicRenderer {
       renderer.setSize(width, height, false);
       for (const c of this.composers) {
         c.setSize(width, height);
+        //~ not sure if this is necessary, but it mirrors what was happening before:
+        for (const pass of c.passes) {
+          pass.setSize(width, height);
+        }
       }
-      // const [pass1, pass2] = this.ssaoPasses;
-      // pass1.setSize(width, height);
-      // pass2.setSize(width, height);
     }
     return needResize;
   }
