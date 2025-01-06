@@ -35,10 +35,6 @@ export class ChromatinBasicRenderer {
 
   //~ threejs stuff
   renderer: THREE.WebGLRenderer;
-  // scene: THREE.Scene;
-  // camera: THREE.PerspectiveCamera;
-  // composer: EffectComposer;
-  // ssaoPasses: [N8AOPostPass, N8AOPostPass];
   meshes: THREE.InstancedMesh[] = [];
 
   //~ dom
@@ -74,11 +70,10 @@ export class ChromatinBasicRenderer {
       premultipliedAlpha: false,
       canvas,
     });
-    // this.renderer.setClearColor("#00eeee");
     this.renderer.setClearAlpha(0.0);
 
     this.render = this.render.bind(this);
-    this.update = this.update.bind(this);
+    // this.update = this.update.bind(this);
     this.getCanvasElement = this.getCanvasElement.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
     this.endDrawing = this.endDrawing.bind(this);
@@ -111,6 +106,10 @@ export class ChromatinBasicRenderer {
     document.addEventListener("keypress", this.onKeyPress);
   }
 
+  /**
+   * Creates and returns a new scene within this Renderer.
+   *
+   */
   initNewScene(): THREE.Scene {
     const newScene = new THREE.Scene();
     const newCamera = new THREE.PerspectiveCamera(25, 2, 0.1, 1000);
@@ -121,8 +120,6 @@ export class ChromatinBasicRenderer {
     newScene.userData.camera = newCamera;
 
     const newComposer = this.setupSSAOPasses(newScene, newCamera);
-
-    // this.markSegments = []; //~ TODO: temporary solution to solve the structures accumulating with mulptiple scenes
 
     this.scenes.push(newScene);
     this.composers.push(newComposer);
@@ -163,6 +160,9 @@ export class ChromatinBasicRenderer {
     return newComposer;
   }
 
+  /**
+   * TODO: Clear up the difference between the actual canvas and the proxy div
+   */
   getCanvasElement(): HTMLCanvasElement {
     return this.renderer.domElement;
   }
@@ -182,7 +182,6 @@ export class ChromatinBasicRenderer {
    * Entrypoint for adding actual data to show
    */
   addSegments(newSegments: DrawableMarkSegment[], forScene: THREE.Scene) {
-    // this.markSegments = [...this.markSegments, ...newSegments];
     const key = forScene.uuid; //~ gonna use the uuid as a key for storing the segments
     const existingSegments = this.markSegments.get(key) || [];
     this.markSegments.set(key, [...existingSegments, ...newSegments]);
@@ -351,67 +350,21 @@ export class ChromatinBasicRenderer {
     return needResize;
   }
 
-  update() {
-    //~ TODO: deal with, if we want to keep...
-    //
-    // this.raycaster.setFromCamera(this.mouse, this.camera);
-    //
-    // this.hoveredBinId = undefined;
-    // for (const [i, m] of this.meshes.entries()) {
-    //   const intersection = this.raycaster.intersectObject(m);
-    //   if (intersection.length > 0) {
-    //     const instanceId = intersection[0].instanceId;
-    //     if (instanceId) {
-    //       this.hoveredBinId = [i, instanceId];
-    //       if (this.updateCallback) {
-    //         this.updateCallback(`Hovered: part ${i}, bin ${instanceId}`);
-    //       }
-    //     }
-    //   } else {
-    //     if (this.updateCallback) {
-    //       this.updateCallback("");
-    //     }
-    //   }
-    // }
-    //
-    // //~ color neighboring sequence
-    // if (this.hoverEffect) {
-    //   if (this.hoveredBinId) {
-    //     const [segmentId, binId] = this.hoveredBinId;
-    //     const segment = this.markSegments[segmentId];
-    //
-    //     const min = -50;
-    //     const max = 50;
-    //     const colorScale = chroma.scale(["yellow", "red", "yellow"]);
-    //     const N = segment.positions.length;
-    //     const indices = Array.from({ length: N + 1 }, (_, i) => i - binId);
-    //     const color = indices.map((v) => colorScale.domain([min, max])(v));
-    //
-    //     this.updateColor(segmentId, color);
-    //   } else {
-    //     //~ reset all
-    //     for (const [i, s] of this.markSegments.entries()) {
-    //       this.updateColor(i, s.attributes.color);
-    //     }
-    //   }
-    // }
-  }
-
   render() {
     // this.canvas.style.transform = `translateY(${window.scrollY}px)`;
     console.log("ChromatinBasicRenderer::render()");
     // this.redrawRequest = requestAnimationFrame(this.render);
     const c = this.getCanvasElement();
     c.style.transform = `translateY(${window.scrollY}px)`;
-    // console.log(this.renderer.getSize());
 
-    this.renderer.setClearColor(0xffffff);
-    this.renderer.setClearAlpha(0.0); //~
+    //~ Clearing the whole fullscreen canvas (can be multiple scene)
+    this.renderer.setClearColor(0xffffff); //~ this is essentially useless because...
+    this.renderer.setClearAlpha(0.0); //~ ...we clear the texture with alpha = 0.0
     this.renderer.setScissorTest(false);
     this.renderer.clear();
 
     // this.renderer.setClearColor(0xe0e0e0);
-    this.renderer.setClearColor(0x00aa00);
+    this.renderer.setClearColor(0xffe4e1); //~ this determines the background of the scene
     this.renderer.setScissorTest(true);
 
     //~ from: https://github.com/mrdoob/three.js/blob/master/examples/webgl_multiple_elements.html
