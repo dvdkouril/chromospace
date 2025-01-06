@@ -360,15 +360,15 @@ export class ChromatinBasicRenderer {
       // get its position relative to the page's viewport
       const rect = element.getBoundingClientRect();
       // check if it's offscreen. If so skip it
-      // if (
-      //   rect.bottom < 0 ||
-      //   rect.top > this.renderer.domElement.clientHeight ||
-      //   rect.right < 0 ||
-      //   rect.left > this.renderer.domElement.clientWidth
-      // ) {
-      //   continue; // it's off screen
-      // }
-      // set the viewport
+      if (
+        rect.bottom < 0 ||
+        rect.top > this.renderer.domElement.clientHeight ||
+        rect.right < 0 ||
+        rect.left > this.renderer.domElement.clientWidth
+      ) {
+        console.log("~~~~~~~~~~~~~~skipping a scene");
+        continue; // it's off screen
+      }
 
       const pixelRatio = window.devicePixelRatio;
       const width = (rect.right - rect.left) * pixelRatio;
@@ -377,6 +377,7 @@ export class ChromatinBasicRenderer {
       const bottom =
         pixelRatio * (this.renderer.domElement.clientHeight - rect.bottom);
 
+      // set the viewport
       this.renderer.setViewport(left, bottom, width, height);
       this.renderer.setScissor(left, bottom, width, height);
 
