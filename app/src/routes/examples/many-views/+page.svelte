@@ -22,7 +22,7 @@
 		// let appEl = document.querySelector("#app");
 		let appEl = document.querySelector("#grid-test");
 
-		const numOfViews = 4;
+		const numOfViews = 3;
 		for (let i = 0; i < numOfViews; i++) {
 			const viewConfig = {
 				scale: 0.005,
@@ -33,8 +33,9 @@
 			let chromatinScene = initScene();
 			//~ take individual parts as chunks only
 			const chunk = tan2018Model.parts[i].chunk;
+			//~ DK finding: I might actually want to normalize+center chunks outside of only loading...
 			chromatinScene = addChunkToScene(chromatinScene, chunk, viewConfig);
-			const [renderer, el] = display(chromatinScene, {
+			const [_, el] = display(chromatinScene, {
 				alwaysRedraw: false,
 			});
 
@@ -54,7 +55,7 @@
 <style>
 	#grid-test {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(5, 1fr);
 		grid-auto-rows: 500px;
 		gap: 10px; /* Spacing between grid items */
 		border: 2px solid black;

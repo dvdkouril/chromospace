@@ -116,7 +116,8 @@ export function display(
 
   const elementToReturn = decideElementToReturn(viewportCounter, canvas);
   const threeScene = renderer.initNewScene(elementToReturn);
-  //~ store the dummy element (in wrapper) in the scene's userData (so that we can grab its rect during rendering)
+  //~ store the dummy element (in wrapper) in the scene's userData (so that we
+  //can grab its rect during rendering)
   buildStructures(scene.structures, renderer, threeScene);
   renderer.startDrawing();
 
