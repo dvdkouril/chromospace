@@ -162,22 +162,24 @@ function buildDisplayableModel(
   const n = model.structure.parts.length;
   const needColorsN = n;
   const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
+  let valuesIndexOffset = 0;
   for (const [i, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
 
     let scale: number | number[] = 0.01; //~ default scale
-    if (typeof vc.scale === "number") {
-      scale = vc.scale || 0.01;
-    } else {
-      if (vc.scale !== undefined) {
-        const min = vc.scale.min;
-        const max = vc.scale.max;
-        const scaleMin = vc.scale.scaleMin || 0.0001;
-        const scaleMax = vc.scale.scaleMax || 0.005;
-        scale = vc.scale.values.map((v) =>
-          valMap(v, min, max, scaleMin, scaleMax),
-        );
-      }
+    if (!vc.scale) {
+      scale = 0.01;
+    } else if (typeof vc.scale === "number") {
+      scale = vc.scale;
+    } else { //~ vs.scale is AssociatedValuesScale
+      const min = vc.scale.min;
+      const max = vc.scale.max;
+      const scaleMin = vc.scale.scaleMin || 0.0001;
+      const scaleMax = vc.scale.scaleMax || 0.005;
+      const valuesSubArr = vc.scale.values.slice(valuesIndexOffset, valuesIndexOffset + part.chunk.bins.length);
+      scale = valuesSubArr.map((v) =>
+        valMap(v, min, max, scaleMin, scaleMax),
+      );
     }
 
     const defaultColor = defaultChunkColors[i];
@@ -189,7 +191,8 @@ function buildDisplayableModel(
         const min = vc.color.min;
         const max = vc.color.max;
         const colorScale = chroma.scale(vc.color.colorScale);
-        color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
+        const valuesSubArr = vc.color.values.slice(valuesIndexOffset, valuesIndexOffset + part.chunk.bins.length);
+        color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
       }
     }
 
@@ -203,6 +206,7 @@ function buildDisplayableModel(
       },
     };
     segments.push(segment);
+    valuesIndexOffset += part.chunk.bins.length;
   }
   renderer.addSegments(segments);
 }
