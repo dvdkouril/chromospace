@@ -171,15 +171,17 @@ function buildDisplayableModel(
       scale = 0.01;
     } else if (typeof vc.scale === "number") {
       scale = vc.scale;
-    } else { //~ vs.scale is AssociatedValuesScale
+    } else {
+      //~ vs.scale is AssociatedValuesScale
       const min = vc.scale.min;
       const max = vc.scale.max;
       const scaleMin = vc.scale.scaleMin || 0.0001;
       const scaleMax = vc.scale.scaleMax || 0.005;
-      const valuesSubArr = vc.scale.values.slice(valuesIndexOffset, valuesIndexOffset + part.chunk.bins.length);
-      scale = valuesSubArr.map((v) =>
-        valMap(v, min, max, scaleMin, scaleMax),
+      const valuesSubArr = vc.scale.values.slice(
+        valuesIndexOffset,
+        valuesIndexOffset + part.chunk.bins.length,
       );
+      scale = valuesSubArr.map((v) => valMap(v, min, max, scaleMin, scaleMax));
     }
 
     const defaultColor = defaultChunkColors[i];
@@ -191,7 +193,10 @@ function buildDisplayableModel(
         const min = vc.color.min;
         const max = vc.color.max;
         const colorScale = chroma.scale(vc.color.colorScale);
-        const valuesSubArr = vc.color.values.slice(valuesIndexOffset, valuesIndexOffset + part.chunk.bins.length);
+        const valuesSubArr = vc.color.values.slice(
+          valuesIndexOffset,
+          valuesIndexOffset + part.chunk.bins.length,
+        );
         color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
       }
     }
