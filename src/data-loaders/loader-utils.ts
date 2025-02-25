@@ -1,4 +1,5 @@
 import { vec3 } from "gl-matrix";
+import { ChromatinPart } from "../chromatin-types";
 
 export type LoadOptions = {
   center?: boolean;
@@ -63,3 +64,44 @@ export const computeNormalizationFactor = (positions: vec3[]): number => {
 
   return scaleFactor;
 };
+
+function findCenter(bins: vec3[]): vec3 {
+  // If we only get a single bin then the bounding box has 0x0x0 dimensions, 
+  // which, for some reason, messes up the results
+  if (bins.length === 1) {
+    return bins[0];
+  }
+
+  const positions = bins;
+  const bbMax = positions.reduce(
+    (a, b) => vec3.max(vec3.create(), a, b),
+    vec3.fromValues(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE),
+  );
+  const bbMin = positions.reduce(
+    (a, b) => vec3.min(vec3.create(), a, b),
+    vec3.fromValues(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE),
+  );
+  const bbCenter = vec3.scale(
+    vec3.create(),
+    vec3.add(vec3.create(), bbMax, bbMin),
+    0.5,
+  );
+  return bbCenter;
+}
+
+/**
+ * I'm actually not sure if this approach will work:
+ * - compute center for each of the parts separately
+ * - then compute center of the centers
+ */
+export function computeModelCenter(parts: ChromatinPart[]): vec3 {
+  const centersOfParts: vec3[] = [];
+  for (const p of parts) {
+    const partCenter = findCenter(p.chunk.bins);
+    centersOfParts.push(partCenter);
+  }
+
+  const modelCenter = findCenter(centersOfParts);
+
+  return modelCenter;
+}

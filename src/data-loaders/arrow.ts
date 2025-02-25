@@ -13,6 +13,7 @@ import type {
 import { flattenAllBins } from "../utils";
 import {
   type LoadOptions,
+  computeModelCenter,
   computeNormalizationFactor,
   normalize,
   recenter,
@@ -169,11 +170,19 @@ function processTableAsModel(
     prevChrom = chrom;
   }
 
+
   // const rawBins = bins; //~ saving the original, unprocessed data
   // TODO: I'm not saving rawBins for ChromatinModels atm?
   options = options || { center: true, normalize: true };
   if (options.center) {
-    console.log("TODO: center bins when loading model");
+    const modelCenter = computeModelCenter(parts);
+    for (const p of parts) {
+      const chunkBins = p.chunk.bins;
+      const positionsCentered = chunkBins.map((a) =>
+        vec3.sub(vec3.create(), a, modelCenter),
+      );
+      p.chunk.bins = positionsCentered;
+    }
   }
 
   if (options.normalize) {
