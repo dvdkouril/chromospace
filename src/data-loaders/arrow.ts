@@ -170,7 +170,6 @@ function processTableAsModel(
     prevChrom = chrom;
   }
 
-
   // const rawBins = bins; //~ saving the original, unprocessed data
   // TODO: I'm not saving rawBins for ChromatinModels atm?
   options = options || { center: true, normalize: true };

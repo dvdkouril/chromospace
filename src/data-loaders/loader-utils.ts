@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix";
-import { ChromatinPart } from "../chromatin-types";
+import type { ChromatinPart } from "../chromatin-types";
 
 export type LoadOptions = {
   center?: boolean;
@@ -66,7 +66,7 @@ export const computeNormalizationFactor = (positions: vec3[]): number => {
 };
 
 function findCenter(bins: vec3[]): vec3 {
-  // If we only get a single bin then the bounding box has 0x0x0 dimensions, 
+  // If we only get a single bin then the bounding box has 0x0x0 dimensions,
   // which, for some reason, messes up the results
   if (bins.length === 1) {
     return bins[0];
