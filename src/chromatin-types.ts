@@ -70,7 +70,7 @@ export type DisplayableModel = {
 };
 
 export type AssociatedValues = {
-  values: number[];
+  values: number[] | string[];
   min: number;
   max: number;
 };

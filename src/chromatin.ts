@@ -153,6 +153,42 @@ function buildStructures(
   }
 }
 
+function resolveScale(vc: ViewConfig, valuesOffset: number, valuesLength: number): number | number[] {
+  let scale: number | number[] = 0.01; //~ default scale
+  if (!vc.scale) {
+    scale = 0.01;
+  } else if (typeof vc.scale === "number") {
+    scale = vc.scale;
+  } else {
+    //~ vc.scale is AssociatedValuesScale
+    const values = vc.scale.values;
+    if (values.length <= 0) {
+      //~ nothing we can do about empty array of values
+      return scale;
+    }
+
+    if (values.every(d => typeof d === 'number')) {
+      //~ quantitative size scale
+      const min = vc.scale.min;
+      const max = vc.scale.max;
+      const scaleMin = vc.scale.scaleMin || 0.0001;
+      const scaleMax = vc.scale.scaleMax || 0.005;
+      const valuesSubArr = values.slice(
+        valuesOffset,
+        valuesOffset + valuesLength,
+      );
+      scale = valuesSubArr.map((v) => valMap(v, min, max, scaleMin, scaleMax));
+    } else {
+      //~ string[] => nominal size scale
+      console.warn("TODO: not implemented");
+    }
+  }
+  return scale;
+}
+
+//function resolveColor() {
+//}
+
 function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
@@ -168,23 +204,7 @@ function buildDisplayableModel(
   for (const [i, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
 
-    let scale: number | number[] = 0.01; //~ default scale
-    if (!vc.scale) {
-      scale = 0.01;
-    } else if (typeof vc.scale === "number") {
-      scale = vc.scale;
-    } else {
-      //~ vs.scale is AssociatedValuesScale
-      const min = vc.scale.min;
-      const max = vc.scale.max;
-      const scaleMin = vc.scale.scaleMin || 0.0001;
-      const scaleMax = vc.scale.scaleMax || 0.005;
-      const valuesSubArr = vc.scale.values.slice(
-        valuesIndexOffset,
-        valuesIndexOffset + part.chunk.bins.length,
-      );
-      scale = valuesSubArr.map((v) => valMap(v, min, max, scaleMin, scaleMax));
-    }
+    let scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
 
     const defaultColor = defaultChunkColors[i];
     let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
@@ -206,7 +226,6 @@ function buildDisplayableModel(
         );
 
         if (typeof values[0] === "number") {
-          //console.log("numbeeeeeeeeeeeer");
           //~ quantitative color scale
           const min = vc.color.min;
           const max = vc.color.max;
