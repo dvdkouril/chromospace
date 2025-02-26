@@ -162,6 +162,8 @@ function buildDisplayableModel(
   const n = model.structure.parts.length;
   const needColorsN = n;
   const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
+  const colorsMap = new Map<string, string>();
+  let usedColors = 0;
   let valuesIndexOffset = 0;
   for (const [i, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
@@ -190,14 +192,42 @@ function buildDisplayableModel(
       if (typeof vc.color === "string") {
         color = chroma(vc.color);
       } else {
-        const min = vc.color.min;
-        const max = vc.color.max;
-        const colorScale = chroma.scale(vc.color.colorScale);
+        const values = vc.color.values;
+        if (values.length <= 0) {
+          //~ nothing we can do with an empty array...
+          return;
+        }
+
+
+        //console.log("gonna sliceeee");
         const valuesSubArr = vc.color.values.slice(
           valuesIndexOffset,
           valuesIndexOffset + part.chunk.bins.length,
         );
-        color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
+
+        if (typeof values[0] === "number") {
+          //console.log("numbeeeeeeeeeeeer");
+          //~ quantitative color scale
+          const min = vc.color.min;
+          const max = vc.color.max;
+          const colorScale = chroma.scale(vc.color.colorScale);
+          color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
+        } else {
+          //~ string[] => nominal color scale
+          //console.log("stringggggggssssss");
+          const colors = vc.color.colorScale as string[];
+          //console.log("valuesSubArr", valuesSubArr);
+          color = valuesSubArr.map(v => {
+            if (colorsMap.has(v)) {
+              return chroma(colorsMap.get(v));
+            } else {
+              colorsMap.set(v, colors[usedColors]);
+              usedColors += 1;
+              return chroma(colorsMap.get(v));
+            }
+          });
+          //console.log(color);
+        }
       }
     }
 
