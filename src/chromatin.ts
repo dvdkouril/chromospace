@@ -11,9 +11,6 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import {
-  customCubeHelix,
-  // decideVisualParameters,
-  // defaultColorScale,
   valMap,
 } from "./utils";
 
@@ -186,8 +183,59 @@ function resolveScale(vc: ViewConfig, valuesOffset: number, valuesLength: number
   return scale;
 }
 
-//function resolveColor() {
-//}
+/**
+ * returns a tuple: [color/colors for each bin; new value for `usedColors` for the colorsMap lookup]
+ * ...probably a bit unreadable solution, will fix later
+ */
+function resolveColor(vc: ViewConfig, colorsMap: Map<string, string>, usedColors: number, valuesOffset: number, valuesLength: number): [ChromaColor | ChromaColor[], number] {
+
+  const defaultColor = chroma("#ff00ff");
+  let color: ChromaColor | ChromaColor[] = defaultColor;
+  if (vc.color !== undefined) {
+    if (typeof vc.color === "string") {
+      color = chroma(vc.color);
+    } else {
+      const values = vc.color.values;
+      if (values.length <= 0) {
+        //~ nothing we can do with an empty array...
+        return [defaultColor, usedColors]; //~ TODO: no need to return early...
+      }
+
+      const valuesSubArr = values.slice(
+        valuesOffset,
+        valuesOffset + valuesLength,
+      );
+
+      if (valuesSubArr.every(d => typeof d === 'number')) {
+        //~ quantitative color scale
+        const min = vc.color.min;
+        const max = vc.color.max;
+        //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same
+        const colorScale =
+          (typeof vc.color.colorScale === 'string') ?
+            chroma.scale(vc.color.colorScale) :
+            chroma.scale(vc.color.colorScale);
+        color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
+      } else {
+        //~ string[] => nominal color scale
+        const colors = vc.color.colorScale;
+        color = valuesSubArr.map(v => {
+          if (colorsMap.has(v)) {
+            const c = colorsMap.get(v);
+            return c ? chroma(c) : defaultColor;
+          } else {
+            colorsMap.set(v, colors[usedColors]);
+            usedColors += 1;
+
+            const c = colorsMap.get(v);
+            return c ? chroma(c) : defaultColor;
+          }
+        });
+      }
+    }
+  }
+  return [color, usedColors];
+}
 
 function buildDisplayableModel(
   model: DisplayableModel,
@@ -195,60 +243,20 @@ function buildDisplayableModel(
 ) {
   const segments: DrawableMarkSegment[] = [];
 
-  const n = model.structure.parts.length;
-  const needColorsN = n;
-  const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
+  //const n = model.structure.parts.length;
+  //const needColorsN = n;
+  //const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
   const colorsMap = new Map<string, string>();
   let usedColors = 0;
   let valuesIndexOffset = 0;
-  for (const [i, part] of model.structure.parts.entries()) {
+  for (const [_, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
 
     let scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
 
-    const defaultColor = defaultChunkColors[i];
-    let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
-    if (vc.color !== undefined) {
-      if (typeof vc.color === "string") {
-        color = chroma(vc.color);
-      } else {
-        const values = vc.color.values;
-        if (values.length <= 0) {
-          //~ nothing we can do with an empty array...
-          return;
-        }
-
-
-        //console.log("gonna sliceeee");
-        const valuesSubArr = vc.color.values.slice(
-          valuesIndexOffset,
-          valuesIndexOffset + part.chunk.bins.length,
-        );
-
-        if (typeof values[0] === "number") {
-          //~ quantitative color scale
-          const min = vc.color.min;
-          const max = vc.color.max;
-          const colorScale = chroma.scale(vc.color.colorScale);
-          color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
-        } else {
-          //~ string[] => nominal color scale
-          //console.log("stringggggggssssss");
-          const colors = vc.color.colorScale as string[];
-          //console.log("valuesSubArr", valuesSubArr);
-          color = valuesSubArr.map(v => {
-            if (colorsMap.has(v)) {
-              return chroma(colorsMap.get(v));
-            } else {
-              colorsMap.set(v, colors[usedColors]);
-              usedColors += 1;
-              return chroma(colorsMap.get(v));
-            }
-          });
-          //console.log(color);
-        }
-      }
-    }
+    //~ TODO: THIS STILL NOT WORKING
+    let [color, newUsedColors] = resolveColor(vc, colorsMap, usedColors, valuesIndexOffset, part.chunk.bins.length);
+    usedColors = newUsedColors; //~ for better readability
 
     const segment: DrawableMarkSegment = {
       mark: model.viewConfig.mark || "sphere",
