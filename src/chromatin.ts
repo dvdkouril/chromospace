@@ -230,13 +230,12 @@ function resolveColor(
           if (colorsMap.has(v)) {
             const c = colorsMap.get(v);
             return c ? chroma(c) : defaultColor;
-          } else {
-            colorsMap.set(v, colors[usedColors]);
-            usedColors += 1;
-
-            const c = colorsMap.get(v);
-            return c ? chroma(c) : defaultColor;
           }
+          colorsMap.set(v, colors[usedColors]);
+          usedColors += 1;
+
+          const c = colorsMap.get(v);
+          return c ? chroma(c) : defaultColor;
         });
       }
     }
