@@ -243,9 +243,6 @@ function buildDisplayableModel(
 ) {
   const segments: DrawableMarkSegment[] = [];
 
-  //const n = model.structure.parts.length;
-  //const needColorsN = n;
-  //const defaultChunkColors = customCubeHelix.scale().colors(needColorsN, null);
   const colorsMap = new Map<string, string>();
   let usedColors = 0;
   let valuesIndexOffset = 0;
@@ -254,7 +251,8 @@ function buildDisplayableModel(
 
     let scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
 
-    //~ TODO: THIS STILL NOT WORKING
+    //~ bit more complicated, due to the need to remember 
+    //~ which values are mapped to which colors from the unsorted colormap
     let [color, newUsedColors] = resolveColor(vc, colorsMap, usedColors, valuesIndexOffset, part.chunk.bins.length);
     usedColors = newUsedColors; //~ for better readability
 
