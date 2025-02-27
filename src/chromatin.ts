@@ -285,13 +285,21 @@ function buildDisplayableChunk(
     scale = vc.scale || 0.01;
   } else {
     if (vc.scale !== undefined) {
-      const min = vc.scale.min;
-      const max = vc.scale.max;
-      const scaleMin = vc.scale.scaleMin || 0.001;
-      const scaleMax = vc.scale.scaleMax || 0.05;
-      scale = vc.scale.values.map((v) =>
-        valMap(v, min, max, scaleMin, scaleMax),
-      );
+
+      const values = vc.scale.values;
+      if (values.every(d => typeof d === 'number')) {
+        //~ quantitative size scale
+        const min = vc.scale.min;
+        const max = vc.scale.max;
+        const scaleMin = vc.scale.scaleMin || 0.001;
+        const scaleMax = vc.scale.scaleMax || 0.05;
+        scale = values.map((v) =>
+          valMap(v, min, max, scaleMin, scaleMax),
+        );
+      } else {
+        //~ string[] => nominal size scale
+        console.warn("TODO: not implemented (nominal size scale for chunk)");
+      }
     }
   }
 
@@ -300,10 +308,13 @@ function buildDisplayableChunk(
     if (typeof vc.color === "string") {
       color = chroma(vc.color);
     } else {
-      const min = vc.color.min;
-      const max = vc.color.max;
-      const colorScale = chroma.scale(vc.color.colorScale);
-      color = vc.color.values.map((v) => colorScale.domain([min, max])(v));
+      const values = vc.color.values;
+      if (values.every(d => typeof d === 'number')) {
+        const min = vc.color.min;
+        const max = vc.color.max;
+        const colorScale = chroma.scale(vc.color.colorScale);
+        color = values.map((v) => colorScale.domain([min, max])(v));
+      }
     }
   }
 
