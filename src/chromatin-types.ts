@@ -70,13 +70,14 @@ export type DisplayableModel = {
 };
 
 export type AssociatedValues = {
-  values: number[];
+  values: number[] | string[];
   min: number;
   max: number;
 };
 
 export type AssociatedValuesColor = AssociatedValues & {
-  colorScale: string;
+  /** Either a colorscale name (e.g., "viridis") or an array of categorical colors (e.g., ["#123456", "#abcdef", ...]) */
+  colorScale: string | string[];
 };
 
 export type AssociatedValuesScale = AssociatedValues & {
