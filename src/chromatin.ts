@@ -312,7 +312,13 @@ function buildDisplayableChunk(
       if (values.every(d => typeof d === 'number')) {
         const min = vc.color.min;
         const max = vc.color.max;
-        const colorScale = chroma.scale(vc.color.colorScale);
+
+        //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
+        //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
+        const colorScale =
+          (typeof vc.color.colorScale === 'string') ?
+            chroma.scale(vc.color.colorScale) :
+            chroma.scale(vc.color.colorScale);
         color = values.map((v) => colorScale.domain([min, max])(v));
       }
     }
