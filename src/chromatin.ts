@@ -10,9 +10,7 @@ import type {
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
-import {
-  valMap,
-} from "./utils";
+import { valMap } from "./utils";
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -150,7 +148,11 @@ function buildStructures(
   }
 }
 
-function resolveScale(vc: ViewConfig, valuesOffset: number, valuesLength: number): number | number[] {
+function resolveScale(
+  vc: ViewConfig,
+  valuesOffset: number,
+  valuesLength: number,
+): number | number[] {
   let scale: number | number[] = 0.01; //~ default scale
   if (!vc.scale) {
     scale = 0.01;
@@ -164,7 +166,7 @@ function resolveScale(vc: ViewConfig, valuesOffset: number, valuesLength: number
       return scale;
     }
 
-    if (values.every(d => typeof d === 'number')) {
+    if (values.every((d) => typeof d === "number")) {
       //~ quantitative size scale
       const min = vc.scale.min;
       const max = vc.scale.max;
@@ -187,8 +189,13 @@ function resolveScale(vc: ViewConfig, valuesOffset: number, valuesLength: number
  * returns a tuple: [color/colors for each bin; new value for `usedColors` for the colorsMap lookup]
  * ...probably a bit unreadable solution, will fix later
  */
-function resolveColor(vc: ViewConfig, colorsMap: Map<string, string>, usedColors: number, valuesOffset: number, valuesLength: number): [ChromaColor | ChromaColor[], number] {
-
+function resolveColor(
+  vc: ViewConfig,
+  colorsMap: Map<string, string>,
+  usedColors: number,
+  valuesOffset: number,
+  valuesLength: number,
+): [ChromaColor | ChromaColor[], number] {
   const defaultColor = chroma("#ff00ff");
   let color: ChromaColor | ChromaColor[] = defaultColor;
   if (vc.color !== undefined) {
@@ -206,20 +213,20 @@ function resolveColor(vc: ViewConfig, colorsMap: Map<string, string>, usedColors
         valuesOffset + valuesLength,
       );
 
-      if (valuesSubArr.every(d => typeof d === 'number')) {
+      if (valuesSubArr.every((d) => typeof d === "number")) {
         //~ quantitative color scale
         const min = vc.color.min;
         const max = vc.color.max;
         //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same
         const colorScale =
-          (typeof vc.color.colorScale === 'string') ?
-            chroma.scale(vc.color.colorScale) :
-            chroma.scale(vc.color.colorScale);
+          typeof vc.color.colorScale === "string"
+            ? chroma.scale(vc.color.colorScale)
+            : chroma.scale(vc.color.colorScale);
         color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
       } else {
         //~ string[] => nominal color scale
         const colors = vc.color.colorScale;
-        color = valuesSubArr.map(v => {
+        color = valuesSubArr.map((v) => {
           if (colorsMap.has(v)) {
             const c = colorsMap.get(v);
             return c ? chroma(c) : defaultColor;
@@ -249,11 +256,17 @@ function buildDisplayableModel(
   for (const [_, part] of model.structure.parts.entries()) {
     const vc = model.viewConfig;
 
-    let scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
+    const scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
 
-    //~ bit more complicated, due to the need to remember 
+    //~ bit more complicated, due to the need to remember
     //~ which values are mapped to which colors from the unsorted colormap
-    let [color, newUsedColors] = resolveColor(vc, colorsMap, usedColors, valuesIndexOffset, part.chunk.bins.length);
+    const [color, newUsedColors] = resolveColor(
+      vc,
+      colorsMap,
+      usedColors,
+      valuesIndexOffset,
+      part.chunk.bins.length,
+    );
     usedColors = newUsedColors; //~ for better readability
 
     const segment: DrawableMarkSegment = {
@@ -285,17 +298,14 @@ function buildDisplayableChunk(
     scale = vc.scale || 0.01;
   } else {
     if (vc.scale !== undefined) {
-
       const values = vc.scale.values;
-      if (values.every(d => typeof d === 'number')) {
+      if (values.every((d) => typeof d === "number")) {
         //~ quantitative size scale
         const min = vc.scale.min;
         const max = vc.scale.max;
         const scaleMin = vc.scale.scaleMin || 0.001;
         const scaleMax = vc.scale.scaleMax || 0.05;
-        scale = values.map((v) =>
-          valMap(v, min, max, scaleMin, scaleMax),
-        );
+        scale = values.map((v) => valMap(v, min, max, scaleMin, scaleMax));
       } else {
         //~ string[] => nominal size scale
         console.warn("TODO: not implemented (nominal size scale for chunk)");
@@ -309,16 +319,16 @@ function buildDisplayableChunk(
       color = chroma(vc.color);
     } else {
       const values = vc.color.values;
-      if (values.every(d => typeof d === 'number')) {
+      if (values.every((d) => typeof d === "number")) {
         const min = vc.color.min;
         const max = vc.color.max;
 
         //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
         //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
         const colorScale =
-          (typeof vc.color.colorScale === 'string') ?
-            chroma.scale(vc.color.colorScale) :
-            chroma.scale(vc.color.colorScale);
+          typeof vc.color.colorScale === "string"
+            ? chroma.scale(vc.color.colorScale)
+            : chroma.scale(vc.color.colorScale);
         color = values.map((v) => colorScale.domain([min, max])(v));
       }
     }
