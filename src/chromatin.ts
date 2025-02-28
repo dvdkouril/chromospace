@@ -179,7 +179,7 @@ function resolveScale(
       scale = valuesSubArr.map((v) => valMap(v, min, max, scaleMin, scaleMax));
     } else {
       //~ string[] => nominal size scale
-      console.warn("TODO: not implemented");
+      console.warn("TODO: not implemented (scale based on string[])");
     }
   }
   return scale;
@@ -191,10 +191,10 @@ function resolveScale(
  */
 function resolveColor(
   vc: ViewConfig,
-  colorsMap: Map<string, string>,
-  usedColors: number,
-  valuesOffset: number,
-  valuesLength: number,
+  colorsMap?: Map<string, string>,
+  usedColors?: number,
+  valuesOffset?: number,
+  valuesLength?: number,
 ): [ChromaColor | ChromaColor[], number] {
   const defaultColor = chroma("#ff00ff");
   let color: ChromaColor | ChromaColor[] = defaultColor;
@@ -205,7 +205,15 @@ function resolveColor(
       const values = vc.color.values;
       if (values.length <= 0) {
         //~ nothing we can do with an empty array...
-        return [defaultColor, usedColors]; //~ TODO: no need to return early...
+        return [defaultColor, usedColors || 0]; //~ TODO: no need to return early...
+      }
+
+      if (!valuesOffset || !valuesLength) {
+        return [defaultColor, usedColors || 0];
+      }
+
+      if (!usedColors || !colorsMap) {
+        return [defaultColor, 0];
       }
 
       const valuesSubArr = values.slice(
@@ -231,6 +239,10 @@ function resolveColor(
             const c = colorsMap.get(v);
             return c ? chroma(c) : defaultColor;
           }
+          if (!usedColors) {
+            //~ definitely an iffy if...needed because of the arrow function, but not totally clear if it's the best design (probably not)
+            return defaultColor;
+          }
           colorsMap.set(v, colors[usedColors]);
           usedColors += 1;
 
@@ -240,7 +252,7 @@ function resolveColor(
       }
     }
   }
-  return [color, usedColors];
+  return [color, usedColors || 0];
 }
 
 function buildDisplayableModel(
@@ -343,4 +355,72 @@ function buildDisplayableChunk(
     },
   };
   renderer.addSegments([segment]);
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  /* --- resolveScale ---*/
+
+  test("resolveScale(): empty viewconfig", () => {
+    const vc: ViewConfig = {};
+    const scale = resolveScale(vc, 0, 0);
+    expect(scale).toBe(0.01);
+  });
+
+  test("resolveScale(): scale is number", () => {
+    const vc: ViewConfig = {
+      scale: 0.123,
+    };
+    const scale = resolveScale(vc, 0, 0);
+    expect(scale).toBe(0.123);
+  });
+
+  test("resolveScale(): scale is number[]", () => {
+    const values = [0.1, 1.0];
+    const vc: ViewConfig = {
+      scale: {
+        values: values,
+        min: 0.1,
+        max: 1.0,
+        scaleMin: 1.0,
+        scaleMax: 10.0,
+      }
+    };
+    const scale = resolveScale(vc, 0, values.length);
+    expect(scale).toEqual([1.0, 10.0]);
+  });
+
+  //test("resolveScale(): scale is string[]", () => {
+  //  const values = ["A", "B"];
+  //  const vc: ViewConfig = {
+  //    scale: {
+  //      values: values,
+  //      min: 0,
+  //      max: 1,
+  //      scaleMin: 0.1,
+  //      scaleMax: 1.0,
+  //    }
+  //  };
+  //  const scale = resolveScale(vc, 0, values.length);
+  //  expect(scale).toEqual([1.0, 10.0]);
+  //});
+
+  /* --- resolveColor ---*/
+
+  test("resolveColor(): `color` is string", () => {
+    const vc: ViewConfig = {
+      color: "#123456"
+    };
+    const [color, _] = resolveColor(vc); //~ TODO: actually I shouldn't need the offset + length, since I don't supply a `values` array
+    expect((color as chroma.Color).hex()).toEqual("#123456");
+  });
+
+  test("resolveColor(): `color` is string[]", () => {
+    //const vc: ViewConfig = {
+    //  color: "#123456"
+    //};
+    //const [color, _] = resolveColor(vc); //~ TODO: actually I shouldn't need the offset + length, since I don't supply a `values` array
+    //expect((color as chroma.Color).hex()).toEqual("#123456");
+  });
 }

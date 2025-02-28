@@ -5,6 +5,7 @@ export default defineConfig({
     // environment: 'happy-dom',
     setupFiles: ["vitest.setup.js"],
     environment: "jsdom",
+    includeSource: ['src/**/*.{js,ts}'],
     deps: {
       // >= 0.34
       optimizer: {

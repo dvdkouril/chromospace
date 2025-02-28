@@ -21,7 +21,11 @@
     /* Emit declaration files */
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
+
+    "types": [
+      "vitest/importMeta",
+    ]
   },
   "include": ["src"]
 }
