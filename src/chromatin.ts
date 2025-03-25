@@ -93,10 +93,12 @@ export type DisplayOptions = {
 export function display(
   scene: ChromatinScene,
   options: DisplayOptions,
+  targetCanvas?: HTMLCanvasElement,
 ): [ChromatinBasicRenderer, HTMLElement | HTMLCanvasElement] {
   const renderer = new ChromatinBasicRenderer({
     alwaysRedraw: options.alwaysRedraw,
     hoverEffect: options.hoverEffect,
+    canvas: targetCanvas,
   });
   buildStructures(scene.structures, renderer);
   renderer.startDrawing();
