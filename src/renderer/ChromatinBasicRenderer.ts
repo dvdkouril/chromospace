@@ -19,7 +19,7 @@ import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor } from "chroma-js";
 import chroma from "chroma-js";
-import type { vec3 } from "gl-matrix";
+import { vec3 } from "gl-matrix";
 import { ChromatinSceneConfig } from "../chromatin-types";
 
 /**
