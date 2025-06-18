@@ -11,7 +11,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   decideVisualParametersBasedOn1DData,
-  estimateDefaultTubeSize,
   estimateBestSphereSize
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
