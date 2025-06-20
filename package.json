@@ -12,7 +12,9 @@
     "typecheck": "tsc",
     "fix": "biome check --write ."
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/chromospace.umd.cjs",
   "module": "./dist/chromospace.js",
   "types": "./dist/main.d.ts",
@@ -24,7 +26,7 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.0.2",
     "@types/chroma-js": "^2.4.5",
     "@types/node": "^22.10.2",
     "@types/three": "^0.171.0",
