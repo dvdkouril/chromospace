@@ -1,5 +1,6 @@
-import chroma from "chroma-js";
 import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
+import { vec3 } from "gl-matrix";
 import type {
   ChromatinChunk,
   ChromatinModel,
@@ -18,9 +19,6 @@ import { valMap } from "./utils";
 export function initScene(): ChromatinScene {
   return {
     structures: [],
-    config: {
-      layout: "center",
-    },
   };
 }
 
@@ -251,6 +249,8 @@ function buildDisplayableModel(
 ) {
   const segments: DrawableMarkSegment[] = [];
 
+  const modelPosition = model.viewConfig.position ?? vec3.fromValues(0, 0, 0);
+
   const colorsMap = new Map<string, string>();
   let usedColors = 0;
   let valuesIndexOffset = 0;
@@ -277,6 +277,7 @@ function buildDisplayableModel(
         color: color,
         size: scale,
         makeLinks: model.viewConfig.links || false,
+        position: modelPosition,
       },
     };
     segments.push(segment);
@@ -293,6 +294,8 @@ function buildDisplayableChunk(
   renderer: ChromatinBasicRenderer,
 ) {
   const vc = chunk.viewConfig;
+
+  const chunkPosition = chunk.viewConfig.position ?? vec3.fromValues(0, 0, 0);
 
   let scale: number | number[] = 0.01; //~ default scale
   if (typeof vc.scale === "number") {
@@ -342,6 +345,7 @@ function buildDisplayableChunk(
       color: color,
       size: scale,
       makeLinks: chunk.viewConfig.links || false,
+      position: chunkPosition,
     },
   };
   renderer.addSegments([segment]);

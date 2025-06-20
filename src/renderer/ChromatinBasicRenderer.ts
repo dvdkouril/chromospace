@@ -1,3 +1,6 @@
+import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
+import type { vec3 } from "gl-matrix";
 // @ts-ignore
 import { N8AOPostPass } from "n8ao";
 import {
@@ -11,14 +14,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   decideVisualParametersBasedOn1DData,
-  estimateDefaultTubeSize,
+  estimateBestSphereSize,
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
-
-import type { Color as ChromaColor } from "chroma-js";
-import chroma from "chroma-js";
-import type { vec3 } from "gl-matrix";
 
 /**
  * Basic implementation of a 3d chromatin renderer. Essentially just wraps THREE.WebGLRenderer but provides semantics for building chromatin visualization.
@@ -44,6 +43,7 @@ export class ChromatinBasicRenderer {
 
   alwaysRedraw = false;
   hoverEffect = false;
+  debugView = false;
 
   //~ interactions
   raycaster = new THREE.Raycaster();
@@ -174,6 +174,21 @@ export class ChromatinBasicRenderer {
     for (const segment of this.markSegments) {
       this.buildPart(segment);
     }
+
+    if (this.debugView) {
+      this.showDebugCube();
+    }
+  }
+
+  showDebugCube() {
+    //~ just something to debug the placement of objects in scene
+    const a = 1.0;
+    const indicatorGeom = new THREE.BoxGeometry(a, a, a);
+    const m = new THREE.MeshBasicMaterial({ color: "#000000" });
+    m.wireframe = true;
+    const indicator = new THREE.Mesh(indicatorGeom, m);
+    indicator.position.set(0, 0, 0);
+    this.scene.add(indicator);
   }
 
   /**
@@ -195,6 +210,10 @@ export class ChromatinBasicRenderer {
       makeLinks = true,
     } = segment.attributes;
 
+    const gPos = segment.attributes.position;
+
+    const sphereRadius = estimateBestSphereSize(segment.positions);
+
     //~ make the threejs objects
     const g = decideGeometry(segment.mark);
     const m = new THREE.MeshBasicMaterial({ color: "#FFFFFF" });
@@ -207,7 +226,7 @@ export class ChromatinBasicRenderer {
       const [colorOfThisBin, scaleOfThisBin] =
         decideVisualParametersBasedOn1DData(segment, i);
 
-      dummyObj.position.set(b[0], b[1], b[2]);
+      dummyObj.position.set(gPos[0] + b[0], gPos[1] + b[1], gPos[2] + b[2]);
       dummyObj.scale.setScalar(scaleOfThisBin);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
@@ -217,8 +236,10 @@ export class ChromatinBasicRenderer {
     this.meshes.push(meshInstcedSpheres);
 
     if (makeLinks) {
-      const tubeSize = estimateDefaultTubeSize(segment);
-      this.buildLinks(segment.positions, tubeSize, color);
+      //const tubeSize = estimateDefaultTubeSize(segment);
+      //this.buildLinks(segment.positions, tubeSize, color);
+      const tubeSize = 0.4 * sphereRadius;
+      this.buildLinks(segment.positions, tubeSize, color, gPos);
     }
   }
 
@@ -229,6 +250,7 @@ export class ChromatinBasicRenderer {
     positions: vec3[],
     tubeSize: number,
     color: ChromaColor | ChromaColor[],
+    partPosition: vec3,
   ) {
     //~ tubes between tubes
     const tubes = computeTubes(positions);
@@ -247,10 +269,16 @@ export class ChromatinBasicRenderer {
       tubes.length,
     );
 
+    const p = partPosition;
+
     const dummyObj = new THREE.Object3D();
     const colorObj = new THREE.Color();
     for (const [i, tube] of tubes.entries()) {
-      dummyObj.position.set(tube.position.x, tube.position.y, tube.position.z);
+      dummyObj.position.set(
+        tube.position.x + p[0],
+        tube.position.y + p[1],
+        tube.position.z + p[2],
+      );
       dummyObj.rotation.set(
         tube.rotation.x,
         tube.rotation.y,

@@ -12,9 +12,9 @@ import type {
 } from "../chromatin-types";
 import { flattenAllBins } from "../utils";
 import {
-  type LoadOptions,
   computeModelCenter,
   computeNormalizationFactor,
+  type LoadOptions,
   normalize,
   recenter,
 } from "./loader-utils";
@@ -114,7 +114,7 @@ function processTableAsModel(
   options?: LoadOptions,
 ): ChromatinModel {
   const parts: ChromatinPart[] = [];
-  let currentPart: ChromatinPart | undefined = undefined;
+  let currentPart: ChromatinPart | undefined;
   let prevChrom = "";
 
   const xCol = table.getChild("x");

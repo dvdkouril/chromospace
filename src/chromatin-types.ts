@@ -90,6 +90,7 @@ export type ViewConfig = {
   color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
   links?: boolean;
+  position?: vec3;
 };
 
 /**
@@ -102,10 +103,6 @@ export type Selection = {
   regions: GenomicCoordinates[];
   color: string;
   label: string;
-};
-
-type ChromatinSceneConfig = {
-  layout: "center" | "grid";
 };
 
 export type MarkTypes = "sphere" | "box" | "octahedron";
@@ -121,7 +118,6 @@ export type TrackViewConfig = {
  */
 export type ChromatinScene = {
   structures: (DisplayableChunk | DisplayableModel)[];
-  config: ChromatinSceneConfig;
 
   //~ grammar approach
 };

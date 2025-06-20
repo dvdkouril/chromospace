@@ -31,87 +31,43 @@
     <div id="app">
     </div>
     <script type="module">
-    import { parseTsv, parse3dg, addChunkToScene, addModelToScene, initScene, display, get } from './src/main.ts';
-
-      console.log("hello!");
-
-      const fetchTsv = async (url) => {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
-          const fileContent = await response.text();
-          return fileContent;
-      };
+    import { addChunkToScene, addModelToScene, initScene, display, loadFromURL } from './src/main.ts';
+    import { vec3 } from "gl-matrix";
 
       (async () => {
-          const url = "https://dl.dropboxusercontent.com/scl/fi/2lmqo9xo14bo8466xb2ia/dros.3.txt?rlkey=kb3zt0gjnh9h843y20rkrcq4a&e=1&dl=0";
-          const url2 = "https://dl.dropbox.com/scl/fi/bpd0t21ypyo0nyv3svi14/dros.9.txt?rlkey=i24mzd3hb1zruq7w8eshel9kq&dl=0";          
-          const url3 = "https://dl.dropbox.com/scl/fi/ha34hk0jdg8cj5i7va2lb/dros.26.txt?rlkey=duyjahmvxf64splqvpzndlup3&dl=0";
-
-          const fileContent = await fetchTsv(url);
-          const fileContent2 = await fetchTsv(url2);
-          const fileContent3 = await fetchTsv(url3);
-          const testChunk = parseTsv(fileContent, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
-          const testChunk2 = parseTsv(fileContent2, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
-          const testChunk3 = parseTsv(fileContent3, { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
-          console.log(testChunk);
-
-          const urlTan2018 = "https://dl.dropboxusercontent.com/scl/fi/lzv3ba5paum6srhte4z2t/GSM3271406_pbmc_18.impute.3dg.txt?rlkey=dc7k1gg5ghv2v7dsl0gg1uoo9&dl=0";
-          const fileTan2018 = await fetchTsv(urlTan2018);
-          const tan2018Model = parse3dg(fileTan2018 , { center: true, normalize: true }); //~ parseTsv(data, center = true) ? 
-          
-          //~ API testing
-          //~ this config specifies how the 3D model will look
-
-          // Used for the de-emphasized rest of the model
-          const unselected_ViewConfig = ({ 
-            scale: 0.005, 
-            coloring: "constant", 
-            color: "#a3a3a3",
-            links: false,
-          });
-
-          // Used for highlighted region
-          const selected_viewConfig = ({ 
-            scale: 0.02, 
-            coloring: "constant", 
-            color: "orange",
-            mark: "box",
-            links: true,
-          });
-
-          const num = testChunk.bins.length;
-          const sineWave = (amplitude, frequency, length) => Array.from({ length }, (_, i) => amplitude * Math.sin(frequency * i));
-          const sineValues = sineWave(100, 0.2, num);
+          const urlStevens = "https://pub-5c3f8ce35c924114a178c6e929fc3ac7.r2.dev/Stevens-2017_GSM2219497_Cell_1_model_5.arrow";
+          let structure = await loadFromURL(urlStevens , {
+			center: true,
+			normalize: true,
+		  });
+		  if (!structure) {
+			console.warn("unable to load structure from URL!");
+			return;
+		  }
 
           const viewConfig = ({ 
-            scale: {
-              values: sineValues,
-              min: -100,
-              max: 100,
-              scaleMin: 0.01,
-              scaleMax: 0.03,
-            },
+            scale: 0.01, 
+            color: "lightgreen",
             links: false,
-            mark: "sphere",
-            color: {
-              values: sineValues,
-              min: 0,
-              max: 100,
-              colorScale: "viridis",
-            },
           });
           
           //~ create a scene
           let chromatinScene = initScene();
-          chromatinScene = addChunkToScene(chromatinScene, testChunk, viewConfig);
-          // chromatinScene = addModelToScene(chromatinScene, tan2018Model, viewConfig);
 
-          // const [selectedPartA, selectionA] = get(tan2018Model, "1(pat)");
-          // const selectedModelA = {
-          //   parts: [selectedPartA],
-          // };
-          // chromatinScene = addModelToScene(chromatinScene, tan2018Model, unselected_ViewConfig);
-          // chromatinScene = addModelToScene(chromatinScene, selectedModelA, selected_viewConfig);
+
+          for (let i = 0; i < 8; i++) {
+            const randX = Math.random() - 0.5;
+            const randY = Math.random() - 0.5;
+            const randZ = Math.random() - 0.5;
+            const randomPosition = vec3.fromValues(randX, randY, randZ);
+            console.log("adding chunk nr. " + i);
+            const testChunk = structure.parts[i].chunk;
+            chromatinScene = addChunkToScene(chromatinScene, testChunk, 
+              {
+                ...viewConfig, 
+                position: randomPosition
+              });
+          }
           
           const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: true, withHUD: true});
 
