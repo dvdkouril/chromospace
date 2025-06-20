@@ -147,7 +147,7 @@ function buildStructures(
         buildDisplayableModel(s, renderer, sceneConfig);
         break;
       case "chunk":
-        buildDisplayableChunk(s, renderer);
+        buildDisplayableChunk(s, renderer, sceneConfig);
         break;
     }
   }
@@ -317,8 +317,11 @@ function buildDisplayableModel(
 function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
+  sceneConfig: ChromatinSceneConfig,
 ) {
   const vc = chunk.viewConfig;
+
+  const chunkPosition = decidePositionForStructure(sceneConfig, chunk.viewConfig);
 
   let scale: number | number[] = 0.01; //~ default scale
   if (typeof vc.scale === "number") {
@@ -361,11 +364,6 @@ function buildDisplayableChunk(
     }
   }
 
-  const randX = Math.random() * 0.5;
-  const randY = Math.random() * 0.5;
-  const randZ = Math.random() * 0.5;
-  const randomPosition = vec3.fromValues(randX, randY, randZ);
-
   const segment: DrawableMarkSegment = {
     mark: chunk.viewConfig.mark || "sphere",
     positions: chunk.structure.bins,
@@ -373,7 +371,7 @@ function buildDisplayableChunk(
       color: color,
       size: scale,
       makeLinks: chunk.viewConfig.links || false,
-      position: randomPosition, //~ TODO: use actual values
+      position: chunkPosition,
     },
   };
   renderer.addSegments([segment]);
