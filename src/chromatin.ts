@@ -1,5 +1,6 @@
 import chroma from "chroma-js";
 import type { Color as ChromaColor } from "chroma-js";
+import { vec3 } from "gl-matrix";
 import type {
   ChromatinChunk,
   ChromatinModel,
@@ -11,7 +12,6 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import { valMap } from "./utils";
-import { vec3 } from "gl-matrix";
 
 /**
  * Simple initializer for the ChromatinScene structure.

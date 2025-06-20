@@ -11,15 +11,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   decideVisualParametersBasedOn1DData,
-  estimateBestSphereSize
+  estimateBestSphereSize,
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
 
 import type { Color as ChromaColor } from "chroma-js";
 import chroma from "chroma-js";
-import { vec3 } from "gl-matrix";
-import { ChromatinSceneConfig } from "../chromatin-types";
+import type { vec3 } from "gl-matrix";
 
 /**
  * Basic implementation of a 3d chromatin renderer. Essentially just wraps THREE.WebGLRenderer but provides semantics for building chromatin visualization.
@@ -269,7 +268,11 @@ export class ChromatinBasicRenderer {
     const dummyObj = new THREE.Object3D();
     const colorObj = new THREE.Color();
     for (const [i, tube] of tubes.entries()) {
-      dummyObj.position.set(tube.position.x + p[0], tube.position.y + p[1], tube.position.z + p[2]);
+      dummyObj.position.set(
+        tube.position.x + p[0],
+        tube.position.y + p[1],
+        tube.position.z + p[2],
+      );
       dummyObj.rotation.set(
         tube.rotation.x,
         tube.rotation.y,
