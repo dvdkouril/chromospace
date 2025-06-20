@@ -11,18 +11,16 @@ import type {
 } from "./chromatin-types";
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
-import { valMap } from "./utils";
+import { calculateGridPositions, valMap } from "./utils";
 import { vec3 } from "gl-matrix";
 
 /**
  * Simple initializer for the ChromatinScene structure.
  */
-export function initScene(): ChromatinScene {
+export function initScene(c: ChromatinSceneConfig = { layout: "center" }): ChromatinScene {
   return {
     structures: [],
-    config: {
-      layout: "center",
-    },
+    config: c,
   };
 }
 
@@ -141,13 +139,13 @@ function buildStructures(
   renderer: ChromatinBasicRenderer,
   sceneConfig: ChromatinSceneConfig,
 ) {
-  for (const s of structures) {
+  for (const [i, s] of structures.entries()) {
     switch (s.kind) {
       case "model":
-        buildDisplayableModel(s, renderer, sceneConfig);
+        buildDisplayableModel(s, renderer, sceneConfig, i, structures.length);
         break;
       case "chunk":
-        buildDisplayableChunk(s, renderer, sceneConfig);
+        buildDisplayableChunk(s, renderer, sceneConfig, i, structures.length);
         break;
     }
   }
@@ -249,19 +247,25 @@ function resolveColor(
   return [color, usedColors];
 }
 
-function calculatePositionInScreenGrid(): vec3 {
-  console.warn("calculatePositionInScreenGrid: NOT IMPLEMENTED");
-  return vec3.fromValues(0, 0, 0);
+function calculatePositionInScreenGrid(index: number, n: number): vec3 {
+  //console.warn("calculatePositionInScreenGrid: NOT IMPLEMENTED");
+
+  const N = n;
+  const [gridX, gridY] = calculateGridPositions(index, N);
+  const gScale = 1.0 / Math.floor(Math.sqrt(N)); //~ I don't want the scale to be 0
+  const gPos = vec3.fromValues(gridX * gScale - 0.5, gridY * gScale - 0.5, 0);
+
+  return gPos;
 }
 
-function decidePositionForStructure(sceneConfig: ChromatinSceneConfig, viewConfig: ViewConfig): vec3 {
+function decidePositionForStructure(sceneConfig: ChromatinSceneConfig, viewConfig: ViewConfig, i: number, n: number): vec3 {
   //~ Based on mode of drawing the scene, we use different positioning
   if (sceneConfig.layout === "center") {
     // TODO: we'll use whatever is stored in `position` of `model`
     return viewConfig.position ?? vec3.fromValues(0, 0, 0);
   } else if (sceneConfig.layout === "grid") {
     // TODO: we'll compute the position based on where it fits in regular grid
-    return calculatePositionInScreenGrid();
+    return calculatePositionInScreenGrid(i, n);
   } else {
     return vec3.fromValues(0, 0, 0);
   }
@@ -271,10 +275,12 @@ function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
   sceneConfig: ChromatinSceneConfig,
+  structureIndex: number,
+  structuresNum: number,
 ) {
   const segments: DrawableMarkSegment[] = [];
 
-  const modelPosition = decidePositionForStructure(sceneConfig, model.viewConfig);
+  const modelPosition = decidePositionForStructure(sceneConfig, model.viewConfig, structureIndex, structuresNum);
 
   const colorsMap = new Map<string, string>();
   let usedColors = 0;
@@ -318,10 +324,12 @@ function buildDisplayableChunk(
   chunk: DisplayableChunk,
   renderer: ChromatinBasicRenderer,
   sceneConfig: ChromatinSceneConfig,
+  structureIndex: number,
+  structuresNum: number,
 ) {
   const vc = chunk.viewConfig;
 
-  const chunkPosition = decidePositionForStructure(sceneConfig, chunk.viewConfig);
+  const chunkPosition = decidePositionForStructure(sceneConfig, chunk.viewConfig, structureIndex, structuresNum);
 
   let scale: number | number[] = 0.01; //~ default scale
   if (typeof vc.scale === "number") {

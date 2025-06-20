@@ -34,15 +34,6 @@
     import { addChunkToScene, addModelToScene, initScene, display, loadFromURL } from './src/main.ts';
     import { vec3 } from "gl-matrix";
 
-      console.log("hello!");
-
-      const fetchTsv = async (url) => {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
-          const fileContent = await response.text();
-          return fileContent;
-      };
-
       (async () => {
           const urlStevens = "https://pub-5c3f8ce35c924114a178c6e929fc3ac7.r2.dev/Stevens-2017_GSM2219497_Cell_1_model_5.arrow";
           let structure = await loadFromURL(urlStevens , {
@@ -61,7 +52,7 @@
           });
           
           //~ create a scene
-          let chromatinScene = initScene();
+          let chromatinScene = initScene({layout: "grid"});
 
 
           for (let i = 0; i < 8; i++) {
@@ -71,8 +62,8 @@
             const randomPosition = vec3.fromValues(randX, randY, randZ);
             console.log("adding chunk nr. " + i);
             const testChunk = structure.parts[i].chunk;
-        chromatinScene = addChunkToScene(chromatinScene, testChunk, 
-          {...viewConfig, position: randomPosition});
+            chromatinScene = addChunkToScene(chromatinScene, testChunk, 
+              {...viewConfig, position: randomPosition});
           }
           
           const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: true, withHUD: true});
