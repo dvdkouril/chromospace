@@ -43,6 +43,7 @@ export class ChromatinBasicRenderer {
 
   alwaysRedraw = false;
   hoverEffect = false;
+  debugView = false;
 
   //~ interactions
   raycaster = new THREE.Raycaster();
@@ -174,7 +175,13 @@ export class ChromatinBasicRenderer {
       this.buildPart(segment);
     }
 
-    //~ hovered indicator
+    if (this.debugView) {
+      this.showDebugCube();
+    }
+  }
+
+  showDebugCube() {
+    //~ just something to debug the placement of objects in scene
     const a = 1.0;
     const indicatorGeom = new THREE.BoxGeometry(a, a, a);
     const m = new THREE.MeshBasicMaterial({ color: "#000000" });
