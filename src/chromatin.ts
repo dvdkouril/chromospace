@@ -1,5 +1,5 @@
-import chroma from "chroma-js";
 import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import type {
   ChromatinChunk,

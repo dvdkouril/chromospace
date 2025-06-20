@@ -1,6 +1,5 @@
-import { expect, test } from "vitest";
-
 import { fail } from "node:assert";
+import { expect, test } from "vitest";
 import type { ChromatinModel } from "../chromatin-types.ts";
 // import { parse3dg } from "../data-loaders/tsv-parser.ts";
 import { loadFromURL } from "../data-loaders/arrow.ts";

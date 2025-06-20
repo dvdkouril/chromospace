@@ -1,4 +1,8 @@
 // @ts-ignore
+
+import type { Color as ChromaColor } from "chroma-js";
+import chroma from "chroma-js";
+import type { vec3 } from "gl-matrix";
 import { N8AOPostPass } from "n8ao";
 import {
   EffectComposer,
@@ -15,10 +19,6 @@ import {
 } from "../utils";
 import { computeTubes, decideGeometry } from "./render-utils";
 import type { DrawableMarkSegment } from "./renderer-types";
-
-import type { Color as ChromaColor } from "chroma-js";
-import chroma from "chroma-js";
-import type { vec3 } from "gl-matrix";
 
 /**
  * Basic implementation of a 3d chromatin renderer. Essentially just wraps THREE.WebGLRenderer but provides semantics for building chromatin visualization.
