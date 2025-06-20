@@ -248,7 +248,7 @@ function resolveColor(
 }
 
 function calculatePositionInScreenGrid(index: number, n: number): vec3 {
-  //console.warn("calculatePositionInScreenGrid: NOT IMPLEMENTED");
+  console.warn("calculatePositionInScreenGrid: NOT FINISHED");
 
   const N = n;
   const [gridX, gridY] = calculateGridPositions(index, N);

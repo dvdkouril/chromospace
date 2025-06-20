@@ -10,7 +10,6 @@ import {
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
-  calculateGridPositions,
   decideVisualParametersBasedOn1DData,
   estimateBestSphereSize
 } from "../utils";
@@ -21,7 +20,6 @@ import type { Color as ChromaColor } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import { ChromatinSceneConfig } from "../chromatin-types";
-import { assert } from "../../src/assert.js";
 
 /**
  * Basic implementation of a 3d chromatin renderer. Essentially just wraps THREE.WebGLRenderer but provides semantics for building chromatin visualization.
@@ -181,8 +179,8 @@ export class ChromatinBasicRenderer {
    */
   buildStructures() {
     this.scene.clear();
-    for (const [i, segment] of this.markSegments.entries()) {
-      this.buildPart(segment, i);
+    for (const segment of this.markSegments) {
+      this.buildPart(segment);
     }
 
     //~ hovered indicator
@@ -207,19 +205,12 @@ export class ChromatinBasicRenderer {
   /**
    * Turns a singular segment (ie, position+mark+attributes) into THREEjs objects for rendering
    */
-  buildPart(segment: DrawableMarkSegment, index: number) {
+  buildPart(segment: DrawableMarkSegment) {
     const {
       color, //TODO: these don't make sense now to be undefined eveer
       // size = undefined,
       makeLinks = true,
     } = segment.attributes;
-
-    const N = this.markSegments.length;
-    const [gridX, gridY] = calculateGridPositions(index, N);
-    // const rndNum = Math.random() * 1 - 1;
-    const gScale = 1.0 / Math.floor(Math.sqrt(N)); //~ I don't want the scale to be 0
-    //const gPos = vec3.fromValues(gridX * gScale - 0.5, gridY * gScale - 0.5, 0);
-    // const gScale = 0.2; //~ I don't want the scale to be 0
 
     const gPos = segment.attributes.position;
 
@@ -237,8 +228,8 @@ export class ChromatinBasicRenderer {
       const [colorOfThisBin, scaleOfThisBin] =
         decideVisualParametersBasedOn1DData(segment, i);
 
-      dummyObj.position.set(gPos[0] + gScale * b[0], gPos[1] + gScale * b[1], gPos[2] + gScale * b[2]);
-      dummyObj.scale.setScalar(scaleOfThisBin * gScale);
+      dummyObj.position.set(gPos[0] + b[0], gPos[1] + b[1], gPos[2] + b[2]);
+      dummyObj.scale.setScalar(scaleOfThisBin);
       dummyObj.updateMatrix();
       meshInstcedSpheres.setMatrixAt(i, dummyObj.matrix);
       meshInstcedSpheres.setColorAt(i, colorOfThisBin);
