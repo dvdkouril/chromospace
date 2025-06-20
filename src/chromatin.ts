@@ -12,6 +12,7 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import { valMap } from "./utils";
+import { vec3 } from "gl-matrix";
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -143,7 +144,7 @@ function buildStructures(
   for (const s of structures) {
     switch (s.kind) {
       case "model":
-        buildDisplayableModel(s, renderer);
+        buildDisplayableModel(s, renderer, sceneConfig);
         break;
       case "chunk":
         buildDisplayableChunk(s, renderer);
@@ -248,11 +249,32 @@ function resolveColor(
   return [color, usedColors];
 }
 
+function calculatePositionInScreenGrid(): vec3 {
+  console.warn("calculatePositionInScreenGrid: NOT IMPLEMENTED");
+  return vec3.fromValues(0, 0, 0);
+}
+
+function decidePositionForStructure(sceneConfig: ChromatinSceneConfig, viewConfig: ViewConfig): vec3 {
+  //~ Based on mode of drawing the scene, we use different positioning
+  if (sceneConfig.layout === "center") {
+    // TODO: we'll use whatever is stored in `position` of `model`
+    return viewConfig.position ?? vec3.fromValues(0, 0, 0);
+  } else if (sceneConfig.layout === "grid") {
+    // TODO: we'll compute the position based on where it fits in regular grid
+    return calculatePositionInScreenGrid();
+  } else {
+    return vec3.fromValues(0, 0, 0);
+  }
+}
+
 function buildDisplayableModel(
   model: DisplayableModel,
   renderer: ChromatinBasicRenderer,
+  sceneConfig: ChromatinSceneConfig,
 ) {
   const segments: DrawableMarkSegment[] = [];
+
+  const modelPosition = decidePositionForStructure(sceneConfig, model.viewConfig);
 
   const colorsMap = new Map<string, string>();
   let usedColors = 0;
@@ -280,6 +302,7 @@ function buildDisplayableModel(
         color: color,
         size: scale,
         makeLinks: model.viewConfig.links || false,
+        position: modelPosition,
       },
     };
     segments.push(segment);
@@ -338,6 +361,11 @@ function buildDisplayableChunk(
     }
   }
 
+  const randX = Math.random() * 0.5;
+  const randY = Math.random() * 0.5;
+  const randZ = Math.random() * 0.5;
+  const randomPosition = vec3.fromValues(randX, randY, randZ);
+
   const segment: DrawableMarkSegment = {
     mark: chunk.viewConfig.mark || "sphere",
     positions: chunk.structure.bins,
@@ -345,6 +373,7 @@ function buildDisplayableChunk(
       color: color,
       size: scale,
       makeLinks: chunk.viewConfig.links || false,
+      position: randomPosition, //~ TODO: use actual values
     },
   };
   renderer.addSegments([segment]);

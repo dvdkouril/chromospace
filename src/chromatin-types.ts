@@ -90,6 +90,7 @@ export type ViewConfig = {
   color?: string | AssociatedValuesColor;
   mark?: MarkTypes;
   links?: boolean;
+  position?: vec3;
 };
 
 /**

@@ -22,4 +22,5 @@ export type VisualAttributes = {
   color: ChromaColor | ChromaColor[];
   size: number | number[];
   makeLinks: boolean;
+  position: vec3;
 };
