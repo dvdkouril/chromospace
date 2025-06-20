@@ -52,18 +52,21 @@
           });
           
           //~ create a scene
-          let chromatinScene = initScene({layout: "grid"});
+          let chromatinScene = initScene();
 
 
           for (let i = 0; i < 8; i++) {
-            const randX = Math.random() * 0.5;
-            const randY = Math.random() * 0.5;
-            const randZ = Math.random() * 0.5;
+            const randX = Math.random() - 0.5;
+            const randY = Math.random() - 0.5;
+            const randZ = Math.random() - 0.5;
             const randomPosition = vec3.fromValues(randX, randY, randZ);
             console.log("adding chunk nr. " + i);
             const testChunk = structure.parts[i].chunk;
             chromatinScene = addChunkToScene(chromatinScene, testChunk, 
-              {...viewConfig, position: randomPosition});
+              {
+                ...viewConfig, 
+                position: randomPosition
+              });
           }
           
           const [renderer, canvas] = display(chromatinScene, { alwaysRedraw: true, withHUD: true});

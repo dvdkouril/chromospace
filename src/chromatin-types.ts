@@ -105,10 +105,6 @@ export type Selection = {
   label: string;
 };
 
-export type ChromatinSceneConfig = {
-  layout: "center" | "grid";
-};
-
 export type MarkTypes = "sphere" | "box" | "octahedron";
 
 export type TrackViewConfig = {
@@ -122,7 +118,6 @@ export type TrackViewConfig = {
  */
 export type ChromatinScene = {
   structures: (DisplayableChunk | DisplayableModel)[];
-  config: ChromatinSceneConfig;
 
   //~ grammar approach
 };

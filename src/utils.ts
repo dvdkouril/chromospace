@@ -134,12 +134,3 @@ export function coordinateToBin(
   }
   return Math.floor((coordinate - sequenceOffset) / resolution);
 }
-
-export const calculateGridPositions = (i: number, N: number): [x: number, y: number] => {
-  //~ get the best aspect ratio:
-  const xDim = Math.floor(Math.sqrt(N));
-
-  let x = i % xDim;
-  let y = Math.floor(i / xDim);
-  return [x, y];
-};

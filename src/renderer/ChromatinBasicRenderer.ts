@@ -51,9 +51,6 @@ export class ChromatinBasicRenderer {
   mouse = new THREE.Vector2(1, 1);
   /* returns a tuple of [segment index, bin index] of hovered bin */
   hoveredBinId: [number, number] | undefined = undefined;
-  sceneConfig: ChromatinSceneConfig = {
-    layout: "center",
-  };
 
   constructor(params?: {
     canvas?: HTMLCanvasElement;
@@ -149,10 +146,6 @@ export class ChromatinBasicRenderer {
 
   getCanvasElement(): HTMLCanvasElement {
     return this.renderer.domElement;
-  }
-
-  setConfig(sceneConfig: ChromatinSceneConfig) {
-    this.sceneConfig = sceneConfig;
   }
 
   /**
