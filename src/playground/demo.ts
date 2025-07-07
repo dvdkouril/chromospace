@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix";
-import { addChunkToScene, display, initScene, loadFromURL } from "./main.ts";
+import { addChunkToScene, display, initScene, loadFromURL } from "../main.ts";
 
 (async () => {
   const urlStevens =
