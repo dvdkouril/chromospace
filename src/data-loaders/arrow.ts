@@ -1,23 +1,13 @@
 import {
-  Field,
-  type Float,
-  Float64,
-  Schema,
   Table,
   tableFromArrays,
   tableFromIPC,
 } from "apache-arrow";
-import { vec3 } from "gl-matrix";
 import type {
   ChromatinStructure
 } from "../chromatin-types";
-import { flattenAllBins } from "../utils";
 import {
-  computeModelCenter,
-  computeNormalizationFactor,
   type LoadOptions,
-  normalize,
-  recenter,
 } from "./loader-utils";
 
 /*
@@ -27,7 +17,7 @@ import {
 export async function loadFromURL(
   url: string,
   options: LoadOptions,
-): Promise<ChromatinChunk | ChromatinModel | undefined> {
+): Promise<ChromatinStructure | undefined> {
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -43,22 +33,6 @@ export async function loadFromURL(
   }
 }
 
-/**
- * Does a computation with the bin coordinates based on the options
- * returns a copy of the passed array with the changes applied
- */
-function processBins(bins: vec3[], options: LoadOptions): vec3[] {
-  //~ TODO: idea: just rename the original columns to xOriginal, yOriginal, zOriginal and save the processed positions as x, y, z.
-  let binsCopy = [...bins];
-  if (options.center) {
-    binsCopy = recenter(binsCopy);
-  }
-
-  if (options.normalize) {
-    binsCopy = normalize(binsCopy);
-  }
-  return binsCopy;
-}
 /**
  * Make an assertion.
  *
@@ -142,9 +116,9 @@ function processTableAsStructure(table: Table, options?: LoadOptions, name?: str
   let newTable = saveOriginalXYZ(table);
 
   // 2. center x, y, z coordinates if requested
-  //if (options.center) {
-  //  newTable = recenterXYZColumns(newTable);
-  //}
+  if (options.center) {
+    newTable = recenterXYZColumns(newTable);
+  }
 
   // 3. normalize x, y, z coordinates if requested
   //if (options.normalize) {
@@ -158,128 +132,6 @@ function processTableAsStructure(table: Table, options?: LoadOptions, name?: str
     data: newTable,
     name: name ?? "Sample Chromatin Structure",
     assembly: assembly ?? "unknown",
-  };
-}
-
-/**
- * Turns the Arrow Table into a ChromatinChunk object
- */
-function processTableAsChunk(
-  table: Table,
-  options?: LoadOptions,
-): ChromatinChunk {
-  const typedTable = table as Table<{ x: Float; y: Float; z: Float }>;
-  let bins: vec3[] = [];
-  for (let i = 0; i < typedTable.numRows; i++) {
-    const row = typedTable.get(i);
-    if (row) {
-      bins.push(vec3.fromValues(row.x, row.y, row.z));
-    } else {
-      console.error("Row of XYZ coords");
-    }
-  }
-
-  const rawBins = bins; //~ saving the original, unprocessed data
-  options = options || { center: true, normalize: true };
-  bins = processBins(bins, options);
-
-  return {
-    bins: bins,
-    rawBins: rawBins,
-    id: 0,
-  };
-}
-
-/**
- * Turns the Arrow Table into a ChromatinModel object
- */
-function processTableAsModel(
-  table: Table,
-  options?: LoadOptions,
-): ChromatinModel {
-  const parts: ChromatinPart[] = [];
-  let currentPart: ChromatinPart | undefined;
-  let prevChrom = "";
-
-  const xCol = table.getChild("x");
-  const yCol = table.getChild("y");
-  const zCol = table.getChild("z");
-  const chrCol = table.getChild("chr");
-  const coordCol = table.getChild("coord");
-  if (
-    xCol === null ||
-    yCol === null ||
-    zCol === null ||
-    chrCol === null ||
-    coordCol === null
-  ) {
-    return { parts: [] };
-  }
-  let modelResolution = 123;
-  const firstRow = table.get(0);
-  const secondRow = table.get(1);
-  if (firstRow && secondRow) {
-    const firstCoord = Number.parseInt(firstRow.coord);
-    const secondCoord = Number.parseInt(secondRow.coord);
-    modelResolution = secondCoord - firstCoord;
-  }
-  for (let i = 0; i < table.numRows; i++) {
-    const chrom = chrCol?.get(i) as string;
-    const startCoord = coordCol.get(i) as string;
-    const x = xCol.get(i) as number;
-    const y = yCol.get(i) as number;
-    const z = zCol.get(i) as number;
-
-    if (chrom !== prevChrom || currentPart === undefined) {
-      // new part
-      currentPart = {
-        chunk: {
-          bins: [],
-          rawBins: [],
-          id: 0, // TODO:
-        },
-        coordinates: {
-          start: Number.parseInt(startCoord),
-          end: Number.parseInt(startCoord),
-          chromosome: chrom,
-        },
-        resolution: modelResolution,
-        label: chrom,
-      };
-      parts.push(currentPart);
-    }
-
-    currentPart.chunk.bins.push(vec3.fromValues(x, y, z));
-    currentPart.coordinates.end = Number.parseInt(startCoord); //~ keep pushing the end of this part bin by bin
-    prevChrom = chrom;
-  }
-
-  // const rawBins = bins; //~ saving the original, unprocessed data
-  // TODO: I'm not saving rawBins for ChromatinModels atm?
-  options = options || { center: true, normalize: true };
-  if (options.center) {
-    const modelCenter = computeModelCenter(parts);
-    for (const p of parts) {
-      const chunkBins = p.chunk.bins;
-      const positionsCentered = chunkBins.map((a) =>
-        vec3.sub(vec3.create(), a, modelCenter),
-      );
-      p.chunk.bins = positionsCentered;
-    }
-  }
-
-  if (options.normalize) {
-    //~ parts.bins -> allBins
-    const allBins: vec3[] = flattenAllBins(parts.map((p) => p.chunk));
-    const scaleFactor = computeNormalizationFactor(allBins);
-    for (let i = 0; i < parts.length; i++) {
-      const bins = parts[i].chunk.bins;
-      parts[i].chunk.bins = normalize(bins, scaleFactor);
-    }
-  }
-
-  return {
-    parts: parts,
   };
 }
 
