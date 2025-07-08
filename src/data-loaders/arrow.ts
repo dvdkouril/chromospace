@@ -9,6 +9,7 @@ import type {
 import {
   type LoadOptions,
 } from "./loader-utils";
+import { assert } from "../assert.ts";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
@@ -33,18 +34,6 @@ export async function loadFromURL(
   }
 }
 
-/**
- * Make an assertion.
- *
- * @param expr - The expression to test.
- * @param msg - The optional message to display if the assertion fails.
- * @throws an {@link Error} if `expression` is not truthy.
- */
-export function assert(expr: unknown, msg?: string): asserts expr {
-  if (!expr) {
-    throw new Error(msg ?? "");
-  }
-}
 
 function recenterSingleColumn(col: number[]): number[] {
   const minVal = col.reduce((a, b) => Math.min(a, b), Number.MAX_VALUE);
