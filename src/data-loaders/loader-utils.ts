@@ -1,10 +1,30 @@
 import { vec3 } from "gl-matrix";
 import type { ChromatinPart } from "../chromatin-types";
+import { Schema } from "apache-arrow";
 
 export type LoadOptions = {
   center?: boolean;
   normalize?: boolean;
 };
+
+/**
+ * Will return true if the table schema contains only 3 columns named x, y, z
+ */
+export function isChunk(tableSchema: Schema): boolean {
+  return tableSchema.fields.length === 3 && hasXYZ(tableSchema);
+}
+
+/**
+ * Returns true when table schema contains x, y, z fields
+ */
+export function hasXYZ(tableSchema: Schema): boolean {
+  const columnNames = tableSchema.fields.map((f) => f.name);
+  return (
+    columnNames.includes("x") &&
+    columnNames.includes("y") &&
+    columnNames.includes("z")
+  );
+}
 
 export const recenter = (originalPositions: vec3[]): vec3[] => {
   const positions = originalPositions;
