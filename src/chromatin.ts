@@ -109,148 +109,8 @@ function buildStructures(
   }
 }
 
-function resolveScaleOld(
-  vc: ViewConfig,
-  valuesOffset: number,
-  valuesLength: number,
-): number | number[] {
-  let scale: number | number[] = 0.01; //~ default scale
-  if (!vc.scale) {
-    scale = 0.01;
-  } else if (typeof vc.scale === "number") {
-    scale = vc.scale;
-  } else {
-    //~ vc.scale is AssociatedValuesScale
-    const values = vc.scale.values;
-    if (values.length <= 0) {
-      //~ nothing we can do about empty array of values
-      return scale;
-    }
-
-    if (values.every((d) => typeof d === "number")) {
-      //~ quantitative size scale
-      const min = vc.scale.min;
-      const max = vc.scale.max;
-      const scaleMin = vc.scale.scaleMin || 0.0001;
-      const scaleMax = vc.scale.scaleMax || 0.005;
-      const valuesSubArr = values.slice(
-        valuesOffset,
-        valuesOffset + valuesLength,
-      );
-      scale = valuesSubArr.map((v) => valMap(v, min, max, scaleMin, scaleMax));
-    } else {
-      //~ string[] => nominal size scale
-      console.warn("TODO: not implemented");
-    }
-  }
-  return scale;
-}
-
-/**
- * returns a tuple: [color/colors for each bin; new value for `usedColors` for the colorsMap lookup]
- * ...probably a bit unreadable solution, will fix later
- */
-function resolveColorOld(
-  vc: ViewConfig,
-  colorsMap: Map<string, string>,
-  usedColors: number,
-  valuesOffset: number,
-  valuesLength: number,
-): [ChromaColor | ChromaColor[], number] {
-  const defaultColor = chroma("#ff00ff");
-  let color: ChromaColor | ChromaColor[] = defaultColor;
-  if (vc.color !== undefined) {
-    if (typeof vc.color === "string") {
-      color = chroma(vc.color);
-    } else {
-      const values = vc.color.values;
-      if (values.length <= 0) {
-        //~ nothing we can do with an empty array...
-        return [defaultColor, usedColors]; //~ TODO: no need to return early...
-      }
-
-      const valuesSubArr = values.slice(
-        valuesOffset,
-        valuesOffset + valuesLength,
-      );
-
-      if (valuesSubArr.every((d) => typeof d === "number")) {
-        //~ quantitative color scale
-        const min = vc.color.min;
-        const max = vc.color.max;
-        //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same
-        const colorScale =
-          typeof vc.color.colorScale === "string"
-            ? chroma.scale(vc.color.colorScale)
-            : chroma.scale(vc.color.colorScale);
-        color = valuesSubArr.map((v) => colorScale.domain([min, max])(v));
-      } else {
-        //~ string[] => nominal color scale
-        const colors = vc.color.colorScale;
-        color = valuesSubArr.map((v) => {
-          if (colorsMap.has(v)) {
-            const c = colorsMap.get(v);
-            return c ? chroma(c) : defaultColor;
-          }
-          colorsMap.set(v, colors[usedColors]);
-          usedColors += 1;
-
-          const c = colorsMap.get(v);
-          return c ? chroma(c) : defaultColor;
-        });
-      }
-    }
-  }
-  return [color, usedColors];
-}
-
-//function buildDisplayableModel(
-//  model: DisplayableModel,
-//  renderer: ChromatinBasicRenderer,
-//) {
-//  const segments: DrawableMarkSegment[] = [];
-//
-//  const modelPosition = model.viewConfig.position ?? vec3.fromValues(0, 0, 0);
-//
-//  const colorsMap = new Map<string, string>();
-//  let usedColors = 0;
-//  let valuesIndexOffset = 0;
-//  for (const [_, part] of model.structure.parts.entries()) {
-//    const vc = model.viewConfig;
-//
-//    const scale = resolveScale(vc, valuesIndexOffset, part.chunk.bins.length);
-//
-//    //~ bit more complicated, due to the need to remember
-//    //~ which values are mapped to which colors from the unsorted colormap
-//    const [color, newUsedColors] = resolveColor(
-//      vc,
-//      colorsMap,
-//      usedColors,
-//      valuesIndexOffset,
-//      part.chunk.bins.length,
-//    );
-//    usedColors = newUsedColors; //~ for better readability
-//
-//    const segment: DrawableMarkSegment = {
-//      mark: model.viewConfig.mark || "sphere",
-//      positions: part.chunk.bins,
-//      attributes: {
-//        color: color,
-//        size: scale,
-//        makeLinks: model.viewConfig.links || false,
-//        position: modelPosition,
-//      },
-//    };
-//    segments.push(segment);
-//    valuesIndexOffset += part.chunk.bins.length;
-//  }
-//  renderer.addSegments(segments);
-//}
-
 function resolveScale(
   vc: ViewConfig,
-  //valuesOffset: number,
-  //valuesLength: number,
 ): number | number[] {
 
   const defaultScale = 0.005; //~ default scale
@@ -285,10 +145,6 @@ function resolveScale(
 
 function resolveColor(
   vc: ViewConfig,
-  //colorsMap: Map<string, string>,
-  //usedColors: number,
-  //valuesOffset: number,
-  //valuesLength: number,
 ): ChromaColor | ChromaColor[] {
 
   const defaultColor = chroma("red"); //~ default color is red
@@ -316,10 +172,22 @@ function resolveColor(
     } else {
       //~ values: string[] => nominal color scale
       console.warn("TODO: not implemented (nominal color scale for chunk)");
+
+      const mapColorsValues = new Map<string, ChromaColor>();
+      color = [];
+      for (const val of values) {
+        if (mapColorsValues.has(val)) {
+          const usedColor = mapColorsValues.get(val)!; //~ I know I should get something because I just checked...
+          color.push(usedColor);
+        } else {
+          const newColor = chroma.random(); //~ TODO: use an actual color scale, not random
+          mapColorsValues.set(val, newColor);
+          color.push(newColor);
+        }
+      }
     }
   }
   return color;
-  //return [color, usedColors];
 }
 
 function buildDisplayableStructure(

@@ -16,7 +16,19 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   }
   console.log(`loaded structure: ${structure.name}`);
 
-  chromatinScene = addStructureToScene(chromatinScene, structure, {});
+  const table = structure.data;
+  const chromColumn = table.getChild("chr")!.toArray();
+
+  const vc = {
+    color: {
+      values: chromColumn,
+      //min: minVal,
+      //max: maxVal,
+      //colorScale: "Spectral",
+    },
+  };
+
+  chromatinScene = addStructureToScene(chromatinScene, structure, vc);
 
   return chromatinScene;
 };
@@ -69,8 +81,8 @@ const setupChunkExample = async (): Promise<ChromatinScene> => {
 
 (async () => {
 
-  //const chromatinScene = await setupWholeGenomeExample();
-  const chromatinScene = await setupChunkExample();
+  const chromatinScene = await setupWholeGenomeExample();
+  //const chromatinScene = await setupChunkExample();
 
   const [_, canvas] = display(chromatinScene, {
     alwaysRedraw: false,
