@@ -128,8 +128,8 @@ function resolveScale(
     const values = vc.scale.values;
     if (values.every((d) => typeof d === "number")) {
       //~ quantitative size scale
-      const min = vc.scale.min;
-      const max = vc.scale.max;
+      const min = vc.scale.min ?? 0; // default range <0, 1> seems reasonable...
+      const max = vc.scale.max ?? 1;
       const scaleMin = vc.scale.scaleMin || 0.001; // TODO: define default somewhere more explicit
       const scaleMax = vc.scale.scaleMax || 0.05; // TODO: define default somewhere more explicit
       scale = values.map((v) => valMap(v, min, max, scaleMin, scaleMax));
@@ -159,8 +159,8 @@ function resolveColor(
   } else {
     const values = vc.color.values;
     if (values.every((d) => typeof d === "number")) {
-      const min = vc.color.min;
-      const max = vc.color.max;
+      const min = vc.color.min ?? 0; // default range <0, 1> seems reasonable...
+      const max = vc.color.max ?? 1;
 
       //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
       //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
@@ -173,18 +173,28 @@ function resolveColor(
       //~ values: string[] => nominal color scale
       console.warn("TODO: not implemented (nominal color scale for chunk)");
 
-      const mapColorsValues = new Map<string, ChromaColor>();
       color = [];
-      for (const val of values) {
-        if (mapColorsValues.has(val)) {
-          const usedColor = mapColorsValues.get(val)!; //~ I know I should get something because I just checked...
-          color.push(usedColor);
-        } else {
-          const newColor = chroma.random(); //~ TODO: use an actual color scale, not random
-          mapColorsValues.set(val, newColor);
-          color.push(newColor);
+
+      // one pass to find how many unique values there are in the column
+      const uniqueValues = new Set<string>(values);
+      const numUniqueValues = uniqueValues.size;
+
+      const mapColorsValues = new Map<string, ChromaColor>();
+
+      let colors: string[] = [];
+      if (typeof vc.color.colorScale === "string") {
+        colors = chroma.scale(vc.color.colorScale).colors(numUniqueValues);
+      } else {
+        colors = vc.color.colorScale;
+      }
+      for (const [i, v] of [...uniqueValues].entries()) {
+        const newColor = colors[i];
+        if (!mapColorsValues.has(v)) {
+          mapColorsValues.set(v, chroma(newColor));
         }
       }
+
+      color = values.map((v) => mapColorsValues.get(v) || defaultColor);
     }
   }
   return color;

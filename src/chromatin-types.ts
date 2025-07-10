@@ -30,8 +30,8 @@ export type DisplayableStructure = {
 
 export type AssociatedValues = {
   values: number[] | string[];
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
 };
 
 export type AssociatedValuesColor = AssociatedValues & {

@@ -17,11 +17,12 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   console.log(`loaded structure: ${structure.name}`);
 
   const table = structure.data;
-  const chromColumn = table.getChild("chr")!.toArray();
+  const chromColumn = table.getChild("chr")!.toArray() as string[];
 
   const vc = {
     color: {
       values: chromColumn,
+      colorScale: "viridis",
       //min: minVal,
       //max: maxVal,
       //colorScale: "Spectral",
