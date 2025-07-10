@@ -249,21 +249,77 @@ function resolveColorOld(
 
 function resolveScale(
   vc: ViewConfig,
-  valuesOffset: number,
-  valuesLength: number,
+  //valuesOffset: number,
+  //valuesLength: number,
 ): number | number[] {
-  return 0.1; //~ default scale
+
+  const defaultScale = 0.005; //~ default scale
+  let scale: number | number[] = defaultScale;
+
+  if (!vc.scale) {
+    return scale;
+  }
+
+  if (typeof vc.scale === "number") {
+    //~ scale is a constant number for all bins
+    scale = vc.scale;
+  } else {
+    //~ scale is an array of numbers
+    const values = vc.scale.values;
+    if (values.every((d) => typeof d === "number")) {
+      //~ quantitative size scale
+      const min = vc.scale.min;
+      const max = vc.scale.max;
+      const scaleMin = vc.scale.scaleMin || 0.001; // TODO: define default somewhere more explicit
+      const scaleMax = vc.scale.scaleMax || 0.05; // TODO: define default somewhere more explicit
+      scale = values.map((v) => valMap(v, min, max, scaleMin, scaleMax));
+    } else {
+      //~ string[] => nominal size scale
+      // TODO:
+      console.warn("TODO: not implemented (nominal size scale for chunk)");
+    }
+  }
+  return scale;
 }
 
 
 function resolveColor(
   vc: ViewConfig,
-  colorsMap: Map<string, string>,
-  usedColors: number,
-  valuesOffset: number,
-  valuesLength: number,
-): [ChromaColor | ChromaColor[], number] {
-  return [chroma("red"), usedColors]; //~ default color is red
+  //colorsMap: Map<string, string>,
+  //usedColors: number,
+  //valuesOffset: number,
+  //valuesLength: number,
+): ChromaColor | ChromaColor[] {
+
+  const defaultColor = chroma("red"); //~ default color is red
+  let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
+
+  if (!vc.color) {
+    return color; //~ return default color
+  }
+
+  if (typeof vc.color === "string") {
+    color = chroma(vc.color);
+  } else {
+    const values = vc.color.values;
+    if (values.every((d) => typeof d === "number")) {
+      const min = vc.color.min;
+      const max = vc.color.max;
+
+      //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
+      //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
+      const colorScale =
+        typeof vc.color.colorScale === "string"
+          ? chroma.scale(vc.color.colorScale)
+          : chroma.scale(vc.color.colorScale);
+      color = values.map((v) => colorScale.domain([min, max])(v));
+    } else {
+      //~ values: string[] => nominal color scale
+      console.warn("TODO: not implemented (nominal color scale for chunk)");
+    }
+  }
+  return color;
+  //return [color, usedColors];
 }
 
 function buildDisplayableStructure(
@@ -284,10 +340,8 @@ function buildDisplayableStructure(
   }
 
   //2. calculate the visual attributes based on the viewConfig
-  //const color = resolveColor(vc);
-  //const scale = resolveScale(vc);
-  const color = chroma("red"); // TODO: implement color mapping
-  const scale = 0.005; // TODO: implement size mapping
+  const color = resolveColor(vc);
+  const scale = resolveScale(vc);
 
   const segment: DrawableMarkSegment = {
     mark: vc.mark || "sphere",
@@ -301,68 +355,3 @@ function buildDisplayableStructure(
   };
   renderer.addSegments([segment]);
 }
-
-///*
-// * Takes the data and viewConfig and makes specific DrawableSegments that the renderer can directly render (all visual attributes are decided)
-// */
-//function buildDisplayableChunk(
-//  chunk: DisplayableChunk,
-//  renderer: ChromatinBasicRenderer,
-//) {
-//  const vc = chunk.viewConfig;
-//
-//  const chunkPosition = chunk.viewConfig.position ?? vec3.fromValues(0, 0, 0);
-//
-//  let scale: number | number[] = 0.01; //~ default scale
-//  if (typeof vc.scale === "number") {
-//    scale = vc.scale || 0.01;
-//  } else {
-//    if (vc.scale !== undefined) {
-//      const values = vc.scale.values;
-//      if (values.every((d) => typeof d === "number")) {
-//        //~ quantitative size scale
-//        const min = vc.scale.min;
-//        const max = vc.scale.max;
-//        const scaleMin = vc.scale.scaleMin || 0.001;
-//        const scaleMax = vc.scale.scaleMax || 0.05;
-//        scale = values.map((v) => valMap(v, min, max, scaleMin, scaleMax));
-//      } else {
-//        //~ string[] => nominal size scale
-//        console.warn("TODO: not implemented (nominal size scale for chunk)");
-//      }
-//    }
-//  }
-//
-//  let color: ChromaColor | ChromaColor[] = chroma("red"); //~ default color is red
-//  if (vc.color !== undefined) {
-//    if (typeof vc.color === "string") {
-//      color = chroma(vc.color);
-//    } else {
-//      const values = vc.color.values;
-//      if (values.every((d) => typeof d === "number")) {
-//        const min = vc.color.min;
-//        const max = vc.color.max;
-//
-//        //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
-//        //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
-//        const colorScale =
-//          typeof vc.color.colorScale === "string"
-//            ? chroma.scale(vc.color.colorScale)
-//            : chroma.scale(vc.color.colorScale);
-//        color = values.map((v) => colorScale.domain([min, max])(v));
-//      }
-//    }
-//  }
-//
-//  const segment: DrawableMarkSegment = {
-//    mark: chunk.viewConfig.mark || "sphere",
-//    positions: chunk.structure.bins,
-//    attributes: {
-//      color: color,
-//      size: scale,
-//      makeLinks: chunk.viewConfig.links || false,
-//      position: chunkPosition,
-//    },
-//  };
-//  renderer.addSegments([segment]);
-//}
