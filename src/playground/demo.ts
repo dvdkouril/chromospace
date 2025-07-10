@@ -1,4 +1,4 @@
-import { loadFromURL } from "../main.ts";
+import { addStructureToScene, display, initScene, loadFromURL } from "../main.ts";
 
 (async () => {
   const urlStevens =
@@ -11,6 +11,24 @@ import { loadFromURL } from "../main.ts";
     console.warn("unable to load structure from URL!");
     return;
   }
+  console.log(`loaded structure: ${structure.name}`);
+
+  //~ create a scene
+  let chromatinScene = initScene();
+
+  chromatinScene = addStructureToScene(chromatinScene, structure, {});
+
+  const [renderer, canvas] = display(chromatinScene, {
+    alwaysRedraw: true,
+    withHUD: false,
+  });
+
+  //~ add canvas to the page
+  const appEl = document.querySelector("#app");
+  if (canvas && appEl) {
+    appEl.appendChild(canvas);
+  }
+
 
   //const viewConfig = {
   //  scale: 0.01,

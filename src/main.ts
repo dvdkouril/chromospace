@@ -1,6 +1,5 @@
 export {
-  addChunkToScene,
-  addModelToScene,
+  addStructureToScene,
   display,
   initScene,
 } from "./chromatin.ts";
