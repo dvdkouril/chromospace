@@ -7,9 +7,11 @@ import type {
   ChromatinStructure
 } from "../chromatin-types";
 import {
+  computeNormalizationFactor,
   type LoadOptions,
 } from "./loader-utils";
 import { assert } from "../assert.ts";
+import { vec3 } from "gl-matrix";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
@@ -45,6 +47,7 @@ function recenterSingleColumn(col: number[]): number[] {
 }
 
 function recenterXYZColumns(table: Table): Table {
+  console.log("Recentering x, y, z columns...");
 
   const columnNames = table.schema.fields.map((f) => f.name);
 
@@ -56,9 +59,61 @@ function recenterXYZColumns(table: Table): Table {
   const newYCol = recenterSingleColumn(table.getChild("y")!.toArray());
   const newZCol = recenterSingleColumn(table.getChild("z")!.toArray());
 
-  // create new arrow table
-  // TODO: copy over other columns
+  //~ building in object of arrays from the original table
+  const fields = table.schema.fields;
+  const oldTableObject = Object.fromEntries(
+    fields.map((f) => [f.name, table.getChild(f.name)!.toArray()]),
+  );
   const newTable = tableFromArrays({
+    ...oldTableObject,
+    x: newXCol,
+    y: newYCol,
+    z: newZCol,
+  });
+
+  return newTable;
+}
+
+function normalizeXYZColumns(table: Table): Table {
+  const columnNames = table.schema.fields.map((f) => f.name);
+
+  assert(columnNames.includes("x"), "x column is missing");
+  assert(columnNames.includes("y"), "y column is missing");
+  assert(columnNames.includes("z"), "z column is missing");
+
+  //~ get the original x, y, z positions as arrays
+  const origXCol = table.getChild("x")!.toArray();
+  const origYCol = table.getChild("y")!.toArray();
+  const origZCol = table.getChild("z")!.toArray();
+
+  //~ assemble them to vec3 array
+  const positions: vec3[] = [];
+  for (let i = 0; i < table.numRows; i++) {
+    positions.push(
+      vec3.fromValues(origXCol[i], origYCol[i], origZCol[i]),
+    );
+  }
+
+  //~ compute normalization factor, TODO: I guess there might be a more efficient way but this reuses the same function as before 
+  const scalingFactor = computeNormalizationFactor(positions);
+
+  //~ scale the positions
+  const positionsNormalized = positions.map((p) =>
+    vec3.scale(p, p, scalingFactor),
+  );
+
+  //~ turn back to coordinate arrays
+  const newXCol = positionsNormalized.map((p) => p[0]);
+  const newYCol = positionsNormalized.map((p) => p[1]);
+  const newZCol = positionsNormalized.map((p) => p[2]);
+
+  //~ building in object of arrays from the original table
+  const fields = table.schema.fields;
+  const oldTableObject = Object.fromEntries(
+    fields.map((f) => [f.name, table.getChild(f.name)!.toArray()]),
+  );
+  const newTable = tableFromArrays({
+    ...oldTableObject,
     x: newXCol,
     y: newYCol,
     z: newZCol,
@@ -110,9 +165,9 @@ function processTableAsStructure(table: Table, options?: LoadOptions, name?: str
   }
 
   // 3. normalize x, y, z coordinates if requested
-  //if (options.normalize) {
-  //  newTable = normalizeXYZColumns(newTable);
-  //}
+  if (options.normalize) {
+    newTable = normalizeXYZColumns(newTable);
+  }
 
   console.log(
     `processed Table, with #cols: ${newTable.numCols} and #row: ${newTable.numRows}`,
