@@ -287,7 +287,7 @@ function buildDisplayableStructure(
   //const color = resolveColor(vc);
   //const scale = resolveScale(vc);
   const color = chroma("red"); // TODO: implement color mapping
-  const scale = 0.01; // TODO: implement size mapping
+  const scale = 0.005; // TODO: implement size mapping
 
   const segment: DrawableMarkSegment = {
     mark: vc.mark || "sphere",
