@@ -3,7 +3,7 @@ import { addStructureToScene, ChromatinScene, display, initScene, loadFromURL } 
 const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   const urlStevens =
     "https://pub-5c3f8ce35c924114a178c6e929fc3ac7.r2.dev/Stevens-2017_GSM2219497_Cell_1_model_5.arrow";
-  //const structure = await loadFromURL(urlStevens, {
+
   let chromatinScene = initScene();
 
   const structure = await loadFromURL(urlStevens, {
