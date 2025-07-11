@@ -11,5 +11,4 @@ export { load, loadFromURL } from "./data-loaders/arrow.ts";
 export { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer.ts";
 export {
   get,
-  getBinsFromPart,
 } from "./selections.ts";
