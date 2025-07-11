@@ -1,15 +1,6 @@
-import {
-  Table,
-  tableFromArrays,
-  tableFromIPC,
-} from "apache-arrow";
-import type {
-  ChromatinStructure
-} from "../chromatin-types";
-import {
-  computeNormalizationFactor,
-  type LoadOptions,
-} from "./loader-utils";
+import { Table, tableFromArrays, tableFromIPC } from "apache-arrow";
+import type { ChromatinStructure } from "../chromatin-types";
+import { computeNormalizationFactor, type LoadOptions } from "./loader-utils";
 import { assert } from "../assert.ts";
 import { vec3 } from "gl-matrix";
 
@@ -35,7 +26,6 @@ export async function loadFromURL(
     return undefined;
   }
 }
-
 
 function recenterSingleColumn(col: number[]): number[] {
   const minVal = col.reduce((a, b) => Math.min(a, b), Number.MAX_VALUE);
@@ -89,12 +79,10 @@ function normalizeXYZColumns(table: Table): Table {
   //~ assemble them to vec3 array
   const positions: vec3[] = [];
   for (let i = 0; i < table.numRows; i++) {
-    positions.push(
-      vec3.fromValues(origXCol[i], origYCol[i], origZCol[i]),
-    );
+    positions.push(vec3.fromValues(origXCol[i], origYCol[i], origZCol[i]));
   }
 
-  //~ compute normalization factor, TODO: I guess there might be a more efficient way but this reuses the same function as before 
+  //~ compute normalization factor, TODO: I guess there might be a more efficient way but this reuses the same function as before
   const scalingFactor = computeNormalizationFactor(positions);
 
   //~ scale the positions
@@ -129,7 +117,9 @@ function saveOriginalXYZ(table: Table): Table {
     !columnNames.includes("y") ||
     !columnNames.includes("z")
   ) {
-    console.warn("failed to copy original x, y, z columns, missing one of them");
+    console.warn(
+      "failed to copy original x, y, z columns, missing one of them",
+    );
     return table;
   }
 
@@ -153,7 +143,12 @@ function saveOriginalXYZ(table: Table): Table {
   });
 }
 
-function processTableAsStructure(table: Table, options?: LoadOptions, name?: string, assembly?: string): ChromatinStructure {
+function processTableAsStructure(
+  table: Table,
+  options?: LoadOptions,
+  name?: string,
+  assembly?: string,
+): ChromatinStructure {
   options = options ?? { center: true, normalize: true };
 
   // 1. copy original x, y, z columns to the new ones (as backup of raw data)

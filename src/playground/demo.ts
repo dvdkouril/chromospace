@@ -1,4 +1,10 @@
-import { addStructureToScene, ChromatinScene, display, initScene, loadFromURL } from "../main.ts";
+import {
+  addStructureToScene,
+  ChromatinScene,
+  display,
+  initScene,
+  loadFromURL,
+} from "../main.ts";
 
 const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   const urlStevens =
@@ -20,7 +26,7 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
     color: {
       field: "chr", //~ uses the 'chr' column in the Arrow table that defines the structure
       colorScale: "spectral",
-    }
+    },
   };
 
   chromatinScene = addStructureToScene(chromatinScene, structure, vc);
@@ -29,7 +35,8 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
 };
 
 const setupChunkExample = async (): Promise<ChromatinScene> => {
-  const urlStevensChrf = "https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/refs/heads/main/gosling-3d/Stevens-2017_GSM2219497_Cell_1_model_1_chr_f.arrow";
+  const urlStevensChrf =
+    "https://raw.githubusercontent.com/dvdkouril/chromospace-sample-data/refs/heads/main/gosling-3d/Stevens-2017_GSM2219497_Cell_1_model_1_chr_f.arrow";
 
   let chromatinScene = initScene();
 
@@ -68,14 +75,12 @@ const setupChunkExample = async (): Promise<ChromatinScene> => {
     },
   };
 
-
   chromatinScene = addStructureToScene(chromatinScene, structure, viewConfig);
 
   return chromatinScene;
 };
 
 (async () => {
-
   const chromatinScene = await setupWholeGenomeExample();
   //const chromatinScene = await setupChunkExample();
 

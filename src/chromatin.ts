@@ -111,10 +111,7 @@ function buildStructures(
   }
 }
 
-function resolveScale(
-  vc: ViewConfig,
-): number | number[] {
-
+function resolveScale(vc: ViewConfig): number | number[] {
   const defaultScale = 0.005; //~ default scale
   let scale: number | number[] = defaultScale;
 
@@ -147,7 +144,10 @@ function resolveScale(
   return scale;
 }
 
-function mapValuesToColors(values: number[] | string[], vcColorField: AssociatedValuesColor): ChromaColor[] {
+function mapValuesToColors(
+  values: number[] | string[],
+  vcColorField: AssociatedValuesColor,
+): ChromaColor[] {
   const defaultColor = chroma("red"); //~ default color is red
 
   if (values.every((d) => typeof d === "number")) {
@@ -191,7 +191,6 @@ function resolveColor(
   table: Table,
   vc: ViewConfig,
 ): ChromaColor | ChromaColor[] {
-
   const defaultColor = chroma("red"); //~ default color is red
   let color: ChromaColor | ChromaColor[] = defaultColor; //~ default color is red
 
@@ -207,8 +206,7 @@ function resolveColor(
     const fieldName = vc.color.field;
     const valuesColumn = table.getChild(fieldName)!.toArray() as string[];
     color = mapValuesToColors(valuesColumn, vc.color);
-  }
-  else {
+  } else {
     //~ color should be based on values in the 'values' array
     if (!vc.color.values) {
       return defaultColor; //~ return default color
@@ -222,7 +220,6 @@ function buildDisplayableStructure(
   structure: DisplayableStructure,
   renderer: ChromatinBasicRenderer,
 ) {
-
   const vc = structure.viewConfig;
 
   //1. assemble the xyz into vec3s

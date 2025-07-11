@@ -20,7 +20,6 @@ export type ChromatinStructure = {
  */
 export type ChromatinScene = {
   structures: DisplayableStructure[];
-
 };
 
 export type DisplayableStructure = {
@@ -60,4 +59,3 @@ export type TrackViewConfig = {
   links: boolean;
   color?: string;
 };
-
