@@ -29,7 +29,8 @@ export type DisplayableStructure = {
 };
 
 export type AssociatedValues = {
-  values: number[] | string[];
+  values?: number[] | string[];
+  field?: string; //~ used to specify the field in the Table that contains the values
   min?: number;
   max?: number;
 };

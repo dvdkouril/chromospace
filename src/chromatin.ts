@@ -2,6 +2,7 @@ import type { Color as ChromaColor } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import type {
+  AssociatedValuesColor,
   ChromatinScene,
   ChromatinStructure,
   DisplayableStructure,
@@ -10,6 +11,7 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import { valMap } from "./utils";
+import { Table } from "apache-arrow";
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -126,6 +128,9 @@ function resolveScale(
   } else {
     //~ scale is an array of numbers
     const values = vc.scale.values;
+    if (!values) {
+      return defaultScale; //~ return default scale
+    }
     if (values.every((d) => typeof d === "number")) {
       //~ quantitative size scale
       const min = vc.scale.min ?? 0; // default range <0, 1> seems reasonable...
@@ -142,8 +147,48 @@ function resolveScale(
   return scale;
 }
 
+function mapValuesToColors(values: number[] | string[], vcColorField: AssociatedValuesColor): ChromaColor[] {
+  const defaultColor = chroma("red"); //~ default color is red
+
+  if (values.every((d) => typeof d === "number")) {
+    const min = vcColorField.min ?? 0; // default range <0, 1> seems reasonable...
+    const max = vcColorField.max ?? 1;
+
+    //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
+    //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
+    const colorScale =
+      typeof vcColorField.colorScale === "string"
+        ? chroma.scale(vcColorField.colorScale)
+        : chroma.scale(vcColorField.colorScale);
+    return values.map((v) => colorScale.domain([min, max])(v));
+  } else {
+    //~ values: string[] => nominal color scale
+
+    // one pass to find how many unique values there are in the column
+    const uniqueValues = new Set<string>(values);
+    const numUniqueValues = uniqueValues.size;
+
+    const mapColorsValues = new Map<string, ChromaColor>();
+
+    let colors: string[] = [];
+    if (typeof vcColorField.colorScale === "string") {
+      colors = chroma.scale(vcColorField.colorScale).colors(numUniqueValues);
+    } else {
+      colors = vcColorField.colorScale;
+    }
+    for (const [i, v] of [...uniqueValues].entries()) {
+      const newColor = colors[i];
+      if (!mapColorsValues.has(v)) {
+        mapColorsValues.set(v, chroma(newColor));
+      }
+    }
+
+    return values.map((v) => mapColorsValues.get(v) || defaultColor);
+  }
+}
 
 function resolveColor(
+  table: Table,
   vc: ViewConfig,
 ): ChromaColor | ChromaColor[] {
 
@@ -155,47 +200,20 @@ function resolveColor(
   }
 
   if (typeof vc.color === "string") {
+    //~ color is a single color string
     color = chroma(vc.color);
-  } else {
-    const values = vc.color.values;
-    if (values.every((d) => typeof d === "number")) {
-      const min = vc.color.min ?? 0; // default range <0, 1> seems reasonable...
-      const max = vc.color.max ?? 1;
-
-      //~ DK: For some reason, typescript complains if you don't narrow the type, even though the call is exactly the same.
-      //~ This doesn't work: `const colorScale = chroma.scale(vc.color.colorScale)`
-      const colorScale =
-        typeof vc.color.colorScale === "string"
-          ? chroma.scale(vc.color.colorScale)
-          : chroma.scale(vc.color.colorScale);
-      color = values.map((v) => colorScale.domain([min, max])(v));
-    } else {
-      //~ values: string[] => nominal color scale
-      console.warn("TODO: not implemented (nominal color scale for chunk)");
-
-      color = [];
-
-      // one pass to find how many unique values there are in the column
-      const uniqueValues = new Set<string>(values);
-      const numUniqueValues = uniqueValues.size;
-
-      const mapColorsValues = new Map<string, ChromaColor>();
-
-      let colors: string[] = [];
-      if (typeof vc.color.colorScale === "string") {
-        colors = chroma.scale(vc.color.colorScale).colors(numUniqueValues);
-      } else {
-        colors = vc.color.colorScale;
-      }
-      for (const [i, v] of [...uniqueValues].entries()) {
-        const newColor = colors[i];
-        if (!mapColorsValues.has(v)) {
-          mapColorsValues.set(v, chroma(newColor));
-        }
-      }
-
-      color = values.map((v) => mapColorsValues.get(v) || defaultColor);
+  } else if (vc.color.field) {
+    //~ color should be based on values in a column name in 'field'
+    const fieldName = vc.color.field;
+    const valuesColumn = table.getChild(fieldName)!.toArray() as string[];
+    color = mapValuesToColors(valuesColumn, vc.color);
+  }
+  else {
+    //~ color should be based on values in the 'values' array
+    if (!vc.color.values) {
+      return defaultColor; //~ return default color
     }
+    color = mapValuesToColors(vc.color.values, vc.color);
   }
   return color;
 }
@@ -218,7 +236,7 @@ function buildDisplayableStructure(
   }
 
   //2. calculate the visual attributes based on the viewConfig
-  const color = resolveColor(vc);
+  const color = resolveColor(structure.structure.data, vc);
   const scale = resolveScale(vc);
 
   const segment: DrawableMarkSegment = {
