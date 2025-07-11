@@ -16,15 +16,6 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   }
   console.log(`loaded structure: ${structure.name}`);
 
-  //const table = structure.data;
-  //const chromColumn = table.getChild("chr")!.toArray() as string[];
-  //const vc = {
-  //  color: {
-  //    values: chromColumn,
-  //    colorScale: "viridis",
-  //  },
-  //};
-
   const vc = {
     color: {
       field: "chr", //~ uses the 'chr' column in the Arrow table that defines the structure
@@ -98,66 +89,4 @@ const setupChunkExample = async (): Promise<ChromatinScene> => {
   if (canvas && appEl) {
     appEl.appendChild(canvas);
   }
-
-
-  //const viewConfig = {
-  //  scale: 0.01,
-  //  color: "lightgreen",
-  //  links: false,
-  //};
-  //
-  ////~ create a scene
-  //let chromatinScene = initScene();
-  //
-  //for (let i = 0; i < 8; i++) {
-  //  const randX = Math.random() - 0.5;
-  //  const randY = Math.random() - 0.5;
-  //  const randZ = Math.random() - 0.5;
-  //  const randomPosition = vec3.fromValues(randX, randY, randZ);
-  //  console.log(`adding chunk nr. ${i}`);
-  //  if ("parts" in structure) {
-  //    const testChunk = structure.parts[i].chunk;
-  //    chromatinScene = addChunkToScene(chromatinScene, testChunk, {
-  //      ...viewConfig,
-  //      position: randomPosition,
-  //    });
-  //  }
-  //}
-  //
-  //const [renderer, canvas] = display(chromatinScene, {
-  //  alwaysRedraw: true,
-  //  withHUD: true,
-  //});
-  //
-  ////~ add canvas to the page
-  //const appEl = document.querySelector("#app");
-  //if (canvas && appEl) {
-  //  appEl.appendChild(canvas);
-  //}
-  //
-  //const elem = document.querySelector("#screenshot");
-  //if (elem) {
-  //  elem.addEventListener("click", () => {
-  //    renderer.render();
-  //    if (canvas instanceof HTMLCanvasElement) {
-  //      canvas.toBlob((blob: Blob | null) => {
-  //        saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
-  //      });
-  //    }
-  //  });
-  //}
-
-  //const saveBlob = (() => {
-  //  const a = document.createElement("a");
-  //  document.body.appendChild(a);
-  //  a.style.display = "none";
-  //  return function saveData(blob: Blob | null, fileName: string) {
-  //    if (blob) {
-  //      const url = window.URL.createObjectURL(blob);
-  //      a.href = url;
-  //      a.download = fileName;
-  //      a.click();
-  //    }
-  //  };
-  //})();
 })();
