@@ -1,4 +1,4 @@
-import { Table, tableFromArrays, tableFromIPC } from "apache-arrow";
+import { type Table, tableFromArrays, tableFromIPC } from "apache-arrow";
 import type { ChromatinStructure } from "../chromatin-types";
 import { computeNormalizationFactor, type LoadOptions } from "./loader-utils";
 import { assert } from "../assert.ts";

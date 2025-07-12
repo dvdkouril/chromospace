@@ -1,4 +1,4 @@
-import { Table } from "apache-arrow";
+import type { Table } from "apache-arrow";
 import type { vec3 } from "gl-matrix";
 
 /**

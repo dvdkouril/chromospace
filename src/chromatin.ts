@@ -11,7 +11,7 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import { valMap } from "./utils";
-import { Table } from "apache-arrow";
+import type { Table } from "apache-arrow";
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -161,30 +161,29 @@ function mapValuesToColors(
         ? chroma.scale(vcColorField.colorScale)
         : chroma.scale(vcColorField.colorScale);
     return values.map((v) => colorScale.domain([min, max])(v));
-  } else {
-    //~ values: string[] => nominal color scale
-
-    // one pass to find how many unique values there are in the column
-    const uniqueValues = new Set<string>(values);
-    const numUniqueValues = uniqueValues.size;
-
-    const mapColorsValues = new Map<string, ChromaColor>();
-
-    let colors: string[] = [];
-    if (typeof vcColorField.colorScale === "string") {
-      colors = chroma.scale(vcColorField.colorScale).colors(numUniqueValues);
-    } else {
-      colors = vcColorField.colorScale;
-    }
-    for (const [i, v] of [...uniqueValues].entries()) {
-      const newColor = colors[i];
-      if (!mapColorsValues.has(v)) {
-        mapColorsValues.set(v, chroma(newColor));
-      }
-    }
-
-    return values.map((v) => mapColorsValues.get(v) || defaultColor);
   }
+  //~ values: string[] => nominal color scale
+
+  // one pass to find how many unique values there are in the column
+  const uniqueValues = new Set<string>(values);
+  const numUniqueValues = uniqueValues.size;
+
+  const mapColorsValues = new Map<string, ChromaColor>();
+
+  let colors: string[] = [];
+  if (typeof vcColorField.colorScale === "string") {
+    colors = chroma.scale(vcColorField.colorScale).colors(numUniqueValues);
+  } else {
+    colors = vcColorField.colorScale;
+  }
+  for (const [i, v] of [...uniqueValues].entries()) {
+    const newColor = colors[i];
+    if (!mapColorsValues.has(v)) {
+      mapColorsValues.set(v, chroma(newColor));
+    }
+  }
+
+  return values.map((v) => mapColorsValues.get(v) || defaultColor);
 }
 
 function resolveColor(

@@ -1,6 +1,6 @@
 import {
   addStructureToScene,
-  ChromatinScene,
+  type ChromatinScene,
   display,
   initScene,
   loadFromURL,

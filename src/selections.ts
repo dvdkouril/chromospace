@@ -1,4 +1,4 @@
-import { Table } from "apache-arrow";
+import type { Table } from "apache-arrow";
 
 /**
  * Query for model parts on specified genomic coordinates
