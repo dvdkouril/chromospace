@@ -1,8 +1,8 @@
 import { type Table, tableFromArrays, tableFromIPC } from "apache-arrow";
+import { vec3 } from "gl-matrix";
+import { assert } from "../assert.ts";
 import type { ChromatinStructure } from "../chromatin-types";
 import { computeNormalizationFactor, type LoadOptions } from "./loader-utils";
-import { assert } from "../assert.ts";
-import { vec3 } from "gl-matrix";
 
 /*
  * Inspired by: https://github.com/vega/vega-loader-arrow/blob/main/src/arrow.js
@@ -45,14 +45,14 @@ function recenterXYZColumns(table: Table): Table {
   assert(columnNames.includes("y"), "y column is missing");
   assert(columnNames.includes("z"), "z column is missing");
 
-  const newXCol = recenterSingleColumn(table.getChild("x")!.toArray());
-  const newYCol = recenterSingleColumn(table.getChild("y")!.toArray());
-  const newZCol = recenterSingleColumn(table.getChild("z")!.toArray());
+  const newXCol = recenterSingleColumn(table.getChild("x")?.toArray());
+  const newYCol = recenterSingleColumn(table.getChild("y")?.toArray());
+  const newZCol = recenterSingleColumn(table.getChild("z")?.toArray());
 
   //~ building in object of arrays from the original table
   const fields = table.schema.fields;
   const oldTableObject = Object.fromEntries(
-    fields.map((f) => [f.name, table.getChild(f.name)!.toArray()]),
+    fields.map((f) => [f.name, table.getChild(f.name)?.toArray()]),
   );
   const newTable = tableFromArrays({
     ...oldTableObject,
@@ -72,9 +72,9 @@ function normalizeXYZColumns(table: Table): Table {
   assert(columnNames.includes("z"), "z column is missing");
 
   //~ get the original x, y, z positions as arrays
-  const origXCol = table.getChild("x")!.toArray();
-  const origYCol = table.getChild("y")!.toArray();
-  const origZCol = table.getChild("z")!.toArray();
+  const origXCol = table.getChild("x")?.toArray();
+  const origYCol = table.getChild("y")?.toArray();
+  const origZCol = table.getChild("z")?.toArray();
 
   //~ assemble them to vec3 array
   const positions: vec3[] = [];
@@ -98,7 +98,7 @@ function normalizeXYZColumns(table: Table): Table {
   //~ building in object of arrays from the original table
   const fields = table.schema.fields;
   const oldTableObject = Object.fromEntries(
-    fields.map((f) => [f.name, table.getChild(f.name)!.toArray()]),
+    fields.map((f) => [f.name, table.getChild(f.name)?.toArray()]),
   );
   const newTable = tableFromArrays({
     ...oldTableObject,
@@ -126,13 +126,13 @@ function saveOriginalXYZ(table: Table): Table {
   //~ building in object of arrays from the original table
   const fields = table.schema.fields;
   const oldTableObject = Object.fromEntries(
-    fields.map((f) => [f.name, table.getChild(f.name)!.toArray()]),
+    fields.map((f) => [f.name, table.getChild(f.name)?.toArray()]),
   );
 
   //~ copying the original x, y, z columns to new ones
-  const xColAsArray = table.getChild("x")!.toArray();
-  const yColAsArray = table.getChild("y")!.toArray();
-  const zColAsArray = table.getChild("z")!.toArray();
+  const xColAsArray = table.getChild("x")?.toArray();
+  const yColAsArray = table.getChild("y")?.toArray();
+  const zColAsArray = table.getChild("z")?.toArray();
 
   //~ reassemble the table with duplicated x, y, z columns (as xRaw, yRaw, zRaw)
   return tableFromArrays({

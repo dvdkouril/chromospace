@@ -1,3 +1,4 @@
+import type { Table } from "apache-arrow";
 import type { Color as ChromaColor } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
@@ -11,7 +12,6 @@ import type {
 import { ChromatinBasicRenderer } from "./renderer/ChromatinBasicRenderer";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 import { valMap } from "./utils";
-import type { Table } from "apache-arrow";
 
 /**
  * Simple initializer for the ChromatinScene structure.
@@ -203,7 +203,7 @@ function resolveColor(
   } else if (vc.color.field) {
     //~ color should be based on values in a column name in 'field'
     const fieldName = vc.color.field;
-    const valuesColumn = table.getChild(fieldName)!.toArray() as string[];
+    const valuesColumn = table.getChild(fieldName)?.toArray() as string[];
     color = mapValuesToColors(valuesColumn, vc.color);
   } else {
     //~ color should be based on values in the 'values' array
@@ -222,9 +222,9 @@ function buildDisplayableStructure(
   const vc = structure.viewConfig;
 
   //1. assemble the xyz into vec3s
-  const xArr = structure.structure.data.getChild("x")!.toArray();
-  const yArr = structure.structure.data.getChild("y")!.toArray();
-  const zArr = structure.structure.data.getChild("z")!.toArray();
+  const xArr = structure.structure.data.getChild("x")?.toArray();
+  const yArr = structure.structure.data.getChild("y")?.toArray();
+  const zArr = structure.structure.data.getChild("z")?.toArray();
 
   const positions: vec3[] = [];
   for (let i = 0; i < structure.structure.data.numRows; i++) {

@@ -1,6 +1,6 @@
+import type { Schema } from "apache-arrow";
 import { vec3 } from "gl-matrix";
 import type { ChromatinPart } from "../chromatin-types";
-import type { Schema } from "apache-arrow";
 
 export type LoadOptions = {
   center?: boolean;

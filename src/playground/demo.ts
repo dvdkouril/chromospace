@@ -81,8 +81,11 @@ const setupChunkExample = async (): Promise<ChromatinScene> => {
 };
 
 (async () => {
-  const chromatinScene = await setupWholeGenomeExample();
-  //const chromatinScene = await setupChunkExample();
+  const exampleToUse = "whole-genome";
+  const chromatinScene =
+    exampleToUse === "whole-genome"
+      ? await setupWholeGenomeExample()
+      : await setupChunkExample();
 
   const [_, canvas] = display(chromatinScene, {
     alwaysRedraw: false,
