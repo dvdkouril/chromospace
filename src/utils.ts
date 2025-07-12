@@ -2,7 +2,6 @@ import type { Color as ChromaColor, Scale as ChromaScale } from "chroma-js";
 import chroma from "chroma-js";
 import { vec3 } from "gl-matrix";
 import { Color } from "three";
-import type { ChromatinChunk } from "./chromatin-types";
 import type { DrawableMarkSegment } from "./renderer/renderer-types";
 
 //~ https://gka.github.io/chroma.js/#cubehelix
@@ -23,13 +22,6 @@ export const fetchColorFromScale = (
 ) => {
   const scaledColorMap = colorMap.domain([minValue, maxValue]);
   return scaledColorMap(binAssocValue);
-};
-
-export const flattenAllBins = (parts: ChromatinChunk[]): vec3[] => {
-  const allBins: vec3[] = parts.reduce((acc: vec3[], curr: ChromatinChunk) => {
-    return acc.concat(curr.bins);
-  }, []);
-  return allBins;
 };
 
 export const estimateBestSphereSize = (bins: vec3[]): number => {
