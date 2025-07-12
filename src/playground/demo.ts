@@ -1,3 +1,4 @@
+import { ViewConfig } from "../chromatin-types.ts";
 import {
   addStructureToScene,
   type ChromatinScene,
@@ -6,7 +7,25 @@ import {
   loadFromURL,
 } from "../main.ts";
 
-const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
+enum ExampleType {
+  WholeGenome,
+  WholeGenomeWithLinks,
+  Chunk,
+};
+
+const setupWholeGenomeExampleWithLinks = async (): Promise<ChromatinScene> => {
+  const vc: ViewConfig = {
+    color: {
+      field: "chr", //~ uses the 'chr' column in the Arrow table that defines the structure
+      colorScale: "spectral",
+    },
+    links: true,
+  };
+
+  return await setupWholeGenomeExample(vc);
+}
+
+const setupWholeGenomeExample = async (viewConfig: ViewConfig | undefined = undefined): Promise<ChromatinScene> => {
   const urlStevens =
     "https://pub-5c3f8ce35c924114a178c6e929fc3ac7.r2.dev/Stevens-2017_GSM2219497_Cell_1_model_5.arrow";
 
@@ -22,7 +41,7 @@ const setupWholeGenomeExample = async (): Promise<ChromatinScene> => {
   }
   console.log(`loaded structure: ${structure.name}`);
 
-  const vc = {
+  const vc = viewConfig ?? {
     color: {
       field: "chr", //~ uses the 'chr' column in the Arrow table that defines the structure
       colorScale: "spectral",
@@ -81,11 +100,19 @@ const setupChunkExample = async (): Promise<ChromatinScene> => {
 };
 
 (async () => {
-  const exampleToUse = "whole-genome";
-  const chromatinScene =
-    exampleToUse === "whole-genome"
-      ? await setupWholeGenomeExample()
-      : await setupChunkExample();
+  const exampleToUse: ExampleType = ExampleType.WholeGenomeWithLinks as ExampleType;
+  let chromatinScene = initScene();
+  switch (exampleToUse) {
+    case ExampleType.WholeGenome:
+      chromatinScene = await setupWholeGenomeExampleWithLinks();
+      break;
+    case ExampleType.Chunk:
+      chromatinScene = await setupChunkExample();
+      break;
+    case ExampleType.WholeGenomeWithLinks:
+      chromatinScene = await setupWholeGenomeExampleWithLinks();
+      break;
+  }
 
   const [_, canvas] = display(chromatinScene, {
     alwaysRedraw: false,
